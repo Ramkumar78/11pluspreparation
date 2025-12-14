@@ -27,13 +27,41 @@ def init_db():
     if not session.query(UserStats).first():
         session.add(UserStats(current_level=3, total_score=0, streak=0))
 
-    # 2. Seed Words if empty
-    if session.query(Word).count() < 5:
-        print("Seeding Database...")
-        for w in WORD_LIST:
-            if not session.query(Word).filter_by(text=w["text"]).first():
-                session.add(Word(text=w["text"], difficulty=w["diff"], definition=w["def"]))
-        session.commit()
+    # 2. Seed Words: Upsert Logic (Update existing, Insert new)
+    print("Seeding/Updating Database...")
+
+    # Optimization: Load all existing words into a dict for O(1) lookup
+    existing_words = {word.text: word for word in session.query(Word).all()}
+
+    for w in WORD_LIST:
+        existing_word = existing_words.get(w["text"])
+
+        # Handle list type for word_type
+        w_type = w.get("type")
+        if isinstance(w_type, list):
+            w_type = ", ".join(w_type)
+
+        if existing_word:
+            # Update existing fields to ensure compliance
+            # Only update if changed to minimize DB writes?
+            # For simplicity, we assign (SQLAlchemy tracks changes)
+            existing_word.difficulty = w["diff"]
+            existing_word.definition = w["def"]
+            existing_word.word_type = w_type
+            existing_word.synonym = w.get("synonym")
+        else:
+            # Insert new word
+            new_word = Word(
+                text=w["text"],
+                difficulty=w["diff"],
+                definition=w["def"],
+                word_type=w_type,
+                synonym=w.get("synonym")
+            )
+            session.add(new_word)
+            existing_words[w["text"]] = new_word # Keep track of added words in this session if needed
+
+    session.commit()
     session.close()
 
 with app.app_context():
@@ -77,7 +105,9 @@ def next_word():
         "streak": user.streak,
         # Send text for TTS but frontend should hide it.
         # For a 10yo, we prioritize learning features (pronunciation) over absolute anti-cheat.
-        "tts_text": selected.text
+        "tts_text": selected.text,
+        "word_type": selected.word_type,
+        "synonym": selected.synonym
     }
     session.close()
     return jsonify(response)
