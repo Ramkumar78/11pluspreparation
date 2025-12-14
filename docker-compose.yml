@@ -1,20 +1,20 @@
 services:
   backend:
-    build: ./backend
+    build: ./VocabQuest/backend
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - ./VocabQuest/backend:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
 
   frontend:
-    build: ./frontend
+    build: ./VocabQuest/frontend
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend/src:/app/src
+      - ./VocabQuest/frontend/src:/app/src
     environment:
       - VITE_API_URL=http://localhost:5000
     depends_on:
