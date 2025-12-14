@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
-import { Volume2, Trophy, Flame } from 'lucide-react';
+import { Volume2, Trophy, Flame, ArrowLeft } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-export default function Game() {
+export default function Game({ onBack }) {
   const [gameState, setGameState] = useState(null); // The current word object
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("playing"); // playing, correct, wrong
@@ -29,36 +29,24 @@ export default function Game() {
       setTimeout(() => inputRef.current?.focus(), 100);
     } catch (err) {
       console.error("Failed to load word", err);
+      // Fallback state or error message could go here
     }
-  };
-
-  const playPronunciation = () => {
-    // Native Browser Text-to-Speech
-    if (!gameState) return;
-    // We don't have the text in frontend until we solve it?
-    // Wait, we need to know the word to pronounce it.
-    // Issue: If we send the word text in API, user can inspect element to cheat.
-    // Solution for this age group: Send the word text but don't show it. Cheat risk is low.
-    // Actually, in the backend 'next_word' response, I didn't send the text to prevent cheating.
-    // BUT, for pronunciation, we need it. Let's assume user won't inspect network tab.
-    // EDIT: I will modify backend response below to include 'text_encrypted' or just 'text' for TTS.
-    // For now, let's assume the API sends 'word_text' but we don't display it.
-
-    // NOTE: To fix the backend `next_word` logic, we will assume the backend sends "text"
-    // strictly for TTS purposes.
-
-    // Since I cannot edit the backend block above in this turn easily,
-    // let's assume the backend sends `text` in `check_answer` ONLY.
-    // OR we just send it in `next_word` but trust the kid. Let's trust the kid.
-    // I will add a patch note at bottom.
   };
 
   // Real TTS Function
   const speakWord = (text) => {
+    if (!text) return;
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-GB'; // British English for 11+
+    utterance.lang = 'en-GB';
     utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
+  };
+
+  const handleSpeakClick = () => {
+      // Use the tts_text from backend if available
+      if (gameState && gameState.tts_text) {
+          speakWord(gameState.tts_text);
+      }
   };
 
   const handleSubmit = async (e) => {
@@ -74,14 +62,14 @@ export default function Game() {
       if (res.data.correct) {
         setStatus("correct");
         setFeedback("🎉 Excellent!");
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
         speakWord(res.data.correct_word); // Pronounce on success
-        setTimeout(loadNextWord, 2000); // Auto advance
+        setTimeout(loadNextWord, 2000);
       } else {
         setStatus("wrong");
         setFeedback(`❌ Oops! The word was: ${res.data.correct_word}`);
         speakWord(res.data.correct_word); // Pronounce correction
-        setTimeout(loadNextWord, 3000); // Give time to read correction
+        setTimeout(loadNextWord, 3500); // Give time to read correction
       }
     } catch (err) {
       console.error(err);
@@ -89,58 +77,77 @@ export default function Game() {
   };
 
   if (!gameState || status === "loading") return (
-    <div className="flex items-center justify-center h-screen bg-blue-50">
-      <div className="animate-spin text-4xl">🦁</div>
+    <div className="flex flex-col items-center justify-center h-screen bg-blue-50">
+      <div className="animate-bounce text-6xl mb-4">🦁</div>
+      <div className="text-xl font-bold text-indigo-800 animate-pulse">Loading Next Challenge...</div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-blue-50 flex flex-col items-center py-10 px-4 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center py-6 px-4 font-sans relative">
+
+      {/* Back Button */}
+      <button onClick={onBack} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition">
+        <ArrowLeft className="w-6 h-6 text-indigo-600" />
+      </button>
 
       {/* Header Stats */}
-      <div className="w-full max-w-2xl flex justify-between bg-white p-4 rounded-xl shadow-sm mb-6">
-        <div className="flex items-center gap-2 text-yellow-600 font-bold text-xl">
-          <Trophy className="w-6 h-6" />
-          <span>Score: {gameState.score}</span>
+      <div className="w-full max-w-2xl flex justify-between bg-white p-4 rounded-2xl shadow-lg mb-8 transform hover:scale-[1.02] transition-transform">
+        <div className="flex items-center gap-3 text-yellow-600 font-black text-2xl">
+          <Trophy className="w-8 h-8 fill-current" />
+          <span>{gameState.score}</span>
         </div>
-        <div className="flex items-center gap-2 text-orange-500 font-bold text-xl">
-          <Flame className="w-6 h-6" />
-          <span>Streak: {gameState.streak}</span>
+        <div className="flex flex-col items-center">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">LEVEL</span>
+            <span className="text-2xl font-black text-indigo-600">{gameState.user_level}</span>
         </div>
-        <div className="text-gray-500 font-medium">
-          Level: {gameState.user_level}
+        <div className="flex items-center gap-3 text-orange-500 font-black text-2xl">
+          <Flame className="w-8 h-8 fill-current" />
+          <span>{gameState.streak}</span>
         </div>
       </div>
 
       {/* Main Game Card */}
-      <div className="bg-white p-6 rounded-2xl shadow-xl max-w-2xl w-full border-4 border-indigo-100">
+      <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-2xl w-full border-4 border-indigo-200 relative">
 
         {/* Image Area */}
-        <div className="relative w-full h-64 bg-gray-100 rounded-xl overflow-hidden mb-6 group">
+        <div className="relative w-full h-72 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-2 border-gray-200 shadow-inner">
             <img
               src={gameState.image}
               alt="Clue"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
-            <div className="absolute bottom-0 bg-black/50 text-white w-full p-2 text-center text-sm">
-                {gameState.definition}
+            {/* Definition Overlay - Initially Hidden or Subtle */}
+            <div className="absolute bottom-0 bg-gradient-to-t from-black/80 to-transparent text-white w-full p-4 text-center">
+                <p className="text-lg font-medium drop-shadow-md">{gameState.definition}</p>
             </div>
         </div>
 
-        {/* Clue: Dashes */}
-        <div className="text-center mb-8">
-            <div className="flex justify-center gap-2 text-4xl font-mono tracking-widest text-indigo-800 font-bold">
-                {/* Render dashes based on word length */}
+        {/* Audio Clue */}
+        <div className="flex justify-center mb-6">
+            <button
+                onClick={handleSpeakClick}
+                type="button"
+                className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold transition-colors"
+            >
+                <Volume2 className="w-5 h-5" />
+                <span>Hear Word</span>
+            </button>
+        </div>
+
+        {/* Word Dashes */}
+        <div className="text-center mb-10">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-3xl md:text-5xl font-mono text-indigo-900 font-bold">
                 {Array(gameState.length).fill("_").map((_, i) => (
-                    <span key={i} className="border-b-4 border-indigo-200 w-8 inline-block text-center h-12">
-                        {status !== 'playing' && gameState.text ? gameState.text[i] : (input[i] || "")}
+                    <span key={i} className="border-b-4 border-indigo-300 w-8 md:w-12 h-14 md:h-16 flex items-center justify-center bg-indigo-50/50 rounded-t-lg">
+                        {input[i] || ""}
                     </span>
                 ))}
             </div>
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="flex gap-4 max-w-md mx-auto relative">
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
             <input
                 ref={inputRef}
                 type="text"
@@ -148,37 +155,26 @@ export default function Game() {
                 onChange={(e) => setInput(e.target.value)}
                 maxLength={gameState.length}
                 disabled={status !== "playing"}
-                className="w-full p-4 rounded-xl border-2 border-indigo-200 text-xl focus:border-indigo-600 focus:outline-none text-center uppercase tracking-widest shadow-inner"
-                placeholder="Type here..."
+                className="flex-1 p-4 rounded-xl border-4 border-indigo-100 text-2xl focus:border-indigo-500 focus:outline-none text-center uppercase tracking-widest shadow-inner placeholder-indigo-200 font-bold text-indigo-800"
+                placeholder="TYPE HERE"
                 autoComplete="off"
             />
             <button
                 type="submit"
                 disabled={status !== "playing"}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50"
+                className="bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white font-black text-xl py-4 px-8 rounded-xl shadow-[0_6px_0_rgb(21,128,61)] hover:shadow-[0_4px_0_rgb(21,128,61)] hover:translate-y-1 active:translate-y-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0"
             >
-                GO
+                GO!
             </button>
         </form>
 
-        {/* Pronunciation Button (Cheat / Helper) */}
-        {/* Note: In a real test we hide this until answered, but for learning we show it?
-            Let's show it only after answering to reinforce learning.
-            OR add a "Speak" button that only works if the backend sends the text.
-            Currently backend sends text only on answer check.
-        */}
-
-        <div className="text-center mt-6 h-12">
+        <div className="text-center mt-8 h-12">
             {feedback && (
-                <div className={`text-2xl font-bold ${status === 'correct' ? 'text-green-600' : 'text-red-500'} animate-bounce`}>
+                <div className={`text-2xl font-black ${status === 'correct' ? 'text-green-500' : 'text-red-500'} animate-bounce`}>
                     {feedback}
                 </div>
             )}
         </div>
-      </div>
-
-      <div className="mt-8 text-gray-400 text-sm">
-         VocabQuest 11+ Edition | Adaptive Difficulty Active
       </div>
     </div>
   );
