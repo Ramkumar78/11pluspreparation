@@ -63,19 +63,13 @@ def next_word():
 
     selected = random.choice(candidates)
 
-    # Fetch image if missing (On-Demand Scraping)
-    if not selected.image_url:
-        print(f"Fetching image for {selected.text}...")
-        try:
-             selected.image_url = get_cartoon_image(selected.text)
-             session.commit()
-        except Exception as e:
-             print(f"Scraping failed: {e}")
+    # Use local image path
+    image_url = f"/images/{selected.text}.jpg"
 
     response = {
         "id": selected.id,
         "difficulty": selected.difficulty,
-        "image": selected.image_url,
+        "image": image_url,
         "definition": selected.definition,
         "length": len(selected.text),
         "user_level": user.current_level,
