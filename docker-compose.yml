@@ -2,7 +2,7 @@ services:
   backend:
     build: ./VocabQuest/backend
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ./VocabQuest/backend:/app
     environment:
@@ -16,6 +16,6 @@ services:
     volumes:
       - ./VocabQuest/frontend/src:/app/src
     environment:
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:5001
     depends_on:
       - backend
