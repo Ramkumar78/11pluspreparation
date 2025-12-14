@@ -158,6 +158,9 @@ export default function Game({ onBack }) {
                 className="flex-1 p-4 rounded-xl border-4 border-indigo-100 text-2xl focus:border-indigo-500 focus:outline-none text-center uppercase tracking-widest shadow-inner placeholder-indigo-200 font-bold text-indigo-800"
                 placeholder="TYPE HERE"
                 autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
             />
             <button
                 type="submit"
