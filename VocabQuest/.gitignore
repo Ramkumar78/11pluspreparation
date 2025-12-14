@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Node
+node_modules/
+dist/
+.DS_Store
