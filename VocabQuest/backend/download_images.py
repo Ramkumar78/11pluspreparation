@@ -13,44 +13,59 @@ def download_images():
         print(f"Creating directory: {IMAGE_DIR}", flush=True)
         os.makedirs(IMAGE_DIR)
 
-    print(f"Downloading images for {len(WORD_LIST)} words...", flush=True)
+    print(f"Downloading images for {len(WORD_LIST)} words (SEQUENTIAL)...", flush=True)
+
+    # Session for connection pooling + User Agent
+    session = requests.Session()
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    })
 
     for i, item in enumerate(WORD_LIST):
         word = item['text']
+        definition = item.get('def', '') # Get definition
+        synonym = item.get('synonym', '')
         filename = f"{word}.jpg"
         filepath = os.path.join(IMAGE_DIR, filename)
 
         if os.path.exists(filepath):
-            print(f"[{i+1}/{len(WORD_LIST)}] {word}: Already exists. Skipping.", flush=True)
-            continue
+            # Check for non-empty
+            if os.path.getsize(filepath) > 0:
+                print(f"[{i+1}/{len(WORD_LIST)}] {word}: Exists. Skipping.", flush=True)
+                continue
 
         print(f"[{i+1}/{len(WORD_LIST)}] {word}: Downloading...", flush=True)
+        
+        url = get_cartoon_image(word, definition, synonym)
 
-        max_retries = 3
+        max_retries = 5
+        success = False
+        
         for attempt in range(max_retries):
             try:
-                url = get_cartoon_image(word)
-                # Increased timeout to 60s as generation takes time
-                response = requests.get(url, timeout=60)
+                response = session.get(url, timeout=60)
+                
                 if response.status_code == 200:
                     with open(filepath, 'wb') as f:
                         f.write(response.content)
-                    print(f"  Saved to {filename}", flush=True)
+                    print(f"  -> SAVED {filename}", flush=True)
+                    success = True
                     break
                 elif response.status_code == 429:
-                    wait_time = (2 ** attempt) + random.uniform(1, 3)
-                    print(f"  Rate limited (429). Retrying in {wait_time:.2f}s...", flush=True)
+                    wait_time = (2 ** attempt) + 5
+                    print(f"  -> Rate Limited (429). Waiting {wait_time}s...", flush=True)
                     time.sleep(wait_time)
                 else:
-                    print(f"  Failed with status code: {response.status_code}. Retrying...", flush=True)
+                    print(f"  -> Failed: {response.status_code}", flush=True)
                     time.sleep(2)
             except Exception as e:
-                print(f"  Error downloading {word} (Attempt {attempt+1}): {e}", flush=True)
+                print(f"  -> Error: {e}", flush=True)
                 time.sleep(2)
-        else:
-             print(f"  Failed to download {word} after {max_retries} attempts.", flush=True)
-
-        # Small delay to avoid hammering
+        
+        if not success:
+            print(f"  -> GAVE UP on {word}", flush=True)
+        
+        # Polite delay between words
         time.sleep(1)
 
 if __name__ == "__main__":

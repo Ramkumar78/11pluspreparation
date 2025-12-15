@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+*.env
+
+# React / Node
+node_modules/
+dist/
+build/
+.DS_Store
+
+# JetBrains / IDE
+.idea/
+.vscode/
+
+# Database (Generated)
+*.db
+*.sqlite3
+VocabQuest/backend/vocab.db
+
+# Logs
+*.log
+
+# Docker
+.docker/
+
+# Explicitly Allow Images (Even though they aren't ignored above, being explicit helps)
+!VocabQuest/frontend/public/images/
