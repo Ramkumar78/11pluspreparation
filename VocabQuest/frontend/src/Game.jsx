@@ -117,17 +117,20 @@ export default function Game({ onBack }) {
       {/* Main Game Card */}
       <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-2xl w-full border-4 border-indigo-200 relative">
 
+        {/* Definition Area - High Priority */}
+        <div className="mb-6 px-2 text-center">
+          <p className="text-2xl md:text-3xl font-black text-indigo-900 leading-tight drop-shadow-sm">
+            "{gameState.definition}"
+          </p>
+        </div>
+
         {/* Image Area */}
-        <div className="relative w-full h-72 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-2 border-gray-200 shadow-inner">
+        <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-4 border-white shadow-lg mx-auto max-w-md">
           <img
             src={gameState.image}
             alt="Clue"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
-          {/* Definition Overlay - Initially Hidden or Subtle */}
-          <div className="absolute bottom-0 bg-gradient-to-t from-black/80 to-transparent text-white w-full p-4 text-center">
-            <p className="text-lg font-medium drop-shadow-md">{gameState.definition}</p>
-          </div>
         </div>
 
         {/* Audio Clue */}
