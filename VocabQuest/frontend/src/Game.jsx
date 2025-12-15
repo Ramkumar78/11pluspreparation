@@ -154,10 +154,12 @@ export default function Game({ onBack }) {
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
+        {/* Input Area */}
+        <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
           <input
             ref={inputRef}
             type="text"
+            name="vocab_input_no_autofill"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             maxLength={gameState.length}
@@ -166,7 +168,7 @@ export default function Game({ onBack }) {
                     ${!canType ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-wait' : 'border-indigo-100 focus:border-indigo-500 text-indigo-800 bg-white'}
                 `}
             placeholder={canType ? "TYPE HERE" : "READ DEFINITION..."}
-            autoComplete="off"
+            autoComplete="one-time-code"
             autoCorrect="off"
             autoCapitalize="none"
             spellCheck="false"
