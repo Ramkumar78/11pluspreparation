@@ -5,9 +5,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
 
-from database import Session, Word, UserStats
+from database import Session, Word, UserStats, MathQuestion
 from scraper import get_cartoon_image
 from seed_list import WORD_LIST
+from math_seed import MATH_LIST
 
 app = Flask(__name__)
 CORS(app)
@@ -61,11 +62,119 @@ def init_db():
             session.add(new_word)
             existing_words[w["text"]] = new_word # Keep track of added words in this session if needed
 
+    # 3. Seed Math Questions
+    print("Seeding Math...")
+    for m in MATH_LIST:
+        if not session.query(MathQuestion).filter_by(text=m["text"]).first():
+            session.add(MathQuestion(
+                text=m["text"],
+                answer=m["answer"],
+                difficulty=m["diff"],
+                topic=m["topic"]
+            ))
+
     session.commit()
     session.close()
 
+def generate_arithmetic(level):
+    ops = ['+', '-', '*', '/']
+    op = random.choice(ops)
+
+    if op == '+':
+        a = random.randint(10, 50 * level)
+        b = random.randint(10, 50 * level)
+        return f"{a} + {b}", str(a + b)
+    elif op == '-':
+        a = random.randint(20, 100 * level)
+        b = random.randint(1, a)
+        return f"{a} - {b}", str(a - b)
+    elif op == '*':
+        a = random.randint(2, 12)
+        b = random.randint(2, 10 * level)
+        return f"{a} x {b}", str(a * b)
+    elif op == '/':
+        b = random.randint(2, 12)
+        ans = random.randint(2, 10 * level)
+        a = b * ans
+        return f"{a} ÷ {b}", str(ans)
+
 with app.app_context():
     init_db()
+
+@app.route('/next_math', methods=['GET'])
+def next_math():
+    session = Session()
+    user = session.query(UserStats).first()
+    if not user:
+         user = UserStats(current_level=3, total_score=0, streak=0)
+         session.add(user)
+         session.commit()
+
+    # 50% chance of Word Problem (DB) vs 50% Arithmetic (Generated)
+    if random.random() > 0.5:
+        # Fetch from DB
+        questions = session.query(MathQuestion).all()
+        if not questions:
+            # Fallback if DB empty
+            q_text, q_ans = generate_arithmetic(user.current_level)
+            q_id = -1
+            q_type = "arithmetic"
+        else:
+            selected = random.choice(questions)
+            q_text = selected.text
+            q_ans = selected.answer
+            q_id = selected.id
+            q_type = "word_problem"
+    else:
+        # Generate on fly
+        q_text, q_ans = generate_arithmetic(user.current_level)
+        q_id = -1 # ID -1 indicates generated
+        q_type = "arithmetic"
+
+    response = {
+        "id": q_id,
+        "type": "math",
+        "question": q_text,
+        "hashed_answer": q_ans, # We encrypt or hide the answer in production
+        "user_level": user.current_level,
+        "score": user.total_score,
+        "streak": user.streak
+    }
+    session.close()
+    return jsonify(response)
+
+@app.route('/check_math', methods=['POST'])
+def check_math():
+    data = request.json
+    user_answer = str(data.get('answer', '')).strip()
+    correct_answer = str(data.get('correct_answer', '')).strip()
+
+    is_correct = (user_answer == correct_answer)
+
+    session = Session()
+    user = session.query(UserStats).first()
+
+    if is_correct:
+        user.streak += 1
+        user.total_score += 10
+        if user.streak % 3 == 0:
+            user.current_level = min(10, user.current_level + 1)
+    else:
+        user.streak = 0
+        # Optional: decrease level on wrong answer?
+        # For now, keeping logic simple as per prompt.
+
+    session.commit()
+
+    result = {
+        "correct": is_correct,
+        "correct_answer": correct_answer,
+        "score": user.total_score,
+        "new_level": user.current_level
+    }
+    session.close()
+    return jsonify(result)
+
 
 @app.route('/next_word', methods=['GET'])
 @limiter.limit("20 per minute")

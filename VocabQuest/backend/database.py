@@ -14,6 +14,15 @@ class Word(Base):
     word_type = Column(String, nullable=True)
     synonym = Column(String, nullable=True)
 
+class MathQuestion(Base):
+    __tablename__ = 'math_questions'
+    id = Column(Integer, primary_key=True)
+    text = Column(String, nullable=False) # The question itself
+    answer = Column(String, nullable=False) # The correct answer
+    options = Column(String, nullable=True) # JSON string for multiple choice options (optional)
+    difficulty = Column(Integer, default=3)
+    topic = Column(String) # e.g., "Algebra", "Geometry", "Word Problem"
+
 class UserStats(Base):
     __tablename__ = 'user_stats'
     id = Column(Integer, primary_key=True)

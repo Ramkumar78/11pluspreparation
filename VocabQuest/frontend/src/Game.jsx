@@ -5,38 +5,48 @@ import { Volume2, Trophy, Flame, ArrowLeft } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-export default function Game({ onBack }) {
-  const [gameState, setGameState] = useState(null); // The current word object
+export default function Game({ onBack, mode = 'vocab' }) {
+  const [gameState, setGameState] = useState(null); // The current word/question object
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("playing"); // playing, correct, wrong
   const [feedback, setFeedback] = useState("");
   const [canType, setCanType] = useState(false); // New state for reading delay
+  const [mathAnswer, setMathAnswer] = useState(null); // Store correct answer for math verification
   const inputRef = useRef(null);
 
   // Initial Load
   useEffect(() => {
-    loadNextWord();
-  }, []);
+    loadNextChallenge();
+  }, [mode]);
 
-  const loadNextWord = async () => {
+  const loadNextChallenge = async () => {
     setStatus("loading");
     try {
-      const res = await axios.get(`${API_URL}/next_word`);
+      const endpoint = mode === 'math' ? '/next_math' : '/next_word';
+      const res = await axios.get(`${API_URL}${endpoint}`);
       setGameState(res.data);
+
+      if (mode === 'math') {
+        setMathAnswer(res.data.hashed_answer);
+      }
+
       setInput("");
       setFeedback("");
       setCanType(false); // Lock input
       setStatus("playing");
 
-      // Force read time: 3 seconds delay
+      // Force read time: 3 seconds delay for Vocab, maybe less for Math?
+      // Keeping it consistent for now or reducing for Math if it's rapid fire.
+      // User said "Rapid-fire arithmetic", so maybe 1 second for Math?
+      const delay = mode === 'math' ? 500 : 3000;
+
       setTimeout(() => {
         setCanType(true);
         inputRef.current?.focus();
-      }, 3000);
+      }, delay);
 
     } catch (err) {
-      console.error("Failed to load word", err);
-      // Fallback state or error message could go here
+      console.error("Failed to load challenge", err);
     }
   };
 
@@ -60,26 +70,49 @@ export default function Game({ onBack }) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    try {
-      const res = await axios.post(`${API_URL}/check_answer`, {
-        id: gameState.id,
-        spelling: input
-      });
+    if (mode === 'vocab') {
+        try {
+            const res = await axios.post(`${API_URL}/check_answer`, {
+                id: gameState.id,
+                spelling: input
+            });
 
-      if (res.data.correct) {
-        setStatus("correct");
-        setFeedback("🎉 Excellent!");
-        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-        speakWord(res.data.correct_word); // Pronounce on success
-        setTimeout(loadNextWord, 2000);
-      } else {
-        setStatus("wrong");
-        setFeedback(`❌ Oops! The word was: ${res.data.correct_word}`);
-        speakWord(res.data.correct_word); // Pronounce correction
-        setTimeout(loadNextWord, 3500); // Give time to read correction
-      }
-    } catch (err) {
-      console.error(err);
+            if (res.data.correct) {
+                setStatus("correct");
+                setFeedback("🎉 Excellent!");
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                speakWord(res.data.correct_word); // Pronounce on success
+                setTimeout(loadNextChallenge, 2000);
+            } else {
+                setStatus("wrong");
+                setFeedback(`❌ Oops! The word was: ${res.data.correct_word}`);
+                speakWord(res.data.correct_word); // Pronounce correction
+                setTimeout(loadNextChallenge, 3500); // Give time to read correction
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    } else {
+        // MATH SUBMIT LOGIC
+        try {
+            const res = await axios.post(`${API_URL}/check_math`, {
+                answer: input,
+                correct_answer: mathAnswer
+            });
+
+            if (res.data.correct) {
+                setStatus("correct");
+                setFeedback("🎉 Correct Calculation!");
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                setTimeout(loadNextChallenge, 1500); // Faster transition for math
+            } else {
+                setStatus("wrong");
+                setFeedback(`❌ The answer was: ${res.data.correct_answer}`);
+                setTimeout(loadNextChallenge, 3500);
+            }
+        } catch (err) {
+            console.error(err);
+        }
     }
   };
 
@@ -117,64 +150,76 @@ export default function Game({ onBack }) {
       {/* Main Game Card */}
       <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-2xl w-full border-4 border-indigo-200 relative">
 
-        {/* Definition Area - High Priority */}
-        <div className="mb-6 px-2 text-center">
-          <p className="text-2xl md:text-3xl font-black text-indigo-900 leading-tight drop-shadow-sm">
-            "{gameState.definition}"
-          </p>
-        </div>
+        {mode === 'math' ? (
+            // MATH UI
+            <div className="mb-8 px-2 text-center min-h-[200px] flex items-center justify-center">
+                <p className="text-3xl md:text-4xl font-black text-indigo-900 leading-tight drop-shadow-sm">
+                    {gameState.question}
+                </p>
+            </div>
+        ) : (
+            // VOCAB UI
+            <>
+                {/* Definition Area */}
+                <div className="mb-6 px-2 text-center">
+                <p className="text-2xl md:text-3xl font-black text-indigo-900 leading-tight drop-shadow-sm">
+                    "{gameState.definition}"
+                </p>
+                </div>
 
-        {/* Image Area */}
-        <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-4 border-white shadow-lg mx-auto max-w-md">
-          <img
-            src={gameState.image}
-            alt="Clue"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        </div>
+                {/* Image Area */}
+                <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-4 border-white shadow-lg mx-auto max-w-md">
+                <img
+                    src={gameState.image}
+                    alt="Clue"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                </div>
 
-        {/* Audio Clue */}
-        <div className="flex justify-center mb-6">
-          <button
-            onClick={handleSpeakClick}
-            type="button"
-            className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold transition-colors"
-          >
-            <Volume2 className="w-5 h-5" />
-            <span>Hear Word</span>
-          </button>
-        </div>
+                {/* Audio Clue */}
+                <div className="flex justify-center mb-6">
+                <button
+                    onClick={handleSpeakClick}
+                    type="button"
+                    className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold transition-colors"
+                >
+                    <Volume2 className="w-5 h-5" />
+                    <span>Hear Word</span>
+                </button>
+                </div>
 
-        {/* Word Dashes */}
-        <div className="text-center mb-10">
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-3xl md:text-5xl font-mono text-indigo-900 font-bold">
-            {Array(gameState.length).fill("_").map((_, i) => (
-              <span key={i} className="border-b-4 border-indigo-300 w-8 md:w-12 h-14 md:h-16 flex items-center justify-center bg-indigo-50/50 rounded-t-lg">
-                {input[i] || ""}
-              </span>
-            ))}
-          </div>
-        </div>
+                 {/* Word Dashes - Only in Vocab Mode */}
+                <div className="text-center mb-10">
+                    <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-3xl md:text-5xl font-mono text-indigo-900 font-bold">
+                        {Array(gameState.length).fill("_").map((_, i) => (
+                        <span key={i} className="border-b-4 border-indigo-300 w-8 md:w-12 h-14 md:h-16 flex items-center justify-center bg-indigo-50/50 rounded-t-lg">
+                            {input[i] || ""}
+                        </span>
+                        ))}
+                    </div>
+                </div>
+            </>
+        )}
 
         {/* Input Area */}
         <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
           <input
             ref={inputRef}
-            name={`vocab_field_${Math.random().toString(36).substring(7)}`}
+            name={`field_${Math.random().toString(36).substring(7)}`}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            maxLength={gameState.length}
+            maxLength={mode === 'vocab' ? gameState.length : 10}
             disabled={status !== "playing" || !canType}
+            type={mode === 'math' ? "number" : "search"}
             className={`flex-1 p-4 rounded-xl border-4 text-2xl focus:outline-none text-center uppercase tracking-widest shadow-inner font-bold transition-all
                     ${!canType ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-wait' : 'border-indigo-100 focus:border-indigo-500 text-indigo-800 bg-white'}
                 `}
-            placeholder={canType ? "TYPE HERE" : "READ DEFINITION..."}
+            placeholder={canType ? (mode === 'math' ? "ENTER NUMBER" : "TYPE HERE") : (mode === 'math' ? "READING..." : "READ DEFINITION...")}
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck="false"
             aria-autocomplete="none"
-            type="search"
             data-lpignore="true"
             data-form-type="other"
           />
