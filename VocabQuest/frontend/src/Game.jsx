@@ -138,6 +138,7 @@ export default function Game({ onBack, mode = 'vocab' }) {
     } else if (mode === 'math') {
         try {
             const res = await axios.post(`${API_URL}/check_math`, {
+                id: gameState.id,
                 answer: input,
                 correct_answer: mathAnswer
             });
