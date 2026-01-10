@@ -1,6 +1,6 @@
 # 🦁 ScholarQuest: The Ultimate 11+ Prep Adventure!
 
-**ScholarQuest** (formerly VocabQuest) is a dual-subject learning tool designed to master 11+ preparation. It keeps young minds (ages 8-12) engaged with high-octane challenges in both Vocabulary and Mathematics.
+**ScholarQuest** (formerly VocabQuest) is a dual-subject learning tool designed to master 11+ preparation. It keeps young minds (ages 8-12) engaged with high-octane challenges in Vocabulary, Mathematics, and Comprehension.
 
 **Focused on the specific requirements of:**
 *   Wilson's School
@@ -20,8 +20,8 @@
 
 ### Stage 2
 *   **Format:** Standard written answers.
-*   **Focus:** Harder, multi-step problems requiring working out.
-*   **ScholarQuest:** Includes complex word problems and explains the "how-to" when an answer is incorrect to teach the methodology.
+*   **Focus:** Harder, multi-step problems requiring working out, and English Comprehension.
+*   **ScholarQuest:** Includes complex word problems and explains the "how-to" when an answer is incorrect to teach the methodology. Now also includes classic English comprehension passages with evidence-based questions.
 
 ---
 
@@ -31,9 +31,10 @@
 *   **🧠 Adaptive Difficulty:**
     *   **Vocab Mode:** Adjusts word difficulty based on performance.
     *   **Maths Mode:** Scales arithmetic complexity and introduces tricky word problems.
-*   **📚 Dual Modes:**
+*   **📚 Triple Modes:**
     *   **VocabQuest:** Visual clues, synonyms, and definitions to expand vocabulary.
     *   **MathsQuest:** Covers key 11+ topics like Algebra, Ratios, Logic, and Geometry.
+    *   **Comprehension:** Read classic passages (e.g., The Secret Garden, Oliver Twist) and answer analysis questions.
 *   **💡 Instant Explanations:** Got a math question wrong? We show you exactly how to solve it.
 *   **🎨 Visual Clues:** Stuck on a word? High-quality cartoons and images provide hints.
 *   **🔊 Audio Pronunciation:** Learn how to say it right!
@@ -47,7 +48,7 @@
 | Start Your Adventure | Master The Challenge |
 | :---: | :---: |
 | ![Start Screen](https://via.placeholder.com/400x250/indigo/white?text=ScholarQuest+Home) | ![Game Screen](https://via.placeholder.com/400x250/white/indigo?text=In-Game+Action) |
-| *Choose between Vocab and Maths to begin!* | *Solve problems, guess words, and win big!* |
+| *Choose between Vocab, Maths, and Comprehension to begin!* | *Solve problems, guess words, and win big!* |
 
 ---
 

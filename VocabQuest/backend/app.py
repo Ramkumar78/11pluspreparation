@@ -1,14 +1,16 @@
 import random
 import socket
+import json
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
 
-from database import Session, Word, UserStats, MathQuestion, TopicProgress
+from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
+from comprehension_seed import COMPREHENSION_LIST
 
 app = Flask(__name__)
 CORS(app)
@@ -81,9 +83,49 @@ def init_db():
         if topic not in existing_progress:
             session.add(TopicProgress(topic=topic, mastery_level=1))
 
-    # Add "Mental Maths" as a default topic for generated arithmetic
     if "Mental Maths" not in existing_progress:
         session.add(TopicProgress(topic="Mental Maths", mastery_level=1))
+
+    # 5. Seed Comprehension Passages
+    print("Seeding Comprehension Passages...")
+    existing_passages = {p.title: p for p in session.query(ComprehensionPassage).all()}
+
+    for c in COMPREHENSION_LIST:
+        passage = existing_passages.get(c["title"])
+        if not passage:
+            passage = ComprehensionPassage(
+                title=c["title"],
+                content=c["content"],
+                topic=c["topic"]
+            )
+            session.add(passage)
+            session.flush() # Flush to get the ID for questions
+        else:
+            # Update content/topic if needed
+            passage.content = c["content"]
+            passage.topic = c["topic"]
+
+        # Seed Questions for this passage
+        # Simple check: delete existing and re-add or check by text. Re-adding is safer for updates.
+        # For simplicity in this script, we'll check by text.
+        existing_qs = {q.question_text: q for q in session.query(ComprehensionQuestion).filter_by(passage_id=passage.id).all()}
+
+        for q_data in c["questions"]:
+            if q_data["text"] not in existing_qs:
+                new_q = ComprehensionQuestion(
+                    passage_id=passage.id,
+                    question_text=q_data["text"],
+                    options=json.dumps(q_data["options"]),
+                    correct_answer=q_data["answer"],
+                    explanation=q_data["explanation"]
+                )
+                session.add(new_q)
+            else:
+                # Update existing
+                q_obj = existing_qs[q_data["text"]]
+                q_obj.options = json.dumps(q_data["options"])
+                q_obj.correct_answer = q_data["answer"]
+                q_obj.explanation = q_data["explanation"]
 
     session.commit()
     session.close()
@@ -119,6 +161,88 @@ def generate_arithmetic(level):
 
 with app.app_context():
     init_db()
+
+# --- Comprehension Routes ---
+
+@app.route('/next_comprehension', methods=['GET'])
+def next_comprehension():
+    """Returns a random comprehension passage and its questions."""
+    session = Session()
+    topic = request.args.get('topic')
+
+    query = session.query(ComprehensionPassage)
+    if topic:
+        query = query.filter_by(topic=topic)
+
+    passages = query.all()
+
+    if not passages:
+        # Fallback to all if topic yielded nothing
+        passages = session.query(ComprehensionPassage).all()
+
+    if not passages:
+        return jsonify({"error": "No passages available"}), 404
+
+    selected = random.choice(passages)
+
+    # Get questions
+    questions_objs = session.query(ComprehensionQuestion).filter_by(passage_id=selected.id).all()
+    questions_data = []
+    for q in questions_objs:
+        questions_data.append({
+            "id": q.id,
+            "text": q.question_text,
+            "options": json.loads(q.options)
+        })
+
+    response = {
+        "id": selected.id,
+        "title": selected.title,
+        "topic": selected.topic,
+        "content": selected.content,
+        "questions": questions_data
+    }
+
+    session.close()
+    return jsonify(response)
+
+@app.route('/check_comprehension', methods=['POST'])
+def check_comprehension():
+    """Checks the answer for a specific comprehension question."""
+    data = request.json
+    q_id = data.get('question_id')
+    user_answer = data.get('answer', '').strip()
+
+    session = Session()
+    user = session.query(UserStats).first()
+    question = session.query(ComprehensionQuestion).filter_by(id=q_id).first()
+
+    if not question:
+        session.close()
+        return jsonify({"error": "Question not found"}), 404
+
+    is_correct = (user_answer.lower() == question.correct_answer.lower())
+
+    # Update score
+    if is_correct:
+        user.total_score += 15 # Comprehensions might be worth more
+        user.streak += 1
+    else:
+        user.streak = 0
+
+    session.commit()
+
+    result = {
+        "correct": is_correct,
+        "correct_answer": question.correct_answer,
+        "explanation": question.explanation,
+        "score": user.total_score
+    }
+
+    session.close()
+    return jsonify(result)
+
+# --- Existing Routes (Math & Words) ---
 
 @app.route('/get_topics', methods=['GET'])
 def get_topics():

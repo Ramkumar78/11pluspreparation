@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 
@@ -39,6 +39,26 @@ class TopicProgress(Base):
     questions_answered = Column(Integer, default=0)
     questions_correct = Column(Integer, default=0)
 
+class ComprehensionPassage(Base):
+    __tablename__ = 'comprehension_passages'
+    id = Column(Integer, primary_key=True)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    topic = Column(String) # e.g., "English Classical", "Sports"
+
+    questions = relationship("ComprehensionQuestion", back_populates="passage")
+
+class ComprehensionQuestion(Base):
+    __tablename__ = 'comprehension_questions'
+    id = Column(Integer, primary_key=True)
+    passage_id = Column(Integer, ForeignKey('comprehension_passages.id'))
+    question_text = Column(String, nullable=False)
+    options = Column(String, nullable=False) # JSON string of options
+    correct_answer = Column(String, nullable=False)
+    explanation = Column(String, nullable=True) # Evidence from text
+
+    passage = relationship("ComprehensionPassage", back_populates="questions")
+
 # Init DB
 db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})
@@ -69,12 +89,17 @@ def migrate_db():
             print("Migrating: Adding explanation column to math_questions...")
             conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
 
-        # Create TopicProgress table if it doesn't exist (handled by create_all usually, but good for safety)
+        # Create TopicProgress table if it doesn't exist
         try:
             conn.execute(text("SELECT mastery_level FROM topic_progress LIMIT 1"))
         except Exception:
-            # Table creation is usually handled by Base.metadata.create_all,
-            # but this block ensures safety if adding to existing DB file
+            pass
+
+        # Create Comprehension tables if they don't exist
+        try:
+            conn.execute(text("SELECT title FROM comprehension_passages LIMIT 1"))
+        except Exception:
+            # Tables are created by create_all, but this checks connectivity
             pass
 
         conn.commit()
