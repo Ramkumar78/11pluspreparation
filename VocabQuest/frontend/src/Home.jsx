@@ -17,6 +17,10 @@ export default function Home({ onStart }) {
 
         <p className="text-xl mb-8 font-medium text-indigo-100 max-w-xl">
           The ultimate 11+ prep adventure! Master Vocabulary and conquer Mathematics to become a true scholar.
+          <br/>
+          <span className="text-yellow-300 text-sm mt-2 block">
+            Focused on Wilson's, Wallington, Sutton, and Nonsuch (SET & Stage 2)
+          </span>
         </p>
 
         <div className="flex flex-col md:flex-row gap-6">

@@ -19,6 +19,7 @@ class MathQuestion(Base):
     id = Column(Integer, primary_key=True)
     text = Column(String, nullable=False) # The question itself
     answer = Column(String, nullable=False) # The correct answer
+    explanation = Column(String, nullable=True) # Explanation for the answer
     options = Column(String, nullable=True) # JSON string for multiple choice options (optional)
     difficulty = Column(Integer, default=3)
     topic = Column(String) # e.g., "Algebra", "Geometry", "Word Problem"
@@ -53,6 +54,14 @@ def migrate_db():
         except Exception:
             print("Migrating: Adding synonym column...")
             conn.execute(text("ALTER TABLE words ADD COLUMN synonym VARCHAR"))
+
+        # Check for explanation column in math_questions
+        try:
+            conn.execute(text("SELECT explanation FROM math_questions LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding explanation column to math_questions...")
+            conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
+
         conn.commit()
 
 migrate_db()
