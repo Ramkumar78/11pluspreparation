@@ -17,7 +17,7 @@ CORS(app)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["2000 per day", "500 per hour"], # Increased for testing
     storage_uri="memory://"
 )
 
@@ -26,92 +26,87 @@ def init_db():
     session = Session()
     # 1. Init User Stats if not exists
     if not session.query(UserStats).first():
-        session.add(UserStats(current_level=3, total_score=0, streak=0))
+        session.add(UserStats(current_level=1, total_score=0, streak=0))
 
-    # 2. Seed Words: Upsert Logic (Update existing, Insert new)
-    print("Seeding/Updating Database...")
-
-    # Optimization: Load all existing words into a dict for O(1) lookup
+    # 2. Seed Words (Existing logic...)
     existing_words = {word.text: word for word in session.query(Word).all()}
-
     for w in WORD_LIST:
         existing_word = existing_words.get(w["text"])
-
-        # Handle list type for word_type
         w_type = w.get("type")
         if isinstance(w_type, list):
             w_type = ", ".join(w_type)
 
         if existing_word:
-            # Update existing fields to ensure compliance
-            # Only update if changed to minimize DB writes?
-            # For simplicity, we assign (SQLAlchemy tracks changes)
             existing_word.difficulty = w["diff"]
             existing_word.definition = w["def"]
             existing_word.word_type = w_type
             existing_word.synonym = w.get("synonym")
         else:
-            # Insert new word
-            new_word = Word(
+            session.add(Word(
                 text=w["text"],
                 difficulty=w["diff"],
                 definition=w["def"],
                 word_type=w_type,
                 synonym=w.get("synonym")
-            )
-            session.add(new_word)
-            existing_words[w["text"]] = new_word # Keep track of added words in this session if needed
+            ))
 
-    # 3. Seed Math Questions (Updated for explanations)
-    print("Seeding Math...")
+    # 3. Seed Math Questions
+    print("Seeding Math Questions...")
+    existing_math = {m.text: m for m in session.query(MathQuestion).all()}
+
     for m in MATH_LIST:
-        existing_q = session.query(MathQuestion).filter_by(text=m["text"]).first()
+        existing_q = existing_math.get(m["text"])
         if existing_q:
-            # Update explanation if it's missing or changed
-            existing_q.explanation = m.get("explanation")
+            # Update explanation/difficulty if changed
             existing_q.answer = m["answer"]
             existing_q.difficulty = m["diff"]
+            existing_q.topic = m["topic"]
+            existing_q.explanation = m.get("explanation", "")
         else:
             session.add(MathQuestion(
                 text=m["text"],
                 answer=m["answer"],
-                explanation=m.get("explanation"),
                 difficulty=m["diff"],
-                topic=m["topic"]
+                topic=m["topic"],
+                explanation=m.get("explanation", "")
             ))
 
     session.commit()
     session.close()
 
 def generate_arithmetic(level):
-    """Generates a question and a simple explanation."""
+    """Generates arithmetic questions suitable for the level if DB runs out."""
     ops = ['+', '-', '*', '/']
-    op = random.choice(ops)
+    # Level 1-3: Easy ops
+    if level <= 3:
+        op = random.choice(['+', '-'])
+        a = random.randint(1, 20)
+        b = random.randint(1, 20)
+    # Level 4-7: Medium ops
+    elif level <= 7:
+        op = random.choice(['+', '-', '*'])
+        a = random.randint(10, 100)
+        b = random.randint(2, 12)
+    # Level 8+: Hard ops
+    else:
+        op = random.choice(['+', '-', '*', '/'])
+        a = random.randint(50, 500)
+        b = random.randint(5, 20)
 
     if op == '+':
-        a = random.randint(10, 50 * level)
-        b = random.randint(10, 50 * level)
-        ans = str(a + b)
-        expl = f"Calculation: {a} + {b} = {ans}"
-        return f"{a} + {b}", ans, expl
+        return f"{a} + {b}", str(a + b)
     elif op == '-':
-        a = random.randint(20, 100 * level)
-        b = random.randint(1, a)
-        ans = str(a - b)
-        expl = f"Calculation: {a} - {b} = {ans}"
-        return f"{a} - {b}", ans, expl
+        if a < b: a, b = b, a # Ensure positive result for younger kids usually
+        return f"{a} - {b}", str(a - b)
     elif op == '*':
-        a = random.randint(2, 12)
-        b = random.randint(2, 10 * level)
-        ans = str(a * b)
-        expl = f"Calculation: {a} x {b} = {ans}"
-        return f"{a} x {b}", ans, expl
+        return f"{a} x {b}", str(a * b)
     elif op == '/':
-        b = random.randint(2, 12)
-        ans_val = random.randint(2, 10 * level)
-        a = b * ans_val
-        expl = f"Calculation: {a} ÷ {b} = {ans_val}. Check: {b} x {ans_val} = {a}"
-        return f"{a} ÷ {b}", str(ans_val), expl
+        # Ensure clean division
+        ans = random.randint(2, 12)
+        a = b * ans
+        return f"{a} ÷ {b}", str(ans)
+
+    return f"{a} + {b}", str(a+b)
 
 with app.app_context():
     init_db()
@@ -121,38 +116,52 @@ def next_math():
     session = Session()
     user = session.query(UserStats).first()
     if not user:
-         user = UserStats(current_level=3, total_score=0, streak=0)
+         user = UserStats(current_level=1, total_score=0, streak=0)
          session.add(user)
          session.commit()
 
-    # 60% chance of Word Problem (DB) vs 40% Arithmetic (Generated) for better variety
-    if random.random() > 0.4:
-        # Fetch from DB
-        questions = session.query(MathQuestion).all()
-        if not questions:
-            q_text, q_ans, q_expl = generate_arithmetic(user.current_level)
-            q_id = -1
-        else:
-            # Simple adaptive logic: try to find question close to user level
-            candidates = [q for q in questions if abs(q.difficulty - user.current_level) <= 2]
-            if not candidates: candidates = questions
+    current_level = user.current_level
 
-            selected = random.choice(candidates)
+    # Adaptive Logic: Select questions based on difficulty range
+    # Easy: 1-3, Medium: 4-7, Hard: 8-10
+    # We broaden the search slightly: +/- 1 of current level
+    min_diff = max(1, current_level - 1)
+    max_diff = min(10, current_level + 2)
+
+    # 70% chance of DB question (Concepts), 30% Generated (Mental Maths)
+    if random.random() > 0.3:
+        # Fetch appropriate questions from DB
+        questions = session.query(MathQuestion).filter(
+            MathQuestion.difficulty >= min_diff,
+            MathQuestion.difficulty <= max_diff
+        ).all()
+
+        # If no questions in range (e.g. at very high level), fallback to all
+        if not questions:
+            questions = session.query(MathQuestion).all()
+
+        if questions:
+            selected = random.choice(questions)
             q_text = selected.text
-            q_ans = selected.answer
-            q_expl = selected.explanation
             q_id = selected.id
+            q_type = selected.topic # e.g. "Algebra", "Geometry"
+        else:
+            # Fallback if DB completely empty
+            q_text, q_ans = generate_arithmetic(current_level)
+            q_id = -1
+            q_type = "Mental Maths"
     else:
         # Generate on fly
-        q_text, q_ans, q_expl = generate_arithmetic(user.current_level)
+        q_text, q_ans = generate_arithmetic(current_level)
         q_id = -1
+        q_type = "Mental Maths"
 
     response = {
         "id": q_id,
         "type": "math",
+        "topic": q_type, # Frontend can display this
         "question": q_text,
-        "hashed_answer": q_ans,
-        "explanation": q_expl, # Send explanation to frontend
+        "generated_answer_check": q_ans if q_id == -1 else None,
         "user_level": user.current_level,
         "score": user.total_score,
         "streak": user.streak
@@ -163,35 +172,59 @@ def next_math():
 @app.route('/check_math', methods=['POST'])
 def check_math():
     data = request.json
-    user_answer = str(data.get('answer', '')).strip().lower() # Normalize
-    correct_answer = str(data.get('correct_answer', '')).strip().lower()
-
-    is_correct = (user_answer == correct_answer)
+    user_answer = str(data.get('answer', '')).strip().lower()
+    q_id = data.get('id')
+    generated_correct_answer = str(data.get('correct_answer', '')).strip().lower()
 
     session = Session()
     user = session.query(UserStats).first()
 
+    is_correct = False
+    explanation = ""
+    correct_val = ""
+
+    if q_id and q_id != -1:
+        # DB lookup
+        question = session.query(MathQuestion).filter_by(id=q_id).first()
+        if question:
+            correct_val = question.answer
+            if user_answer == correct_val.lower():
+                is_correct = True
+            else:
+                is_correct = False
+            explanation = question.explanation
+    else:
+        # Generated arithmetic
+        correct_val = generated_correct_answer
+        if user_answer == correct_val:
+            is_correct = True
+            explanation = "Great mental maths!"
+        else:
+            is_correct = False
+            explanation = f"Let's double check. The answer is {correct_val}."
+
     if is_correct:
         user.streak += 1
         user.total_score += 10
-        if user.streak % 3 == 0:
+        # Adaptive Progression: Increase level every 2 correct answers in a row
+        if user.streak % 2 == 0:
             user.current_level = min(10, user.current_level + 1)
     else:
         user.streak = 0
-        # Optional: decrease level on wrong answer?
-        # For now, keeping logic simple as per prompt.
+        # Optional: Drop level if struggling repeatedly?
+        # For now, we keep it encouraging.
 
     session.commit()
 
     result = {
         "correct": is_correct,
-        "correct_answer": correct_answer,
+        "correct_answer": correct_val,
+        "explanation": explanation,
         "score": user.total_score,
         "new_level": user.current_level
     }
     session.close()
     return jsonify(result)
-
 
 @app.route('/next_word', methods=['GET'])
 @limiter.limit("20 per minute")

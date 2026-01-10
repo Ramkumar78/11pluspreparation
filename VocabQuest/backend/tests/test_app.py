@@ -11,10 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from app import app, init_db
 from database import Base, UserStats, Word
 
-# We need to mock the database session used in app.py
-# However, app.py imports Session directly from database.py.
-# To properly test with a separate DB, we need to monkeypatch the Session factory in app.py or database.py.
-
 @pytest.fixture(scope='function')
 def test_db():
     # Create an in-memory SQLite database for testing
@@ -39,24 +35,23 @@ def test_db():
 def client(monkeypatch, test_db):
     app.config['TESTING'] = True
 
+    # Proxy class to prevent closing the session
+    class NoCloseSession:
+        def __init__(self, session):
+            self.session = session
+
+        def close(self):
+            pass
+
+        def __getattr__(self, attr):
+            return getattr(self.session, attr)
+
     # Mock the Session factory used in app.py
-    # app.py uses: from database import Session
-    # So we need to patch `app.Session` (if imported) or `database.Session`
-
-    # Since app.py does `from database import Session`, checking `app.Session` works if it's bound there.
-    # But better to patch where it's defined or used.
-
-    # Let's patch `app.Session` directly since it's imported in app.py global scope
-    # Wait, `from database import Session` inside app.py makes `Session` available as `app.Session`.
-
-    # We want `Session()` to return our `test_db` session (or a session bound to our test engine).
-    # Since SQLAlchemy Session() creates a new session, we need a factory.
-
-    TestSessionMaker = lambda: test_db
+    TestSessionMaker = lambda: NoCloseSession(test_db)
     monkeypatch.setattr('app.Session', TestSessionMaker)
 
-    # Also need to patch `get_cartoon_image` to avoid network calls
-    monkeypatch.setattr('app.get_cartoon_image', lambda x: "http://mock.image/url")
+    # Mock get_cartoon_image just in case
+    monkeypatch.setattr('app.get_cartoon_image', lambda x: "http://mock.image/url", raising=False)
 
     with app.test_client() as client:
         yield client
@@ -70,11 +65,10 @@ def test_next_word(client):
     assert 'tts_text' in data
     assert data['streak'] == 0
 
-def test_check_answer_correct(client):
-    # Get a word first
-    rv = client.get('/next_word')
-    data = rv.get_json()
-    word_id = data['id']
+def test_check_answer_correct(client, test_db):
+    word = test_db.query(Word).filter_by(text="testword").first()
+    word_id = word.id
+
     # In our seed, word is "testword"
     correct_text = "testword"
 
@@ -88,11 +82,10 @@ def test_check_answer_correct(client):
     assert res_data['correct'] is True
     assert res_data['score'] > 0
 
-def test_check_answer_incorrect(client):
+def test_check_answer_incorrect(client, test_db):
     # Get a word
-    rv = client.get('/next_word')
-    data = rv.get_json()
-    word_id = data['id']
+    word = test_db.query(Word).first()
+    word_id = word.id
 
     # Submit wrong answer
     res = client.post('/check_answer', json={
@@ -102,13 +95,12 @@ def test_check_answer_incorrect(client):
     assert res.status_code == 200
     res_data = res.get_json()
     assert res_data['correct'] is False
-    assert res_data['score'] == 0 # Score shouldn't increase from initial 0
+    assert res_data['score'] == 0
 
-def test_streak_logic(client):
-    # 1. Get word (id will be 1 from seed)
-    rv = client.get('/next_word')
-    data = rv.get_json()
-    word_id = data['id']
+def test_streak_logic(client, test_db):
+    # 1. Get word
+    word = test_db.query(Word).first()
+    word_id = word.id
     text = "testword"
 
     # 2. Correct Answer

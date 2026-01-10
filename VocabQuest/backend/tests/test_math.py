@@ -25,8 +25,9 @@ def test_db():
     session.add(MathQuestion(
         text="What is 2+2?",
         answer="4",
-        difficulty=1,
-        topic="Arithmetic"
+        difficulty=3,
+        topic="Arithmetic",
+        explanation="2 plus 2 is 4."
     ))
     session.commit()
 
@@ -39,11 +40,19 @@ def test_db():
 def client(monkeypatch, test_db):
     app.config['TESTING'] = True
 
+    # Proxy class to prevent closing the session
+    class NoCloseSession:
+        def __init__(self, session):
+            self.session = session
+
+        def close(self):
+            pass
+
+        def __getattr__(self, attr):
+            return getattr(self.session, attr)
+
     # Monkeypatch the Session in app.py to return our test_db session
-    # Note: Since Session() is called as a constructor, we need a lambda that returns the session object
-    # However, Session() returns a NEW session. Our test_db IS a session instance.
-    # So we need `app.Session` to be a callable that returns `test_db`.
-    TestSessionMaker = lambda: test_db
+    TestSessionMaker = lambda: NoCloseSession(test_db)
     monkeypatch.setattr('app.Session', TestSessionMaker)
 
     with app.test_client() as client:
@@ -55,45 +64,56 @@ def test_next_math(client):
     data = rv.get_json()
     assert 'id' in data
     assert 'question' in data
-    assert 'hashed_answer' in data
     assert data['type'] == 'math'
 
-def test_check_math_correct(client):
-    # Test checking a known answer
-    # Since next_math is random (DB or generated), we can't easily rely on the previous flow
-    # unless we force it. But we can test the check_math endpoint directly.
+    # Check if generated or from DB
+    if data['id'] == -1:
+        assert 'generated_answer_check' in data
+    else:
+        assert 'topic' in data
 
-    # We'll rely on the fact that the test DB has UserStats seeded.
+def test_check_math_correct(client, test_db):
+    # Retrieve the question ID from DB
+    q = test_db.query(MathQuestion).first()
+    q_id = q.id # Store id to avoid access after potential expire
 
     res = client.post('/check_math', json={
+        'id': q_id,
         'answer': '4',
-        'correct_answer': '4'
+        'correct_answer': '4' # Should be ignored for DB questions
     })
     assert res.status_code == 200
     res_data = res.get_json()
     assert res_data['correct'] is True
+    assert res_data['explanation'] == "2 plus 2 is 4."
     assert res_data['score'] == 10 # 0 + 10
 
-def test_check_math_incorrect(client):
+def test_check_math_incorrect(client, test_db):
+    q = test_db.query(MathQuestion).first()
+    q_id = q.id
+
     res = client.post('/check_math', json={
+        'id': q_id,
         'answer': '5',
         'correct_answer': '4'
     })
     assert res.status_code == 200
     res_data = res.get_json()
     assert res_data['correct'] is False
+    assert res_data['explanation'] == "2 plus 2 is 4."
     assert res_data['score'] == 0
 
-def test_math_level_up(client):
+def test_math_level_up(client, test_db):
     # User streak starts at 0.
-    # We need 3 correct answers to level up.
+    # We need 2 correct answers to level up.
+
+    q = test_db.query(MathQuestion).first()
+    q_id = q.id
 
     # 1
-    client.post('/check_math', json={'answer': '4', 'correct_answer': '4'})
+    client.post('/check_math', json={'id': q_id, 'answer': '4', 'correct_answer': '4'})
     # 2
-    client.post('/check_math', json={'answer': '4', 'correct_answer': '4'})
-    # 3
-    res = client.post('/check_math', json={'answer': '4', 'correct_answer': '4'})
+    res = client.post('/check_math', json={'id': q_id, 'answer': '4', 'correct_answer': '4'})
 
     data = res.get_json()
-    assert data['new_level'] == 4 # Started at 3, +1 after 3 correct
+    assert data['new_level'] == 4 # Started at 3, +1 after 2 correct
