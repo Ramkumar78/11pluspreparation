@@ -32,7 +32,7 @@ export default function Game({ onBack, mode = 'vocab' }) {
       setGameState(res.data);
 
       if (mode === 'math') {
-        setMathAnswer(res.data.hashed_answer);
+        setMathAnswer(res.data.generated_answer_check);
         setExplanation(res.data.explanation);
       } else if (mode === 'comprehension') {
         if (res.data.questions && res.data.questions.length > 0) {

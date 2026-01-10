@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-export default function MockTest({ onBack }) {
+export default function MockTest({ onBack, type = 'mixed' }) {
   const [test, setTest] = useState(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState({}); // { id: value }
@@ -15,13 +15,13 @@ export default function MockTest({ onBack }) {
 
   useEffect(() => {
     // Fetch new mock test
-    axios.get(`${API_URL}/mock_test`)
+    axios.get(`${API_URL}/mock_test?type=${type}`)
       .then(res => {
         setTest(res.data);
         setTimeLeft(res.data.duration_minutes * 60);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [type]);
 
   // Timer
   useEffect(() => {
@@ -144,19 +144,40 @@ export default function MockTest({ onBack }) {
                 <img src={`${API_URL}${currentQ.image}`} className="h-40 object-contain mb-4 rounded-lg" alt="Clue" onError={(e) => e.target.style.display = 'none'} />
             )}
 
+            {currentQ.type === 'comprehension' && (
+                <div className="w-full mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-200 max-h-60 overflow-y-auto">
+                    <h3 className="font-bold text-lg mb-2">{currentQ.passage_title}</h3>
+                    <p className="whitespace-pre-line text-sm text-gray-700">{currentQ.passage_content}</p>
+                </div>
+            )}
+
             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-8 leading-snug">
                 {currentQ.question}
             </h2>
 
-            <input
-                autoFocus
-                value={answers[currentQ.id] || ""}
-                onChange={(e) => handleAnswerChange(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && nextQuestion()}
-                className="w-full max-w-md p-4 text-center text-2xl border-b-4 border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 rounded-t-lg transition-colors"
-                placeholder="Type answer..."
-                autoComplete="off"
-            />
+            {currentQ.type === 'comprehension' ? (
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+                    {currentQ.options.map((opt, idx) => (
+                        <button
+                            key={idx}
+                            onClick={() => handleAnswerChange(opt)}
+                            className={`p-3 rounded-lg border-2 font-bold text-left transition-all ${answers[currentQ.id] === opt ? 'bg-indigo-100 border-indigo-500 text-indigo-900' : 'bg-white border-gray-200 hover:border-indigo-300'}`}
+                        >
+                            {opt}
+                        </button>
+                    ))}
+                 </div>
+            ) : (
+                <input
+                    autoFocus
+                    value={answers[currentQ.id] || ""}
+                    onChange={(e) => handleAnswerChange(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && nextQuestion()}
+                    className="w-full max-w-md p-4 text-center text-2xl border-b-4 border-gray-200 focus:border-indigo-500 outline-none bg-gray-50 rounded-t-lg transition-colors"
+                    placeholder="Type answer..."
+                    autoComplete="off"
+                />
+            )}
         </div>
 
         <button
