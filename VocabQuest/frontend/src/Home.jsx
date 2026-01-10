@@ -1,7 +1,7 @@
 import React from 'react';
-import { Play, Star, ShieldCheck, Zap, BookOpen } from 'lucide-react';
+import { Play, Star, ShieldCheck, Zap, BookOpen, Clock, LayoutDashboard } from 'lucide-react';
 
-export default function Home({ onStart }) {
+export default function Home({ onStart, onViewChange }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-center text-white p-4">
 
@@ -23,7 +23,7 @@ export default function Home({ onStart }) {
           </span>
         </p>
 
-        <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center">
+        <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center mb-6">
           <button
             onClick={() => onStart('vocab')}
             className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
@@ -49,7 +49,16 @@ export default function Home({ onStart }) {
           </button>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
+            <button onClick={() => onViewChange('mock')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+                <Clock className="text-yellow-300" /> TAKE MOCK EXAM
+            </button>
+            <button onClick={() => onViewChange('dashboard')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+                <LayoutDashboard className="text-yellow-300" /> MY DASHBOARD
+            </button>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             <FeatureCard icon={<Zap className="w-8 h-8 text-yellow-400" />} title="Power Up!" desc="Build your streak to unlock higher levels." />
             <FeatureCard icon={<Star className="w-8 h-8 text-yellow-400" />} title="Earn Rewards" desc="Get points for every correct answer." />
             <FeatureCard icon={<ShieldCheck className="w-8 h-8 text-yellow-400" />} title="Safe & Fun" desc="A secure place to learn and grow." />
