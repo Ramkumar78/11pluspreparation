@@ -12,20 +12,30 @@ export default function Home({ onStart }) {
         </div>
 
         <h1 className="text-6xl font-extrabold mb-4 drop-shadow-lg tracking-tight">
-          Vocab<span className="text-yellow-300">Quest</span>
+          Scholar<span className="text-yellow-300">Quest</span>
         </h1>
 
         <p className="text-xl mb-8 font-medium text-indigo-100 max-w-xl">
-          Embark on an epic journey to master words! Solve puzzles, earn points, and become a vocabulary legend.
+          The ultimate 11+ prep adventure! Master Vocabulary and conquer Mathematics to become a true scholar.
         </p>
 
-        <button
-          onClick={onStart}
-          className="group relative inline-flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-indigo-900 font-black text-3xl py-6 px-16 rounded-full shadow-[0_10px_0_rgb(180,83,9)] hover:shadow-[0_6px_0_rgb(180,83,9)] hover:translate-y-1 transition-all"
-        >
-          <Play className="w-8 h-8 fill-current" />
-          PLAY NOW
-        </button>
+        <div className="flex flex-col md:flex-row gap-6">
+          <button
+            onClick={() => onStart('vocab')}
+            className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl py-6 px-10 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
+          >
+            <Play className="w-8 h-8 fill-current text-yellow-300" />
+            PLAY VOCAB
+          </button>
+
+          <button
+            onClick={() => onStart('math')}
+            className="group relative inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-400 text-white font-black text-2xl py-6 px-10 rounded-full shadow-[0_10px_0_rgb(194,65,12)] hover:shadow-[0_6px_0_rgb(194,65,12)] hover:translate-y-1 transition-all"
+          >
+            <Play className="w-8 h-8 fill-current text-yellow-300" />
+            PLAY MATHS
+          </button>
+        </div>
 
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
             <FeatureCard icon={<Zap className="w-8 h-8 text-yellow-400" />} title="Power Up!" desc="Build your streak to unlock higher levels." />

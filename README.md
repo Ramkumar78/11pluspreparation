@@ -1,17 +1,22 @@
-# 🦁 VocabQuest: The Ultimate Word Adventure!
+# 🦁 ScholarQuest: The Ultimate 11+ Prep Adventure!
 
-**VocabQuest** is not just a learning tool; it's a high-octane journey into the world of words, designed specifically to keep young minds (ages 8-12) engaged, challenged, and gluing them to the screen (in a good way!).
+**ScholarQuest** (formerly VocabQuest) is a dual-subject learning tool designed to master 11+ preparation. It keeps young minds (ages 8-12) engaged with high-octane challenges in both Vocabulary and Mathematics.
 
 ---
 
 ## 🚀 Features That Make Learning Fun
 
 *   **🎮 Gamified Experience:** Earn points, build streaks, and level up! The more you play, the harder it gets.
-*   **🧠 Adaptive Difficulty:** The game gets smarter as you do. It adjusts the word difficulty based on your performance, ensuring you are always challenged but never overwhelmed.
-*   **🎨 Visual Clues:** Stuck on a word? High-quality cartoons and images provide hints to jog your memory.
-*   **🔊 Audio Pronunciation:** Learn how to say it right! Native browser-based pronunciation helps with listening and speaking skills.
+*   **🧠 Adaptive Difficulty:**
+    *   **Vocab Mode:** Adjusts word difficulty based on performance.
+    *   **Maths Mode:** Scales arithmetic complexity and introduces tricky word problems.
+*   **📚 Dual Modes:**
+    *   **VocabQuest:** Visual clues, synonyms, and definitions to expand vocabulary.
+    *   **MathsQuest:** Rapid-fire arithmetic (Stage 1) and multi-step word problems (Stage 2) tailored for 11+ exams (e.g., Wilson's School).
+*   **🎨 Visual Clues:** Stuck on a word? High-quality cartoons and images provide hints.
+*   **🔊 Audio Pronunciation:** Learn how to say it right!
 *   **✨ Flashy Animations:** Confetti for wins, bouncing text, and slick transitions make every interaction feel rewarding.
-*   **🛡️ Kid-Safe Environment:** Secure, sanitized inputs, and curated content mean parents can relax while kids learn.
+*   **🛡️ Kid-Safe Environment:** Secure, sanitized inputs, and curated content.
 
 ---
 
@@ -19,14 +24,14 @@
 
 | Start Your Adventure | Master The Challenge |
 | :---: | :---: |
-| ![Start Screen](https://via.placeholder.com/400x250/indigo/white?text=VocabQuest+Home) | ![Game Screen](https://via.placeholder.com/400x250/white/indigo?text=In-Game+Action) |
-| *Colorful, inviting home screen to get you pumped!* | *Guess the word, see the clues, and win big!* |
+| ![Start Screen](https://via.placeholder.com/400x250/indigo/white?text=ScholarQuest+Home) | ![Game Screen](https://via.placeholder.com/400x250/white/indigo?text=In-Game+Action) |
+| *Choose between Vocab and Maths to begin!* | *Solve problems, guess words, and win big!* |
 
 ---
 
 ## 🛠️ How to Run
 
-VocabQuest is built with **Docker** for easy setup.
+ScholarQuest is built with **Docker** for easy setup.
 
 ### Prerequisites
 *   Docker & Docker Compose
@@ -44,7 +49,7 @@ VocabQuest is built with **Docker** for easy setup.
 
 ## 🧪 Testing & Security
 
-We take quality seriously. VocabQuest comes brim-full of tests and security features.
+We take quality seriously. ScholarQuest comes brim-full of tests and security features.
 
 ### Running Tests
 **Backend:**
@@ -69,6 +74,6 @@ npm test
 ---
 
 ## 🌟 Why Kids Love It?
-> "It's like a video game, but I'm actually learning new words for school!" - *Beta Tester, Age 10*
+> "It's like a video game, but I'm actually learning for my 11+ exams!" - *Future Scholar*
 
-Start your **VocabQuest** today!
+Start your **ScholarQuest** today!
