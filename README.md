@@ -2,6 +2,27 @@
 
 **ScholarQuest** (formerly VocabQuest) is a dual-subject learning tool designed to master 11+ preparation. It keeps young minds (ages 8-12) engaged with high-octane challenges in both Vocabulary and Mathematics.
 
+**Focused on the specific requirements of:**
+*   Wilson's School
+*   Wallington County Grammar School
+*   Sutton Grammar School
+*   Nonsuch High School for Girls
+
+---
+
+## 🚀 Syllabus Focus
+
+### Stage 1 (SET - Selective Eligibility Test)
+*   **Format:** Multiple choice (mostly).
+*   **Focus:** KS2 English & Math with a requirement for speed and accuracy.
+*   **Topics:** Number, Algebra, Ratio, Geometry (angles, area), Data (mean, mode), and Fractions/Decimals/Percentages.
+*   **ScholarQuest:** Provides rapid-fire arithmetic and targeted multiple-choice style questions.
+
+### Stage 2
+*   **Format:** Standard written answers.
+*   **Focus:** Harder, multi-step problems requiring working out.
+*   **ScholarQuest:** Includes complex word problems and explains the "how-to" when an answer is incorrect to teach the methodology.
+
 ---
 
 ## 🚀 Features That Make Learning Fun
@@ -12,7 +33,8 @@
     *   **Maths Mode:** Scales arithmetic complexity and introduces tricky word problems.
 *   **📚 Dual Modes:**
     *   **VocabQuest:** Visual clues, synonyms, and definitions to expand vocabulary.
-    *   **MathsQuest:** Rapid-fire arithmetic (Stage 1) and multi-step word problems (Stage 2) tailored for 11+ exams (e.g., Wilson's School).
+    *   **MathsQuest:** Covers key 11+ topics like Algebra, Ratios, Logic, and Geometry.
+*   **💡 Instant Explanations:** Got a math question wrong? We show you exactly how to solve it.
 *   **🎨 Visual Clues:** Stuck on a word? High-quality cartoons and images provide hints.
 *   **🔊 Audio Pronunciation:** Learn how to say it right!
 *   **✨ Flashy Animations:** Confetti for wins, bouncing text, and slick transitions make every interaction feel rewarding.

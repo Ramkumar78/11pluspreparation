@@ -62,13 +62,20 @@ def init_db():
             session.add(new_word)
             existing_words[w["text"]] = new_word # Keep track of added words in this session if needed
 
-    # 3. Seed Math Questions
+    # 3. Seed Math Questions (Updated for explanations)
     print("Seeding Math...")
     for m in MATH_LIST:
-        if not session.query(MathQuestion).filter_by(text=m["text"]).first():
+        existing_q = session.query(MathQuestion).filter_by(text=m["text"]).first()
+        if existing_q:
+            # Update explanation if it's missing or changed
+            existing_q.explanation = m.get("explanation")
+            existing_q.answer = m["answer"]
+            existing_q.difficulty = m["diff"]
+        else:
             session.add(MathQuestion(
                 text=m["text"],
                 answer=m["answer"],
+                explanation=m.get("explanation"),
                 difficulty=m["diff"],
                 topic=m["topic"]
             ))
@@ -77,26 +84,34 @@ def init_db():
     session.close()
 
 def generate_arithmetic(level):
+    """Generates a question and a simple explanation."""
     ops = ['+', '-', '*', '/']
     op = random.choice(ops)
 
     if op == '+':
         a = random.randint(10, 50 * level)
         b = random.randint(10, 50 * level)
-        return f"{a} + {b}", str(a + b)
+        ans = str(a + b)
+        expl = f"Calculation: {a} + {b} = {ans}"
+        return f"{a} + {b}", ans, expl
     elif op == '-':
         a = random.randint(20, 100 * level)
         b = random.randint(1, a)
-        return f"{a} - {b}", str(a - b)
+        ans = str(a - b)
+        expl = f"Calculation: {a} - {b} = {ans}"
+        return f"{a} - {b}", ans, expl
     elif op == '*':
         a = random.randint(2, 12)
         b = random.randint(2, 10 * level)
-        return f"{a} x {b}", str(a * b)
+        ans = str(a * b)
+        expl = f"Calculation: {a} x {b} = {ans}"
+        return f"{a} x {b}", ans, expl
     elif op == '/':
         b = random.randint(2, 12)
-        ans = random.randint(2, 10 * level)
-        a = b * ans
-        return f"{a} ÷ {b}", str(ans)
+        ans_val = random.randint(2, 10 * level)
+        a = b * ans_val
+        expl = f"Calculation: {a} ÷ {b} = {ans_val}. Check: {b} x {ans_val} = {a}"
+        return f"{a} ÷ {b}", str(ans_val), expl
 
 with app.app_context():
     init_db()
@@ -110,32 +125,34 @@ def next_math():
          session.add(user)
          session.commit()
 
-    # 50% chance of Word Problem (DB) vs 50% Arithmetic (Generated)
-    if random.random() > 0.5:
+    # 60% chance of Word Problem (DB) vs 40% Arithmetic (Generated) for better variety
+    if random.random() > 0.4:
         # Fetch from DB
         questions = session.query(MathQuestion).all()
         if not questions:
-            # Fallback if DB empty
-            q_text, q_ans = generate_arithmetic(user.current_level)
+            q_text, q_ans, q_expl = generate_arithmetic(user.current_level)
             q_id = -1
-            q_type = "arithmetic"
         else:
-            selected = random.choice(questions)
+            # Simple adaptive logic: try to find question close to user level
+            candidates = [q for q in questions if abs(q.difficulty - user.current_level) <= 2]
+            if not candidates: candidates = questions
+
+            selected = random.choice(candidates)
             q_text = selected.text
             q_ans = selected.answer
+            q_expl = selected.explanation
             q_id = selected.id
-            q_type = "word_problem"
     else:
         # Generate on fly
-        q_text, q_ans = generate_arithmetic(user.current_level)
-        q_id = -1 # ID -1 indicates generated
-        q_type = "arithmetic"
+        q_text, q_ans, q_expl = generate_arithmetic(user.current_level)
+        q_id = -1
 
     response = {
         "id": q_id,
         "type": "math",
         "question": q_text,
-        "hashed_answer": q_ans, # We encrypt or hide the answer in production
+        "hashed_answer": q_ans,
+        "explanation": q_expl, # Send explanation to frontend
         "user_level": user.current_level,
         "score": user.total_score,
         "streak": user.streak
@@ -146,8 +163,8 @@ def next_math():
 @app.route('/check_math', methods=['POST'])
 def check_math():
     data = request.json
-    user_answer = str(data.get('answer', '')).strip()
-    correct_answer = str(data.get('correct_answer', '')).strip()
+    user_answer = str(data.get('answer', '')).strip().lower() # Normalize
+    correct_answer = str(data.get('correct_answer', '')).strip().lower()
 
     is_correct = (user_answer == correct_answer)
 
