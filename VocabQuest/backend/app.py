@@ -7,6 +7,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
 
+from sqlalchemy.sql.expression import func
 from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
@@ -161,6 +162,110 @@ def generate_arithmetic(level):
 
 with app.app_context():
     init_db()
+
+# --- NEW: FEATURES ---
+
+@app.route('/mock_test', methods=['GET'])
+def get_mock_test():
+    """Generates a mixed 11+ mock test (Maths + Vocab)."""
+    session = Session()
+
+    # 1. Fetch random selection of Math questions (e.g., 10)
+    math_qs = session.query(MathQuestion).order_by(func.random()).limit(10).all()
+
+    # 2. Fetch random selection of Vocab words (e.g., 10)
+    vocab_qs = session.query(Word).order_by(func.random()).limit(10).all()
+
+    test_items = []
+
+    for m in math_qs:
+        test_items.append({
+            "id": m.id,
+            "type": "math",
+            "question": m.text,
+            "topic": m.topic,
+            "difficulty": m.difficulty
+        })
+
+    for v in vocab_qs:
+        test_items.append({
+            "id": v.id,
+            "type": "vocab",
+            "question": v.definition, # Show definition, ask for word
+            "image": f"/images/{v.text}.jpg",
+            "length": len(v.text),
+            "difficulty": v.difficulty
+        })
+
+    random.shuffle(test_items)
+    session.close()
+
+    return jsonify({
+        "test_id": f"mock-{random.randint(1000,9999)}",
+        "duration_minutes": 20,
+        "items": test_items
+    })
+
+@app.route('/submit_mock', methods=['POST'])
+def submit_mock():
+    """Batch processes mock test results and returns a scorecard."""
+    data = request.json
+    answers = data.get('answers', [])
+
+    session = Session()
+    user = session.query(UserStats).first()
+
+    score = 0
+    max_score = len(answers) * 10
+    results_breakdown = []
+
+    for item in answers:
+        is_correct = False
+        correct_val = ""
+        explanation = ""
+
+        if item['type'] == 'math':
+            q = session.query(MathQuestion).filter_by(id=item['id']).first()
+            if q:
+                correct_val = q.answer
+                explanation = q.explanation
+                if str(item['user_answer']).strip().lower() == q.answer.lower():
+                    is_correct = True
+
+        elif item['type'] == 'vocab':
+            w = session.query(Word).filter_by(id=item['id']).first()
+            if w:
+                correct_val = w.text
+                if str(item['user_answer']).strip().lower() == w.text.lower():
+                    is_correct = True
+
+        if is_correct:
+            score += 10
+
+        results_breakdown.append({
+            "id": item['id'],
+            "type": item['type'],
+            "correct": is_correct,
+            "your_answer": item['user_answer'],
+            "correct_answer": correct_val,
+            "explanation": explanation
+        })
+
+    # Update User Stats
+    user.total_score += score
+    # Simple logic: if score > 80%, boost level
+    if max_score > 0 and (score / max_score) > 0.8:
+        user.current_level = min(10, user.current_level + 1)
+
+    session.commit()
+    session.close()
+
+    return jsonify({
+        "total_score": score,
+        "max_score": max_score,
+        "percentage": int((score/max_score)*100) if max_score > 0 else 0,
+        "breakdown": results_breakdown
+    })
 
 # --- Comprehension Routes ---
 
