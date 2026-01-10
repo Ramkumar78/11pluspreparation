@@ -104,8 +104,8 @@ def test_check_math_incorrect(client, test_db):
     assert res_data['score'] == 0
 
 def test_math_level_up(client, test_db):
-    # User streak starts at 0.
-    # We need 2 correct answers to level up.
+    # With topic-based progression, we track topic level starting at 1.
+    # We need 3 correct answers to level up the topic mastery.
 
     q = test_db.query(MathQuestion).first()
     q_id = q.id
@@ -116,4 +116,9 @@ def test_math_level_up(client, test_db):
     res = client.post('/check_math', json={'id': q_id, 'answer': '4', 'correct_answer': '4'})
 
     data = res.get_json()
-    assert data['new_level'] == 4 # Started at 3, +1 after 2 correct
+    assert data['new_level'] == 1 # Still 1 after 2 answers
+
+    # 3
+    res = client.post('/check_math', json={'id': q_id, 'answer': '4', 'correct_answer': '4'})
+    data = res.get_json()
+    assert data['new_level'] == 2 # Leveled up after 3 answers
