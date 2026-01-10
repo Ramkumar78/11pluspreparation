@@ -1,12 +1,12 @@
 import random
+import socket
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
 
-from database import Session, Word, UserStats, MathQuestion
-from scraper import get_cartoon_image
+from database import Session, Word, UserStats, MathQuestion, TopicProgress
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 
@@ -17,18 +17,19 @@ CORS(app)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["2000 per day", "500 per hour"], # Increased for testing
+    default_limits=["5000 per day", "1000 per hour"],
     storage_uri="memory://"
 )
 
 # Helper to Initialize Data
 def init_db():
     session = Session()
+
     # 1. Init User Stats if not exists
     if not session.query(UserStats).first():
-        session.add(UserStats(current_level=1, total_score=0, streak=0))
+        session.add(UserStats(current_level=3, total_score=0, streak=0))
 
-    # 2. Seed Words (Existing logic...)
+    # 2. Seed Words (Standard logic)
     existing_words = {word.text: word for word in session.query(Word).all()}
     for w in WORD_LIST:
         existing_word = existing_words.get(w["text"])
@@ -54,10 +55,13 @@ def init_db():
     print("Seeding Math Questions...")
     existing_math = {m.text: m for m in session.query(MathQuestion).all()}
 
+    # Track topics for TopicProgress init
+    unique_topics = set()
+
     for m in MATH_LIST:
+        unique_topics.add(m["topic"])
         existing_q = existing_math.get(m["text"])
         if existing_q:
-            # Update explanation/difficulty if changed
             existing_q.answer = m["answer"]
             existing_q.difficulty = m["diff"]
             existing_q.topic = m["topic"]
@@ -71,23 +75,30 @@ def init_db():
                 explanation=m.get("explanation", "")
             ))
 
+    # 4. Init Topic Progress for new topics
+    existing_progress = {p.topic: p for p in session.query(TopicProgress).all()}
+    for topic in unique_topics:
+        if topic not in existing_progress:
+            session.add(TopicProgress(topic=topic, mastery_level=1))
+
+    # Add "Mental Maths" as a default topic for generated arithmetic
+    if "Mental Maths" not in existing_progress:
+        session.add(TopicProgress(topic="Mental Maths", mastery_level=1))
+
     session.commit()
     session.close()
 
 def generate_arithmetic(level):
-    """Generates arithmetic questions suitable for the level if DB runs out."""
+    """Generates arithmetic questions suitable for the level."""
     ops = ['+', '-', '*', '/']
-    # Level 1-3: Easy ops
     if level <= 3:
         op = random.choice(['+', '-'])
         a = random.randint(1, 20)
         b = random.randint(1, 20)
-    # Level 4-7: Medium ops
     elif level <= 7:
         op = random.choice(['+', '-', '*'])
         a = random.randint(10, 100)
         b = random.randint(2, 12)
-    # Level 8+: Hard ops
     else:
         op = random.choice(['+', '-', '*', '/'])
         a = random.randint(50, 500)
@@ -96,73 +107,129 @@ def generate_arithmetic(level):
     if op == '+':
         return f"{a} + {b}", str(a + b)
     elif op == '-':
-        if a < b: a, b = b, a # Ensure positive result for younger kids usually
+        if a < b: a, b = b, a
         return f"{a} - {b}", str(a - b)
     elif op == '*':
         return f"{a} x {b}", str(a * b)
     elif op == '/':
-        # Ensure clean division
         ans = random.randint(2, 12)
         a = b * ans
         return f"{a} ÷ {b}", str(ans)
-
     return f"{a} + {b}", str(a+b)
 
 with app.app_context():
     init_db()
+
+@app.route('/get_topics', methods=['GET'])
+def get_topics():
+    """Returns list of topics and user's current mastery level in them."""
+    session = Session()
+    topics = session.query(TopicProgress).all()
+
+    # Calculate percentage completion or simple level
+    result = []
+    for t in topics:
+        # Simple heuristic for 'mastery percentage': (level / 10) * 100
+        # Or based on correct answers. Let's use Level.
+        mastery_pct = (t.mastery_level / 10.0) * 100
+        result.append({
+            "topic": t.topic,
+            "level": t.mastery_level,
+            "mastery": min(100, int(mastery_pct)),
+            "correct": t.questions_correct,
+            "total": t.questions_answered
+        })
+
+    session.close()
+    return jsonify(result)
 
 @app.route('/next_math', methods=['GET'])
 def next_math():
     session = Session()
     user = session.query(UserStats).first()
     if not user:
-         user = UserStats(current_level=1, total_score=0, streak=0)
+         user = UserStats(current_level=3, total_score=0, streak=0)
          session.add(user)
          session.commit()
 
-    current_level = user.current_level
+    selected_topic = request.args.get('topic') # Frontend can pass ?topic=Algebra
 
-    # Adaptive Logic: Select questions based on difficulty range
-    # Easy: 1-3, Medium: 4-7, Hard: 8-10
-    # We broaden the search slightly: +/- 1 of current level
+    q_id = -1
+    q_text = ""
+    q_ans = ""
+    topic_display = ""
+
+    # 1. Determine Difficulty Level
+    # If topic selected, use topic mastery level. Else use global user level.
+    current_level = user.current_level
+    if selected_topic:
+        topic_prog = session.query(TopicProgress).filter_by(topic=selected_topic).first()
+        if topic_prog:
+            current_level = topic_prog.mastery_level
+            topic_display = selected_topic
+        else:
+            # Handle case where topic name is not in progress table for some reason
+            topic_display = selected_topic
+
+    # 2. Select Question
+    # Range: -1 to +2 of current level to keep it challenging but doable
     min_diff = max(1, current_level - 1)
     max_diff = min(10, current_level + 2)
 
-    # 70% chance of DB question (Concepts), 30% Generated (Mental Maths)
-    if random.random() > 0.3:
-        # Fetch appropriate questions from DB
+    if selected_topic and selected_topic != "Mental Maths":
+        # Fetch DB question for specific topic
         questions = session.query(MathQuestion).filter(
+            MathQuestion.topic == selected_topic,
             MathQuestion.difficulty >= min_diff,
             MathQuestion.difficulty <= max_diff
         ).all()
 
-        # If no questions in range (e.g. at very high level), fallback to all
+        # Fallback if no questions in that difficulty range for this topic
         if not questions:
-            questions = session.query(MathQuestion).all()
+             questions = session.query(MathQuestion).filter_by(topic=selected_topic).all()
 
         if questions:
             selected = random.choice(questions)
             q_text = selected.text
             q_id = selected.id
-            q_type = selected.topic # e.g. "Algebra", "Geometry"
+            topic_display = selected.topic
         else:
-            # Fallback if DB completely empty
-            q_text, q_ans = generate_arithmetic(current_level)
-            q_id = -1
-            q_type = "Mental Maths"
-    else:
-        # Generate on fly
+            # Fallback if topic valid but no questions (shouldn't happen with good seed)
+            q_text = "No questions available for this topic yet."
+            q_ans = "0"
+            q_id = -2 # Error code
+
+    elif selected_topic == "Mental Maths":
         q_text, q_ans = generate_arithmetic(current_level)
         q_id = -1
-        q_type = "Mental Maths"
+        topic_display = "Mental Maths"
+
+    else:
+        # Mixed Mode (Default behaviour)
+        if random.random() > 0.3:
+            questions = session.query(MathQuestion).filter(
+                MathQuestion.difficulty >= min_diff,
+                MathQuestion.difficulty <= max_diff
+            ).all()
+            if questions:
+                selected = random.choice(questions)
+                q_text = selected.text
+                q_id = selected.id
+                topic_display = selected.topic
+            else:
+                q_text, q_ans = generate_arithmetic(current_level)
+                topic_display = "Mental Maths"
+        else:
+            q_text, q_ans = generate_arithmetic(current_level)
+            topic_display = "Mental Maths"
 
     response = {
         "id": q_id,
         "type": "math",
-        "topic": q_type, # Frontend can display this
+        "topic": topic_display,
         "question": q_text,
         "generated_answer_check": q_ans if q_id == -1 else None,
-        "user_level": user.current_level,
+        "user_level": current_level,
         "score": user.total_score,
         "streak": user.streak
     }
@@ -174,7 +241,6 @@ def check_math():
     data = request.json
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
-    generated_correct_answer = str(data.get('correct_answer', '')).strip().lower()
 
     session = Session()
     user = session.query(UserStats).first()
@@ -183,11 +249,16 @@ def check_math():
     explanation = ""
     correct_val = ""
 
-    if q_id and q_id != -1:
+    # Identify Topic for progress update
+    actual_topic = "Mental Maths"
+
+    if q_id and q_id > 0:
         # DB lookup
         question = session.query(MathQuestion).filter_by(id=q_id).first()
         if question:
             correct_val = question.answer
+            actual_topic = question.topic
+            # Loose comparison for strings/numbers
             if user_answer == correct_val.lower():
                 is_correct = True
             else:
@@ -195,24 +266,40 @@ def check_math():
             explanation = question.explanation
     else:
         # Generated arithmetic
+        generated_correct_answer = str(data.get('correct_answer', '')).strip().lower()
         correct_val = generated_correct_answer
+        actual_topic = "Mental Maths"
         if user_answer == correct_val:
             is_correct = True
-            explanation = "Great mental maths!"
+            explanation = "Correct calculation!"
         else:
             is_correct = False
-            explanation = f"Let's double check. The answer is {correct_val}."
+            explanation = f"The correct answer was {correct_val}."
 
+    # Update Global Stats
     if is_correct:
         user.streak += 1
         user.total_score += 10
-        # Adaptive Progression: Increase level every 2 correct answers in a row
-        if user.streak % 2 == 0:
-            user.current_level = min(10, user.current_level + 1)
     else:
         user.streak = 0
-        # Optional: Drop level if struggling repeatedly?
-        # For now, we keep it encouraging.
+
+    # Update Topic Stats
+    topic_prog = session.query(TopicProgress).filter_by(topic=actual_topic).first()
+    if not topic_prog:
+        topic_prog = TopicProgress(topic=actual_topic, mastery_level=1, questions_answered=0, questions_correct=0)
+        session.add(topic_prog)
+
+    topic_prog.questions_answered += 1
+    if is_correct:
+        topic_prog.questions_correct += 1
+        # Progression Logic: 3 correct in a row effectively (simple heuristic based on total count)
+        # Simple Adaptive: If they get it right, small chance to bump level up.
+        if topic_prog.questions_correct % 3 == 0:
+             topic_prog.mastery_level = min(10, topic_prog.mastery_level + 1)
+    else:
+        # Regression Logic: If they get it wrong, and level > 1, chance to drop
+        # For child friendliness, we are lenient. Only drop if level > 1
+        pass
 
     session.commit()
 
@@ -221,11 +308,13 @@ def check_math():
         "correct_answer": correct_val,
         "explanation": explanation,
         "score": user.total_score,
-        "new_level": user.current_level
+        "new_level": topic_prog.mastery_level, # Return specific topic level
+        "topic": actual_topic
     }
     session.close()
     return jsonify(result)
 
+# Existing word routes
 @app.route('/next_word', methods=['GET'])
 @limiter.limit("20 per minute")
 def next_word():
@@ -327,5 +416,14 @@ def check_answer():
     session.close()
     return jsonify(result)
 
+def find_available_port(start_port, max_port=5100):
+    """Finds the first available port in the range."""
+    for port in range(start_port, max_port):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(('0.0.0.0', port)) != 0:
+                return port
+    return start_port
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    port = find_available_port(5000)
+    app.run(host='0.0.0.0', port=port)
