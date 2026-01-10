@@ -1,11 +1,11 @@
 import React from 'react';
-import { Play, Star, ShieldCheck, Zap } from 'lucide-react';
+import { Play, Star, ShieldCheck, Zap, BookOpen } from 'lucide-react';
 
 export default function Home({ onStart }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-center text-white p-4">
 
-      <div className="max-w-4xl w-full bg-white/10 backdrop-blur-md rounded-3xl p-8 border-4 border-white/20 shadow-2xl flex flex-col items-center text-center animate-fade-in-up">
+      <div className="max-w-5xl w-full bg-white/10 backdrop-blur-md rounded-3xl p-8 border-4 border-white/20 shadow-2xl flex flex-col items-center text-center animate-fade-in-up">
 
         <div className="mb-6 animate-bounce">
             <span className="text-8xl">🦁</span>
@@ -16,17 +16,17 @@ export default function Home({ onStart }) {
         </h1>
 
         <p className="text-xl mb-8 font-medium text-indigo-100 max-w-xl">
-          The ultimate 11+ prep adventure! Master Vocabulary and conquer Mathematics to become a true scholar.
+          The ultimate 11+ prep adventure! Master Vocabulary, Mathematics and Comprehension to become a true scholar.
           <br/>
           <span className="text-yellow-300 text-sm mt-2 block">
             Focused on Wilson's, Wallington, Sutton, and Nonsuch (SET & Stage 2)
           </span>
         </p>
 
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center">
           <button
             onClick={() => onStart('vocab')}
-            className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-2xl py-6 px-10 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
+            className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
             PLAY VOCAB
@@ -34,10 +34,18 @@ export default function Home({ onStart }) {
 
           <button
             onClick={() => onStart('math')}
-            className="group relative inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-400 text-white font-black text-2xl py-6 px-10 rounded-full shadow-[0_10px_0_rgb(194,65,12)] hover:shadow-[0_6px_0_rgb(194,65,12)] hover:translate-y-1 transition-all"
+            className="group relative inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-400 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(194,65,12)] hover:shadow-[0_6px_0_rgb(194,65,12)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
             PLAY MATHS
+          </button>
+
+          <button
+            onClick={() => onStart('comprehension')}
+            className="group relative inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(5,150,105)] hover:shadow-[0_6px_0_rgb(5,150,105)] hover:translate-y-1 transition-all"
+          >
+            <BookOpen className="w-8 h-8 text-yellow-300" />
+            PLAY COMP
           </button>
         </div>
 
