@@ -167,42 +167,83 @@ with app.app_context():
 
 @app.route('/mock_test', methods=['GET'])
 def get_mock_test():
-    """Generates a mixed 11+ mock test (Maths + Vocab)."""
+    """Generates a mock test based on type (math, english, or mixed)."""
     session = Session()
-
-    # 1. Fetch random selection of Math questions (e.g., 10)
-    math_qs = session.query(MathQuestion).order_by(func.random()).limit(10).all()
-
-    # 2. Fetch random selection of Vocab words (e.g., 10)
-    vocab_qs = session.query(Word).order_by(func.random()).limit(10).all()
-
+    test_type = request.args.get('type', 'mixed') # mixed, math, english
     test_items = []
+    duration = 20
 
-    for m in math_qs:
-        test_items.append({
-            "id": m.id,
-            "type": "math",
-            "question": m.text,
-            "topic": m.topic,
-            "difficulty": m.difficulty
-        })
+    if test_type == 'math':
+        duration = 30
+        math_qs = session.query(MathQuestion).order_by(func.random()).limit(20).all()
+        for m in math_qs:
+            test_items.append({
+                "id": m.id,
+                "type": "math",
+                "question": m.text,
+                "topic": m.topic,
+                "difficulty": m.difficulty
+            })
 
-    for v in vocab_qs:
-        test_items.append({
-            "id": v.id,
-            "type": "vocab",
-            "question": v.definition, # Show definition, ask for word
-            "image": f"/images/{v.text}.jpg",
-            "length": len(v.text),
-            "difficulty": v.difficulty
-        })
+    elif test_type == 'english':
+        duration = 40
+        # 1. Vocab (15 questions)
+        vocab_qs = session.query(Word).order_by(func.random()).limit(15).all()
+        for v in vocab_qs:
+            test_items.append({
+                "id": v.id,
+                "type": "vocab",
+                "question": v.definition,
+                "image": f"/images/{v.text}.jpg",
+                "length": len(v.text),
+                "difficulty": v.difficulty
+            })
 
-    random.shuffle(test_items)
+        # 2. Comprehension (1 Passage, all questions)
+        passage = session.query(ComprehensionPassage).order_by(func.random()).first()
+        if passage:
+            questions = session.query(ComprehensionQuestion).filter_by(passage_id=passage.id).all()
+            for q in questions:
+                test_items.append({
+                    "id": q.id,
+                    "type": "comprehension",
+                    "question": q.question_text,
+                    "options": json.loads(q.options),
+                    "passage_title": passage.title,
+                    "passage_content": passage.content,
+                    "topic": passage.topic
+                })
+    else:
+        # Mixed (Original behavior)
+        math_qs = session.query(MathQuestion).order_by(func.random()).limit(10).all()
+        vocab_qs = session.query(Word).order_by(func.random()).limit(10).all()
+
+        for m in math_qs:
+            test_items.append({
+                "id": m.id,
+                "type": "math",
+                "question": m.text,
+                "topic": m.topic,
+                "difficulty": m.difficulty
+            })
+
+        for v in vocab_qs:
+            test_items.append({
+                "id": v.id,
+                "type": "vocab",
+                "question": v.definition,
+                "image": f"/images/{v.text}.jpg",
+                "length": len(v.text),
+                "difficulty": v.difficulty
+            })
+
+        random.shuffle(test_items)
+
     session.close()
 
     return jsonify({
         "test_id": f"mock-{random.randint(1000,9999)}",
-        "duration_minutes": 20,
+        "duration_minutes": duration,
         "items": test_items
     })
 
@@ -229,7 +270,7 @@ def submit_mock():
             if q:
                 correct_val = q.answer
                 explanation = q.explanation
-                if str(item['user_answer']).strip().lower() == q.answer.lower():
+                if str(item['user_answer']).strip().lower() == str(q.answer).strip().lower():
                     is_correct = True
 
         elif item['type'] == 'vocab':
@@ -237,6 +278,15 @@ def submit_mock():
             if w:
                 correct_val = w.text
                 if str(item['user_answer']).strip().lower() == w.text.lower():
+                    is_correct = True
+
+        elif item['type'] == 'comprehension':
+            q = session.query(ComprehensionQuestion).filter_by(id=item['id']).first()
+            if q:
+                correct_val = q.correct_answer
+                explanation = q.explanation
+                # Exact match expected for multiple choice options usually, but let's be safe with strip/lower
+                if str(item['user_answer']).strip().lower() == q.correct_answer.lower():
                     is_correct = True
 
         if is_correct:
@@ -488,7 +538,7 @@ def check_math():
             correct_val = question.answer
             actual_topic = question.topic
             # Loose comparison for strings/numbers
-            if user_answer == correct_val.lower():
+            if user_answer == str(correct_val).strip().lower():
                 is_correct = True
             else:
                 is_correct = False

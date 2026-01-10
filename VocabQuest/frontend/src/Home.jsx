@@ -50,10 +50,15 @@ export default function Home({ onStart, onViewChange }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
-            <button onClick={() => onViewChange('mock')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
-                <Clock className="text-yellow-300" /> TAKE MOCK EXAM
+            <button onClick={() => onStart('mock_math')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+                <Clock className="text-orange-300" /> MATHS MOCK
             </button>
-            <button onClick={() => onViewChange('dashboard')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => onStart('mock_english')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+                <Clock className="text-emerald-300" /> ENGLISH MOCK
+            </button>
+        </div>
+        <div className="w-full max-w-2xl mb-8">
+            <button onClick={() => onViewChange('dashboard')} className="w-full bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <LayoutDashboard className="text-yellow-300" /> MY DASHBOARD
             </button>
         </div>
