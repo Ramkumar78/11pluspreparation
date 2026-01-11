@@ -25,6 +25,11 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
+# Helper Functions
+def sanitize_filename(title):
+    s = re.sub(r'[^\w\s-]', '', title).strip().lower()
+    return re.sub(r'[-\s]+', '_', s)
+
 # Helper to Initialize Data
 def init_db():
     session = Session()
