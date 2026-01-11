@@ -45,6 +45,7 @@ class ComprehensionPassage(Base):
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     topic = Column(String) # e.g., "English Classical", "Sports"
+    image_url = Column(String, nullable=True)
 
     questions = relationship("ComprehensionQuestion", back_populates="passage")
 
@@ -101,6 +102,12 @@ def migrate_db():
         except Exception:
             # Tables are created by create_all, but this checks connectivity
             pass
+
+        try:
+            conn.execute(text("SELECT image_url FROM comprehension_passages LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding image_url column to comprehension_passages...")
+            conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
 
         conn.commit()
 
