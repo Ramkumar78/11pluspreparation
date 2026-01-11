@@ -241,11 +241,16 @@ export default function Game({ onBack, mode = 'vocab' }) {
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Passage Column */}
                 <div className="flex-1 bg-indigo-50 p-6 rounded-2xl max-h-[60vh] overflow-y-auto">
+                    {gameState.image_url && (
+                         <div className="mb-4 rounded-xl overflow-hidden border-2 border-indigo-200 shadow-sm">
+                            <img src={gameState.image_url} alt={gameState.title} className="w-full h-48 object-cover" />
+                         </div>
+                    )}
                     <h2 className="text-2xl font-bold text-indigo-900 mb-2">{gameState.title}</h2>
                     <span className="inline-block bg-indigo-200 text-indigo-800 text-xs px-2 py-1 rounded-full mb-4 uppercase tracking-wider font-bold">
                         {gameState.topic}
                     </span>
-                    <p className="text-lg text-indigo-800 leading-relaxed whitespace-pre-line">
+                    <p className="text-lg text-indigo-800 leading-relaxed whitespace-pre-line font-medium">
                         {gameState.content}
                     </p>
                 </div>
