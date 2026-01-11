@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import bleach
+import re
 
 from sqlalchemy.sql.expression import func
 from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
@@ -23,6 +24,11 @@ limiter = Limiter(
     default_limits=["5000 per day", "1000 per hour"],
     storage_uri="memory://"
 )
+
+# Helper Functions
+def sanitize_filename(title):
+    s = re.sub(r'[^\w\s-]', '', title).strip().lower()
+    return re.sub(r'[-\s]+', '_', s)
 
 # Helper to Initialize Data
 def init_db():
@@ -202,6 +208,10 @@ def get_mock_test():
         # 2. Comprehension (1 Passage, all questions)
         passage = session.query(ComprehensionPassage).order_by(func.random()).first()
         if passage:
+            p_image = passage.image_url
+            if not p_image:
+                p_image = f"/images/comprehension/{sanitize_filename(passage.title)}.jpg"
+
             questions = session.query(ComprehensionQuestion).filter_by(passage_id=passage.id).all()
             for q in questions:
                 test_items.append({
@@ -211,6 +221,7 @@ def get_mock_test():
                     "options": json.loads(q.options),
                     "passage_title": passage.title,
                     "passage_content": passage.content,
+                    "passage_image": p_image,
                     "topic": passage.topic
                 })
     else:
@@ -350,11 +361,16 @@ def next_comprehension():
             "options": json.loads(q.options)
         })
 
+    image_url = selected.image_url
+    if not image_url:
+        image_url = f"/images/comprehension/{sanitize_filename(selected.title)}.jpg"
+
     response = {
         "id": selected.id,
         "title": selected.title,
         "topic": selected.topic,
         "content": selected.content,
+        "image_url": image_url,
         "questions": questions_data
     }
 

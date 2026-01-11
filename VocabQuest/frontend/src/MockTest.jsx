@@ -146,6 +146,11 @@ export default function MockTest({ onBack, type = 'mixed' }) {
 
             {currentQ.type === 'comprehension' && (
                 <div className="w-full mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-200 max-h-60 overflow-y-auto">
+                     {currentQ.passage_image && (
+                         <div className="mb-2 rounded-lg overflow-hidden border border-gray-200">
+                             <img src={currentQ.passage_image} alt={currentQ.passage_title} className="w-full h-32 object-cover" />
+                         </div>
+                     )}
                     <h3 className="font-bold text-lg mb-2">{currentQ.passage_title}</h3>
                     <p className="whitespace-pre-line text-sm text-gray-700">{currentQ.passage_content}</p>
                 </div>
