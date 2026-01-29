@@ -8,7 +8,7 @@ vi.mock('./Home', () => ({
   default: ({ onStart }) => (
     <div data-testid="home-screen">
       <h1>VocabQuest</h1>
-      <button onClick={onStart}>Start Game</button>
+      <button onClick={() => onStart('vocab')}>Start Game</button>
     </div>
   ),
 }));
