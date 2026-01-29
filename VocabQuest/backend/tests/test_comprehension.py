@@ -63,9 +63,10 @@ def client(monkeypatch, test_db):
         def __getattr__(self, attr):
             return getattr(self.session, attr)
 
-    # Mock the Session factory used in app.py
+    # Mock the Session factory used in app.py and blueprints
     TestSessionMaker = lambda: NoCloseSession(test_db)
     monkeypatch.setattr('app.Session', TestSessionMaker)
+    monkeypatch.setattr('blueprints.comprehension_routes.Session', TestSessionMaker)
 
     with app.test_client() as client:
         yield client

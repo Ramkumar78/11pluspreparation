@@ -6,6 +6,13 @@ import axios from 'axios';
 // Mock axios
 vi.mock('axios');
 
+// Mock react-router-dom
+const navigateMock = vi.fn();
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => navigateMock,
+  useParams: () => ({ type: 'mixed' })
+}));
+
 // Mock canvas-confetti
 vi.mock('canvas-confetti', () => ({
   default: vi.fn(),
@@ -65,13 +72,13 @@ describe('MockTest Component', () => {
   it('renders loading state initially', () => {
     // Setup axios to return promise that doesn't resolve immediately
     axios.get.mockImplementation(() => new Promise(() => {}));
-    render(<MockTest onBack={() => {}} />);
+    render(<MockTest />);
     expect(screen.getByText('Generating Mock Exam...')).toBeInTheDocument();
   });
 
   it('renders test items after loading', async () => {
     axios.get.mockResolvedValueOnce({ data: mockTest });
-    render(<MockTest onBack={() => {}} />);
+    render(<MockTest />);
 
     await waitFor(() => {
         expect(screen.getByText(/QUESTION 1 \/ 2/)).toBeInTheDocument();
@@ -85,7 +92,7 @@ describe('MockTest Component', () => {
     axios.get.mockResolvedValueOnce({ data: mockTest });
     axios.post.mockResolvedValueOnce({ data: mockResult });
 
-    render(<MockTest onBack={() => {}} />);
+    render(<MockTest />);
 
     // Wait for load
     await waitFor(() => {

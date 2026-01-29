@@ -46,9 +46,10 @@ def client(monkeypatch, test_db):
         def __getattr__(self, attr):
             return getattr(self.session, attr)
 
-    # Mock the Session factory used in app.py
+    # Mock the Session factory used in app.py and blueprints
     TestSessionMaker = lambda: NoCloseSession(test_db)
     monkeypatch.setattr('app.Session', TestSessionMaker)
+    monkeypatch.setattr('blueprints.vocab_routes.Session', TestSessionMaker)
 
     # Mock get_cartoon_image just in case
     monkeypatch.setattr('app.get_cartoon_image', lambda x: "http://mock.image/url", raising=False)

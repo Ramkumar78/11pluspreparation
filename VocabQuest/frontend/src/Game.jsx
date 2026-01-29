@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { Volume2, Trophy, Flame, ArrowLeft, Lightbulb } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-export default function Game({ onBack, mode = 'vocab' }) {
+export default function Game() {
+  const navigate = useNavigate();
+  const { mode: paramMode } = useParams();
+  const mode = paramMode || 'vocab';
+
   const [gameState, setGameState] = useState(null);
   const [input, setInput] = useState("");
   const [status, setStatus] = useState("playing");
@@ -178,7 +183,7 @@ export default function Game({ onBack, mode = 'vocab' }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center py-6 px-4 font-sans relative">
-      <button onClick={onBack} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition">
+      <button onClick={() => navigate('/')} className="absolute top-6 left-6 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition">
         <ArrowLeft className="w-6 h-6 text-indigo-600" />
       </button>
 
