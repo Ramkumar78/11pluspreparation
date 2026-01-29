@@ -14,7 +14,7 @@ This roadmap outlines planned features to enhance the 11+ preparation experience
 *   **Description:** Allow users to set custom timers for practice sessions, not just mock exams, to build speed and accuracy.
 *   **Implementation:**
     *   [x] Toggleable timer per question (60s default).
-    *   "Blitz" mode (answer as many as possible in 1 minute).
+    *   [x] "Blitz" mode (answer as many as possible in 1 minute).
 
 ### 3. Adaptive Learning Paths
 *   **Description:** AI-driven progression that automatically targets weak areas based on historical performance.

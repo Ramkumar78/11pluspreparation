@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
-import { Trophy, Flame, ArrowLeft, Lightbulb, Clock } from 'lucide-react';
+import { Trophy, Flame, ArrowLeft, Lightbulb, Clock, Zap, RotateCcw } from 'lucide-react';
 import { MODES } from './constants';
 import VocabGame from './components/VocabGame';
 import MathGame from './components/MathGame';
@@ -27,12 +27,20 @@ export default function Game() {
   const [isTimed, setIsTimed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const [newBadge, setNewBadge] = useState(null);
+
+  // Blitz Mode State
+  const [isBlitz, setIsBlitz] = useState(false);
+  const [blitzTimeLeft, setBlitzTimeLeft] = useState(60);
+  const [blitzStats, setBlitzStats] = useState({ correct: 0, total: 0 });
+  const [showBlitzSummary, setShowBlitzSummary] = useState(false);
+
   const inputRef = useRef(null);
 
   useEffect(() => {
     loadNextChallenge();
   }, [mode]);
 
+  // Per-Question Timer
   useEffect(() => {
     if (!isTimed || status !== 'playing') return;
     if (timeLeft === 0) {
@@ -42,6 +50,27 @@ export default function Game() {
     const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
     return () => clearInterval(timer);
   }, [isTimed, status, timeLeft]);
+
+  // Blitz Timer
+  useEffect(() => {
+    if (!isBlitz || showBlitzSummary) return;
+    if (blitzTimeLeft === 0) {
+      setShowBlitzSummary(true);
+      setIsBlitz(false);
+      return;
+    }
+    const timer = setInterval(() => setBlitzTimeLeft(t => t - 1), 1000);
+    return () => clearInterval(timer);
+  }, [isBlitz, blitzTimeLeft, showBlitzSummary]);
+
+  const startBlitz = () => {
+    setIsBlitz(true);
+    setBlitzTimeLeft(60);
+    setBlitzStats({ correct: 0, total: 0 });
+    setShowBlitzSummary(false);
+    setIsTimed(false); // Disable per-question timer
+    loadNextChallenge();
+  };
 
   const loadNextChallenge = async () => {
     setStatus("loading");
@@ -71,7 +100,7 @@ export default function Game() {
       setCanType(false);
       setStatus("playing");
 
-      const delay = mode === MODES.MATH ? 500 : (mode === MODES.COMPREHENSION ? 1000 : 3000);
+      const delay = isBlitz ? 100 : (mode === MODES.MATH ? 500 : (mode === MODES.COMPREHENSION ? 1000 : 3000));
       setTimeout(() => {
         setCanType(true);
         if (inputRef.current && mode !== MODES.COMPREHENSION) {
@@ -173,17 +202,19 @@ export default function Game() {
           });
 
           if (res.data.correct) {
+              if (isBlitz) setBlitzStats(s => ({ ...s, correct: s.correct + 1, total: s.total + 1 }));
               setStatus("correct");
               setFeedback("🎉 Correct!");
               checkAndShowBadges(res);
-              confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-              setTimeout(loadNextChallenge, 2000);
+              if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+              setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);
           } else {
+              if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
               setStatus("wrong");
               setFeedback(
                   <div className="flex flex-col items-center gap-2">
                       <span>❌ Incorrect. The answer was: {res.data.correct_answer}</span>
-                      {res.data.explanation && (
+                      {res.data.explanation && !isBlitz && (
                            <div className="text-lg bg-yellow-100 text-yellow-800 p-3 rounded-xl border border-yellow-200 mt-2 flex items-start gap-2 text-left max-w-md">
                               <Lightbulb className="w-6 h-6 shrink-0 mt-1" />
                               <span>{res.data.explanation}</span>
@@ -191,7 +222,7 @@ export default function Game() {
                       )}
                   </div>
               );
-              setTimeout(loadNextChallenge, 8000);
+              setTimeout(loadNextChallenge, isBlitz ? 1000 : 8000);
           }
       } catch (err) {
           console.error(err);
@@ -210,17 +241,19 @@ export default function Game() {
             });
 
             if (res.data.correct) {
+                if (isBlitz) setBlitzStats(s => ({ ...s, correct: s.correct + 1, total: s.total + 1 }));
                 setStatus("correct");
                 setFeedback("🎉 Excellent!");
                 checkAndShowBadges(res);
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 speakWord(res.data.correct_word);
-                setTimeout(loadNextChallenge, 2000);
+                setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);
             } else {
+                if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
                 setStatus("wrong");
                 setFeedback(`❌ Oops! The word was: ${res.data.correct_word}`);
                 speakWord(res.data.correct_word);
-                setTimeout(loadNextChallenge, 3500);
+                setTimeout(loadNextChallenge, isBlitz ? 1000 : 3500);
             }
         } catch (err) {
             console.error(err);
@@ -234,17 +267,19 @@ export default function Game() {
             });
 
             if (res.data.correct) {
+                if (isBlitz) setBlitzStats(s => ({ ...s, correct: s.correct + 1, total: s.total + 1 }));
                 setStatus("correct");
                 setFeedback("🎉 Correct!");
                 checkAndShowBadges(res);
-                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                setTimeout(loadNextChallenge, 1500);
+                if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                setTimeout(loadNextChallenge, isBlitz ? 500 : 1500);
             } else {
+                if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
                 setStatus("wrong");
                 setFeedback(
                     <div className="flex flex-col items-center gap-2">
                         <span>❌ The answer was: {res.data.correct_answer}</span>
-                        {explanation && (
+                        {explanation && !isBlitz && (
                              <div className="text-lg bg-yellow-100 text-yellow-800 p-3 rounded-xl border border-yellow-200 mt-2 flex items-start gap-2 text-left max-w-md">
                                 <Lightbulb className="w-6 h-6 shrink-0 mt-1" />
                                 <span>{explanation}</span>
@@ -252,7 +287,7 @@ export default function Game() {
                         )}
                     </div>
                 );
-                setTimeout(loadNextChallenge, 8000);
+                setTimeout(loadNextChallenge, isBlitz ? 1000 : 8000);
             }
         } catch (err) {
             console.error(err);
@@ -273,13 +308,57 @@ export default function Game() {
         <ArrowLeft className="w-6 h-6 text-indigo-600" />
       </button>
 
-      <button
-        onClick={() => setIsTimed(!isTimed)}
-        className={`absolute top-6 right-6 p-2 rounded-full shadow-md transition flex items-center gap-2 font-bold ${isTimed ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
-      >
-        <Clock className="w-6 h-6" />
-        <span className="hidden md:inline">{isTimed ? `TIME: ${timeLeft}s` : 'TIMER OFF'}</span>
-      </button>
+      <div className="absolute top-6 right-6 flex gap-3">
+        {!isBlitz && (
+            <button
+                onClick={() => setIsTimed(!isTimed)}
+                className={`p-2 rounded-full shadow-md transition flex items-center gap-2 font-bold ${isTimed ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+            >
+                <Clock className="w-6 h-6" />
+                <span className="hidden md:inline">{isTimed ? `TIME: ${timeLeft}s` : 'TIMER OFF'}</span>
+            </button>
+        )}
+
+        <button
+            onClick={isBlitz ? () => setIsBlitz(false) : startBlitz}
+            className={`p-2 rounded-full shadow-md transition flex items-center gap-2 font-bold ${isBlitz ? 'bg-orange-600 text-white' : 'bg-white text-orange-600 hover:bg-orange-50'}`}
+        >
+            <Zap className="w-6 h-6" />
+            <span className="hidden md:inline">{isBlitz ? `BLITZ: ${blitzTimeLeft}s` : 'BLITZ MODE'}</span>
+        </button>
+      </div>
+
+      {showBlitzSummary && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm mx-4 transform scale-110">
+               <div className="p-4 bg-orange-100 rounded-full mb-4 text-orange-600 animate-bounce">
+                   <Zap size={64} strokeWidth={3} />
+               </div>
+               <h3 className="text-3xl font-black text-indigo-900 mb-2">BLITZ COMPLETE!</h3>
+               <div className="grid grid-cols-2 gap-4 w-full mb-6">
+                   <div className="bg-green-50 p-4 rounded-xl">
+                       <div className="text-3xl font-black text-green-600">{blitzStats.correct}</div>
+                       <div className="text-sm font-bold text-green-800 uppercase">Correct</div>
+                   </div>
+                   <div className="bg-gray-50 p-4 rounded-xl">
+                       <div className="text-3xl font-black text-gray-600">{blitzStats.total}</div>
+                       <div className="text-sm font-bold text-gray-800 uppercase">Total</div>
+                   </div>
+               </div>
+               <div className="text-xl font-bold text-indigo-600 mb-6">
+                   Accuracy: {blitzStats.total > 0 ? Math.round((blitzStats.correct / blitzStats.total) * 100) : 0}%
+               </div>
+               <div className="flex gap-3 w-full">
+                    <button onClick={() => setShowBlitzSummary(false)} className="flex-1 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-300 transition">
+                        CLOSE
+                    </button>
+                    <button onClick={startBlitz} className="flex-1 bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700 transition flex items-center justify-center gap-2">
+                        <RotateCcw size={20} /> RETRY
+                    </button>
+               </div>
+           </div>
+        </div>
+      )}
 
       {newBadge && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">

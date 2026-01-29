@@ -1,5 +1,6 @@
 import socket
 import json
+import os
 from flask import Flask
 from flask_cors import CORS
 from extensions import limiter
@@ -17,7 +18,17 @@ from blueprints.mock_routes import mock_bp
 from blueprints.core_routes import core_bp
 
 app = Flask(__name__)
-CORS(app)
+
+# Configure CORS
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+env_frontend = os.environ.get("FRONTEND_URL")
+if env_frontend:
+    allowed_origins.append(env_frontend)
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 # Initialize Limiter
 limiter.init_app(app)
