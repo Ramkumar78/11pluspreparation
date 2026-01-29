@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Activity, BookOpen, ArrowLeft, Trophy } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
@@ -9,16 +10,26 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [userStats, setUserStats] = useState(null);
+  const [scoreHistory, setScoreHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
         axios.get(`${API_URL}/get_topics`),
-        axios.get(`${API_URL}/get_user_stats`)
+        axios.get(`${API_URL}/get_user_stats`),
+        axios.get(`${API_URL}/get_score_history`)
     ])
-    .then(([topicsRes, statsRes]) => {
+    .then(([topicsRes, statsRes, historyRes]) => {
         setTopics(topicsRes.data);
         setUserStats(statsRes.data);
+
+        // Process history data for chart
+        const historyData = historyRes.data.map(h => ({
+             ...h,
+             date: new Date(h.timestamp).toLocaleDateString() + ' ' + new Date(h.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        }));
+        setScoreHistory(historyData);
+
         setLoading(false);
     })
     .catch(err => {
@@ -69,6 +80,23 @@ export default function Dashboard() {
               </div>
           </div>
       )}
+
+      {/* Score Trend Chart */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Score Progression</h2>
+        <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={scoreHistory}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" hide />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="score" stroke="#8884d8" activeDot={{ r: 8 }} name="Total Score" />
+                </LineChart>
+            </ResponsiveContainer>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {topics.map((t, idx) => (

@@ -1,6 +1,7 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
+import datetime
 
 Base = declarative_base()
 
@@ -31,6 +32,14 @@ class UserStats(Base):
     total_score = Column(Integer, default=0)
     streak = Column(Integer, default=0)
     badges = Column(Text, default="[]") # JSON list of badges
+
+class ScoreHistory(Base):
+    __tablename__ = 'score_history'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, default=1)
+    score = Column(Integer, default=0)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    mode = Column(String, nullable=True)
 
 class TopicProgress(Base):
     __tablename__ = 'topic_progress'
@@ -66,57 +75,3 @@ db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
-
-def migrate_db():
-    """Simple migration to add missing columns/tables."""
-    from sqlalchemy import text
-    with engine.connect() as conn:
-        # Check for word_type column
-        try:
-            conn.execute(text("SELECT word_type FROM words LIMIT 1"))
-        except Exception:
-            print("Migrating: Adding word_type column...")
-            conn.execute(text("ALTER TABLE words ADD COLUMN word_type VARCHAR"))
-
-        # Check for synonym column
-        try:
-            conn.execute(text("SELECT synonym FROM words LIMIT 1"))
-        except Exception:
-            print("Migrating: Adding synonym column...")
-            conn.execute(text("ALTER TABLE words ADD COLUMN synonym VARCHAR"))
-
-        try:
-            conn.execute(text("SELECT explanation FROM math_questions LIMIT 1"))
-        except Exception:
-            print("Migrating: Adding explanation column to math_questions...")
-            conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
-
-        # Create TopicProgress table if it doesn't exist
-        try:
-            conn.execute(text("SELECT mastery_level FROM topic_progress LIMIT 1"))
-        except Exception:
-            pass
-
-        # Create Comprehension tables if they don't exist
-        try:
-            conn.execute(text("SELECT title FROM comprehension_passages LIMIT 1"))
-        except Exception:
-            # Tables are created by create_all, but this checks connectivity
-            pass
-
-        try:
-            conn.execute(text("SELECT image_url FROM comprehension_passages LIMIT 1"))
-        except Exception:
-            print("Migrating: Adding image_url column to comprehension_passages...")
-            conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
-
-        # Check for badges column
-        try:
-            conn.execute(text("SELECT badges FROM user_stats LIMIT 1"))
-        except Exception:
-            print("Migrating: Adding badges column to user_stats...")
-            conn.execute(text("ALTER TABLE user_stats ADD COLUMN badges TEXT DEFAULT '[]'"))
-
-        conn.commit()
-
-migrate_db()

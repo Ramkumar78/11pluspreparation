@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 import json
-from database import Session, TopicProgress, UserStats
+from database import Session, TopicProgress, UserStats, ScoreHistory
 
 core_bp = Blueprint('core', __name__)
 
@@ -26,6 +26,23 @@ def get_user_stats():
         "level": user.current_level,
         "badges": badges
     }
+    session.close()
+    return jsonify(result)
+
+@core_bp.route('/get_score_history', methods=['GET'])
+def get_score_history():
+    session = Session()
+    # Fetch all history, ordered by time
+    history = session.query(ScoreHistory).order_by(ScoreHistory.timestamp).all()
+
+    result = []
+    for h in history:
+        result.append({
+            "timestamp": h.timestamp.isoformat(),
+            "score": h.score,
+            "mode": h.mode
+        })
+
     session.close()
     return jsonify(result)
 

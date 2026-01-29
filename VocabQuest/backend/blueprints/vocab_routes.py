@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import random
 import bleach
 from extensions import limiter
-from database import Session, Word, UserStats
+from database import Session, Word, UserStats, ScoreHistory
 from utils import check_badges
 
 vocab_bp = Blueprint('vocab', __name__)
@@ -86,6 +86,9 @@ def check_answer():
         # Correct Logic
         user.streak += 1
         user.total_score += 10 + (user.streak * 2)
+
+        # Record Score History
+        session.add(ScoreHistory(score=user.total_score, mode='vocab'))
 
         # Increase Difficulty every 2 consecutive correct answers
         if user.streak % 2 == 0:
