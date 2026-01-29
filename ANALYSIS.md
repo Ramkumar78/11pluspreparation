@@ -1,30 +1,50 @@
-# Analysis of ScholarQuest & Missing Features for 11+ Preparation
+# Project Analysis & Feature Recommendations
 
-ScholarQuest provides a solid foundation with Math, Vocabulary, and Comprehension modules. To further enhance its effectiveness for 11+ exam preparation, the following features are recommended:
+## Overview
+ScholarQuest is a solid foundation for an 11+ preparation tool. It covers Vocabulary, Math, and Comprehension. The architecture is modular (Flask Blueprints + React), making it scalable. However, several key features are missing to make it a complete product for students and parents.
 
-## 1. Verbal & Non-Verbal Reasoning (Critical Gap)
-*   **Non-Verbal Reasoning (NVR):** Implement image-based puzzles (Matrices, Sequences, 3D Building Blocks). This requires a new question type in the backend supporting multiple image assets per question.
-*   **Verbal Reasoning (VR):** Add specific VR question types like "Move a letter", "Code breaking", and "Missing words".
+## Mandatory Features (High Learning Value)
 
-## 2. Smart "Mistake Bank"
-*   **Feature:** Automatically collect every question answered incorrectly into a "Mistake Bank".
-*   **Usage:** Allow users to launch a "Repair Session" that specifically targets these weak points until mastery is achieved.
+### 1. User Profiles & Authentication (Critical)
+*   **Current State:** The application currently supports only a single user (`UserStats.first()`).
+*   **Why it's Mandatory:** Most households prepping for 11+ might have siblings. Also, users need to save progress across devices.
+*   **Priority:** **High**
 
-## 3. Spaced Repetition System (SRS) for Vocabulary
-*   **Feature:** Instead of random word selection, use an algorithm (like SM-2) to schedule reviews. Words answered correctly are shown less frequently; difficult words reappear sooner.
+### 2. "Mistake Bank" / Error Review (Critical)
+*   **Current State:** Feedback is immediate, but there is no way to review previously incorrect questions later.
+*   **Why it's Mandatory:** Learning happens when addressing gaps. A specific mode to re-try only wrong answers is essential for mastery.
+*   **Priority:** **High**
 
-## 4. Multiplayer "Duel" Mode
-*   **Feature:** Real-time 1v1 math or vocab battles.
-*   **Implementation:** Use WebSockets (Socket.io) to sync game state between two clients. Great for engagement and competitive practice.
+### 3. Comprehensive Content Expansion (Verbal & Non-Verbal Reasoning)
+*   **Current State:** Focuses on Math, Vocab, Comprehension.
+*   **Why it's Mandatory:** 11+ exams (GL/CEM) heavily feature VR and NVR. The app is incomplete as a "one-stop-shop" without them.
+*   **Priority:** **High**
 
-## 5. Voice-Activated Spelling Bee
-*   **Feature:** Utilize the Web Speech API to allow students to spell words verbally instead of typing. This mimics real-world usage and is excellent for auditory learners.
+### 4. Detailed Explanations & Walkthroughs
+*   **Current State:** Math has simple explanations. Vocab has definitions.
+*   **Why it's Mandatory:** For Math, step-by-step breakdown (not just text) is better. For Vocab, usage sentences and etymology help retention.
+*   **Priority:** **Medium**
 
-## 6. Contextual Learning Stories
-*   **Feature:** Generate short paragraphs or stories that incorporate the target vocabulary words. This helps students understand nuance and context, not just definitions.
+## Cool Features (High Engagement Value)
 
-## 7. Customizable Mock Exams
-*   **Feature:** Allow parents/students to configure mock exams by granularity (e.g., "Only Fractions, Ratio, and Antonyms", "45 minutes").
+### 1. Advanced Gamification (Avatars & Shop)
+*   **Current State:** Simple Badges and Streak.
+*   **Idea:** Earn "Coins" for correct answers to buy virtual accessories for an avatar.
+*   **Why it's Cool:** Greatly increases retention for the 9-11 age group.
+*   **Priority:** **High**
 
-## 8. Detailed Parent Reporting
-*   **Feature:** Weekly email summaries sent to parents detailing progress, time spent, and specific topics needing attention.
+### 2. "Blitz" Mode / Speed Drills
+*   **Current State:** Timed practice exists, but a dedicated "60 seconds to answer as many as possible" mode is exciting.
+*   **Why it's Cool:** gamifies speed, which is crucial for 11+ exams.
+*   **Priority:** **Medium**
+
+### 3. Multiplayer / Leaderboards
+*   **Current State:** Single player.
+*   **Idea:** Weekly leaderboards (friends or global) or "Challenge a Friend".
+*   **Why it's Cool:** Social motivation.
+*   **Priority:** **Low** (Privacy concerns with kids).
+
+### 4. Text-to-Speech (Pronunciation)
+*   **Current State:** Backend sends `tts_text`, but frontend integration could be more prominent.
+*   **Why it's Cool:** Helps with vocabulary retention and auditory learning.
+*   **Priority:** **Medium**

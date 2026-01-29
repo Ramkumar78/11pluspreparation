@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import random
-from database import Session, UserStats, MathQuestion, TopicProgress
+from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory
 from utils import generate_arithmetic, check_badges
 
 math_bp = Blueprint('math', __name__)
@@ -142,6 +142,9 @@ def check_math():
     if is_correct:
         user.streak += 1
         user.total_score += 10
+
+        # Record Score History
+        session.add(ScoreHistory(score=user.total_score, mode='math'))
     else:
         user.streak = 0
 

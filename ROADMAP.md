@@ -36,7 +36,7 @@ This roadmap outlines planned features to enhance the 11+ preparation experience
 ### 5. Detailed Analytics Dashboard
 *   **Description:** Visual insights into progress.
 *   **Implementation:**
-    *   Line graphs showing score trends over time.
+    *   [x] Line graphs showing score trends over time.
     *   Heatmaps for topic mastery (Green = Mastered, Red = Needs Work).
     *   Compare performance against average/target levels for specific schools.
 
