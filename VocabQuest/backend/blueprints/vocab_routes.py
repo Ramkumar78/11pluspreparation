@@ -3,6 +3,7 @@ import random
 import bleach
 from extensions import limiter
 from database import Session, Word, UserStats
+from utils import check_badges
 
 vocab_bp = Blueprint('vocab', __name__)
 
@@ -96,13 +97,16 @@ def check_answer():
         # Decrease difficulty immediately
         user.current_level = max(1, user.current_level - 1)
 
+    new_badges = check_badges(user)
     session.commit()
 
     result = {
         "correct": is_correct,
-        "correct_word": word.text,
+        "correct_answer": word.text,
+        "correct_word": word.text, # Keep for backward compatibility if needed, or remove. keeping for safety but plan said standardize.
         "new_level": user.current_level,
-        "score": user.total_score
+        "score": user.total_score,
+        "new_badges": new_badges
     }
     session.close()
     return jsonify(result)

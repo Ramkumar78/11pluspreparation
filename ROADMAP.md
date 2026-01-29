@@ -24,10 +24,10 @@ This roadmap outlines planned features to enhance the 11+ preparation experience
 
 ## Engagement & Gamification
 
-### 4. Gamification System
+### 4. Gamification System (Partially Completed)
 *   **Description:** Increase student motivation through rewards.
 *   **Implementation:**
-    *   **Badges:** "Math Whiz", "Streak Master", "Early Bird".
+    *   [x] **Badges:** "Math Whiz", "Streak Master", "Early Bird".
     *   **Avatars:** Unlockable avatars based on points/levels.
     *   **Leaderboards:** Weekly/Monthly leaderboards (optional/anonymous).
 

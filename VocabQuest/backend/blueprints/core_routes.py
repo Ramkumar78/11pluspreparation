@@ -1,7 +1,33 @@
 from flask import Blueprint, jsonify
-from database import Session, TopicProgress
+import json
+from database import Session, TopicProgress, UserStats
 
 core_bp = Blueprint('core', __name__)
+
+@core_bp.route('/get_user_stats', methods=['GET'])
+def get_user_stats():
+    session = Session()
+    user = session.query(UserStats).first()
+    if not user:
+        user = UserStats(current_level=3, total_score=0, streak=0)
+        session.add(user)
+        session.commit()
+
+    badges = []
+    if user.badges:
+        try:
+            badges = json.loads(user.badges)
+        except:
+            badges = []
+
+    result = {
+        "score": user.total_score,
+        "streak": user.streak,
+        "level": user.current_level,
+        "badges": badges
+    }
+    session.close()
+    return jsonify(result)
 
 @core_bp.route('/get_topics', methods=['GET'])
 def get_topics():

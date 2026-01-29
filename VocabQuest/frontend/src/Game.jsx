@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
-import { Volume2, Trophy, Flame, ArrowLeft, Lightbulb, Clock } from 'lucide-react';
+import { Trophy, Flame, ArrowLeft, Lightbulb, Clock } from 'lucide-react';
 import { MODES } from './constants';
+import VocabGame from './components/VocabGame';
+import MathGame from './components/MathGame';
+import ComprehensionGame from './components/ComprehensionGame';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
@@ -20,9 +23,10 @@ export default function Game() {
   const [mathAnswer, setMathAnswer] = useState(null);
   const [explanation, setExplanation] = useState("");
   const [compQuestionId, setCompQuestionId] = useState(null);
-  const [currentCompQuestion, setCurrentCompQuestion] = useState(null); // Add state for current question
+  const [currentCompQuestion, setCurrentCompQuestion] = useState(null);
   const [isTimed, setIsTimed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [newBadge, setNewBadge] = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -94,6 +98,19 @@ export default function Game() {
     }
   };
 
+  const checkAndShowBadges = (res) => {
+    if (res.data.new_badges && res.data.new_badges.length > 0) {
+      setNewBadge(res.data.new_badges[0]);
+      confetti({
+          particleCount: 200,
+          spread: 100,
+          origin: { y: 0.5 },
+          colors: ['#FFD700', '#FFA500', '#FF4500']
+      });
+      setTimeout(() => setNewBadge(null), 5000);
+    }
+  };
+
   const handleTimeout = () => {
     setStatus("wrong");
 
@@ -158,6 +175,7 @@ export default function Game() {
           if (res.data.correct) {
               setStatus("correct");
               setFeedback("🎉 Correct!");
+              checkAndShowBadges(res);
               confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
               setTimeout(loadNextChallenge, 2000);
           } else {
@@ -194,6 +212,7 @@ export default function Game() {
             if (res.data.correct) {
                 setStatus("correct");
                 setFeedback("🎉 Excellent!");
+                checkAndShowBadges(res);
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 speakWord(res.data.correct_word);
                 setTimeout(loadNextChallenge, 2000);
@@ -217,6 +236,7 @@ export default function Game() {
             if (res.data.correct) {
                 setStatus("correct");
                 setFeedback("🎉 Correct!");
+                checkAndShowBadges(res);
                 confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 setTimeout(loadNextChallenge, 1500);
             } else {
@@ -261,6 +281,21 @@ export default function Game() {
         <span className="hidden md:inline">{isTimed ? `TIME: ${timeLeft}s` : 'TIMER OFF'}</span>
       </button>
 
+      {newBadge && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-sm mx-4 transform scale-110">
+               <div className="p-4 bg-yellow-100 rounded-full mb-4 text-yellow-600 animate-bounce">
+                   <Trophy size={64} strokeWidth={3} />
+               </div>
+               <h3 className="text-3xl font-black text-indigo-900 mb-2">BADGE UNLOCKED!</h3>
+               <p className="text-2xl font-bold text-yellow-600 mb-6">{newBadge}</p>
+               <button onClick={() => setNewBadge(null)} className="bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition">
+                   AWESOME!
+               </button>
+           </div>
+        </div>
+      )}
+
       {/* Stats Bar */}
       <div className="w-full max-w-2xl flex justify-between bg-white p-4 rounded-2xl shadow-lg mb-8">
         <div className="flex items-center gap-3 text-yellow-600 font-black text-2xl">
@@ -281,112 +316,42 @@ export default function Game() {
 
       <div className={`bg-white p-8 rounded-3xl shadow-2xl w-full border-4 border-indigo-200 relative ${mode === MODES.COMPREHENSION ? 'max-w-4xl' : 'max-w-2xl'}`}>
 
-        {mode === MODES.MATH && (
-            <div className="mb-8 px-2 text-center min-h-[200px] flex items-center justify-center">
-                <p className="text-3xl md:text-4xl font-black text-indigo-900 leading-tight drop-shadow-sm">
-                    {gameState.question}
-                </p>
-            </div>
-        )}
-
         {mode === MODES.VOCAB && (
-             <>
-                <div className="mb-6 px-2 text-center">
-                <p className="text-2xl md:text-3xl font-black text-indigo-900 leading-tight drop-shadow-sm">
-                    "{gameState.definition}"
-                </p>
-                </div>
-                <div className="relative w-full h-64 bg-gray-100 rounded-2xl overflow-hidden mb-8 group border-4 border-white shadow-lg mx-auto max-w-md">
-                <img src={gameState.image} alt="Clue" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex justify-center mb-6">
-                <button onClick={handleSpeakClick} type="button" className="flex items-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-2 rounded-full font-bold transition-colors">
-                    <Volume2 className="w-5 h-5" /> <span>Hear Word</span>
-                </button>
-                </div>
-                <div className="text-center mb-10">
-                    <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-3xl md:text-5xl font-mono text-indigo-900 font-bold">
-                        {Array(gameState.length).fill("_").map((_, i) => (
-                        <span key={i} className="border-b-4 border-indigo-300 w-8 md:w-12 h-14 md:h-16 flex items-center justify-center bg-indigo-50/50 rounded-t-lg">
-                            {input[i] || ""}
-                        </span>
-                        ))}
-                    </div>
-                </div>
-            </>
-        )}
-
-        {mode === MODES.COMPREHENSION && currentCompQuestion && (
-            <div className="flex flex-col md:flex-row gap-6">
-                {/* Passage Column */}
-                <div className="flex-1 bg-indigo-50 p-6 rounded-2xl max-h-[60vh] overflow-y-auto">
-                    {gameState.image_url && (
-                         <div className="mb-4 rounded-xl overflow-hidden border-2 border-indigo-200 shadow-sm">
-                            <img src={gameState.image_url} alt={gameState.title} className="w-full h-48 object-cover" />
-                         </div>
-                    )}
-                    <h2 className="text-2xl font-bold text-indigo-900 mb-2">{gameState.title}</h2>
-                    <span className="inline-block bg-indigo-200 text-indigo-800 text-xs px-2 py-1 rounded-full mb-4 uppercase tracking-wider font-bold">
-                        {gameState.topic}
-                    </span>
-                    <p className="text-lg text-indigo-800 leading-relaxed whitespace-pre-line font-medium">
-                        {gameState.content}
-                    </p>
-                </div>
-
-                {/* Question Column */}
-                <div className="flex-1 flex flex-col justify-center">
-                    <div className="mb-6">
-                        <span className="text-sm font-bold text-gray-400 uppercase tracking-widest block mb-2">QUESTION</span>
-                        <p className="text-xl font-bold text-gray-800">
-                            {currentCompQuestion.text}
-                        </p>
-                    </div>
-
-                    <div className="space-y-3">
-                        {currentCompQuestion.options.map((option, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => handleCompOptionClick(option)}
-                                disabled={status !== 'playing'}
-                                className="w-full p-4 text-left bg-white border-2 border-indigo-100 hover:border-indigo-500 hover:bg-indigo-50 rounded-xl transition-all font-medium text-lg text-indigo-900 shadow-sm"
-                            >
-                                {option}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {/* Input Form for Math/Vocab */}
-        {mode !== MODES.COMPREHENSION && (
-            <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
-            <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                maxLength={mode === MODES.VOCAB ? gameState.length : 10}
-                disabled={status !== "playing" || !canType}
-                type={mode === MODES.MATH ? "number" : "search"}
-                className={`flex-1 p-4 rounded-xl border-4 text-2xl focus:outline-none text-center uppercase tracking-widest shadow-inner font-bold transition-all
-                        ${!canType ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-wait' : 'border-indigo-100 focus:border-indigo-500 text-indigo-800 bg-white'}
-                    `}
-                placeholder={canType ? (mode === MODES.MATH ? "ENTER NUMBER" : "TYPE HERE") : "WAIT..."}
+            <VocabGame
+                gameState={gameState}
+                input={input}
+                setInput={setInput}
+                status={status}
+                canType={canType}
+                inputRef={inputRef}
+                handleSubmit={handleSubmit}
+                handleSpeakClick={handleSpeakClick}
+                feedback={feedback}
             />
-            <button
-                type="submit"
-                disabled={status !== "playing"}
-                className="bg-green-500 hover:bg-green-600 text-white font-black text-xl py-4 px-8 rounded-xl shadow-[0_6px_0_rgb(21,128,61)] hover:translate-y-1 active:translate-y-2 transition-all disabled:opacity-50"
-            >
-                GO!
-            </button>
-            </form>
         )}
 
-        <div className="text-center mt-8 min-h-[3rem]">
-          {feedback}
-        </div>
+        {mode === MODES.MATH && (
+            <MathGame
+                gameState={gameState}
+                input={input}
+                setInput={setInput}
+                status={status}
+                canType={canType}
+                inputRef={inputRef}
+                handleSubmit={handleSubmit}
+                feedback={feedback}
+            />
+        )}
+
+        {mode === MODES.COMPREHENSION && (
+            <ComprehensionGame
+                gameState={gameState}
+                currentCompQuestion={currentCompQuestion}
+                handleCompOptionClick={handleCompOptionClick}
+                status={status}
+                feedback={feedback}
+            />
+        )}
       </div>
     </div>
   );
