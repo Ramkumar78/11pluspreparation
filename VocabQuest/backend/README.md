@@ -13,7 +13,7 @@ The application uses local images for vocabulary words. To download these images
 
 1. Run the download script:
    ```bash
-   python download_images.py
+   python scripts/download_images.py
    ```
    This script fetches images from `pollinations.ai` for words listed in `seed_list.py` and saves them to `../frontend/public/images`.
    Note: The download might take some time due to rate limiting.

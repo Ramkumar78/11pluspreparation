@@ -3,13 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, CheckCircle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { MODES, MOCK_TYPES } from './constants';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function MockTest() {
   const navigate = useNavigate();
   const { type: paramType } = useParams();
-  const type = paramType || 'mixed';
+  const type = paramType || MOCK_TYPES.MIXED;
 
   const [test, setTest] = useState(null);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -141,15 +142,15 @@ export default function MockTest() {
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center text-center mt-6">
-            <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-4 ${currentQ.type === 'math' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
-                {currentQ.type === 'math' ? 'MATHEMATICS' : 'VOCABULARY'}
+            <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-widest mb-4 ${currentQ.type === MODES.MATH ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
+                {currentQ.type === MODES.MATH ? 'MATHEMATICS' : 'VOCABULARY'}
             </span>
 
-            {currentQ.type === 'vocab' && currentQ.image && (
+            {currentQ.type === MODES.VOCAB && currentQ.image && (
                 <img src={`${API_URL}${currentQ.image}`} className="h-40 object-contain mb-4 rounded-lg" alt="Clue" onError={(e) => e.target.style.display = 'none'} />
             )}
 
-            {currentQ.type === 'comprehension' && (
+            {currentQ.type === MODES.COMPREHENSION && (
                 <div className="w-full mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-200 max-h-60 overflow-y-auto">
                      {currentQ.passage_image && (
                          <div className="mb-2 rounded-lg overflow-hidden border border-gray-200">
@@ -165,7 +166,7 @@ export default function MockTest() {
                 {currentQ.question}
             </h2>
 
-            {currentQ.type === 'comprehension' ? (
+            {currentQ.type === MODES.COMPREHENSION ? (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
                     {currentQ.options.map((opt, idx) => (
                         <button

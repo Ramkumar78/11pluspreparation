@@ -1,13 +1,18 @@
 import os
+import sys
 import requests
 import time
 import random
-from comprehension_seed import COMPREHENSION_LIST
-from scraper import get_cartoon_image
 import re
 
+# Add parent directory to path to allow importing seed_list
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from comprehension_seed import COMPREHENSION_LIST
+import scraper
+
 # Path to store images relative to this script
-IMAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'public', 'images', 'comprehension')
+IMAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'frontend', 'public', 'images', 'comprehension')
 
 def sanitize_filename(title):
     # Remove special chars and replace spaces with underscores
@@ -49,7 +54,6 @@ def download_comprehension_images():
         # But get_cartoon_image constructs the query.
         # Let's import generate_pollinations_image directly from scraper if possible or reimplement a simple version here.
 
-        from scraper import generate_pollinations_image
         import urllib.parse
 
         # Use Pollinations directly with the custom prompt for best results matching the "cartoon" requirement
@@ -57,6 +61,7 @@ def download_comprehension_images():
         encoded_query = urllib.parse.quote(prompt)
         seed = random.randint(1, 1000000)
         url = f"https://image.pollinations.ai/prompt/{encoded_query}?nologo=true&seed={seed}"
+        # Alternative: url = scraper.generate_pollinations_image(...) but that uses definition. We have custom prompt.
 
         max_retries = 5
         success = False

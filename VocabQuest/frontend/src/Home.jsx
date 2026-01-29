@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, Star, ShieldCheck, Zap, BookOpen, Clock, LayoutDashboard } from 'lucide-react';
+import { MODES, MOCK_TYPES } from './constants';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function Home() {
 
         <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center mb-6">
           <button
-            onClick={() => navigate('/game/vocab')}
+            onClick={() => navigate(`/game/${MODES.VOCAB}`)}
             className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
@@ -36,7 +37,7 @@ export default function Home() {
           </button>
 
           <button
-            onClick={() => navigate('/game/math')}
+            onClick={() => navigate(`/game/${MODES.MATH}`)}
             className="group relative inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-400 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(194,65,12)] hover:shadow-[0_6px_0_rgb(194,65,12)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
@@ -44,7 +45,7 @@ export default function Home() {
           </button>
 
           <button
-            onClick={() => navigate('/game/comprehension')}
+            onClick={() => navigate(`/game/${MODES.COMPREHENSION}`)}
             className="group relative inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(5,150,105)] hover:shadow-[0_6px_0_rgb(5,150,105)] hover:translate-y-1 transition-all"
           >
             <BookOpen className="w-8 h-8 text-yellow-300" />
@@ -53,10 +54,10 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
-            <button onClick={() => navigate('/mock/math')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => navigate(`/mock/${MOCK_TYPES.MATH}`)} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <Clock className="text-orange-300" /> MATHS MOCK
             </button>
-            <button onClick={() => navigate('/mock/english')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => navigate(`/mock/${MOCK_TYPES.ENGLISH}`)} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <Clock className="text-emerald-300" /> ENGLISH MOCK
             </button>
         </div>

@@ -10,10 +10,10 @@ This roadmap outlines planned features to enhance the 11+ preparation experience
     *   Image-based questions for NVR (sequences, matrices).
     *   Code-breaking, sequences, and logic puzzles for VR.
 
-### 2. Timed Practice Mode
+### 2. Timed Practice Mode (Completed)
 *   **Description:** Allow users to set custom timers for practice sessions, not just mock exams, to build speed and accuracy.
 *   **Implementation:**
-    *   Configurable timer per question or per session.
+    *   [x] Toggleable timer per question (60s default).
     *   "Blitz" mode (answer as many as possible in 1 minute).
 
 ### 3. Adaptive Learning Paths
