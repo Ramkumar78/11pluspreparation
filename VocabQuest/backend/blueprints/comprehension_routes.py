@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import random
 import json
 from database import Session, UserStats, ComprehensionPassage, ComprehensionQuestion
-from utils import sanitize_filename
+from utils import sanitize_filename, check_badges
 
 comprehension_bp = Blueprint('comprehension', __name__)
 
@@ -78,13 +78,15 @@ def check_comprehension():
     else:
         user.streak = 0
 
+    new_badges = check_badges(user)
     session.commit()
 
     result = {
         "correct": is_correct,
         "correct_answer": question.correct_answer,
         "explanation": question.explanation,
-        "score": user.total_score
+        "score": user.total_score,
+        "new_badges": new_badges
     }
 
     session.close()

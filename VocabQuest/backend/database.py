@@ -30,6 +30,7 @@ class UserStats(Base):
     current_level = Column(Integer, default=3) # Global adaptive level
     total_score = Column(Integer, default=0)
     streak = Column(Integer, default=0)
+    badges = Column(Text, default="[]") # JSON list of badges
 
 class TopicProgress(Base):
     __tablename__ = 'topic_progress'
@@ -108,6 +109,13 @@ def migrate_db():
         except Exception:
             print("Migrating: Adding image_url column to comprehension_passages...")
             conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
+
+        # Check for badges column
+        try:
+            conn.execute(text("SELECT badges FROM user_stats LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding badges column to user_stats...")
+            conn.execute(text("ALTER TABLE user_stats ADD COLUMN badges TEXT DEFAULT '[]'"))
 
         conn.commit()
 

@@ -30,6 +30,13 @@ describe('Dashboard Component', () => {
     }
   ];
 
+  const mockUserStats = {
+      score: 150,
+      streak: 5,
+      level: 3,
+      badges: ['Novice']
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -40,8 +47,13 @@ describe('Dashboard Component', () => {
     expect(screen.getByText('Loading Analytics...')).toBeInTheDocument();
   });
 
-  it('renders topics after fetching', async () => {
-    axios.get.mockResolvedValueOnce({ data: mockTopics });
+  it('renders topics and stats after fetching', async () => {
+    axios.get.mockImplementation((url) => {
+        if (url.includes('/get_topics')) return Promise.resolve({ data: mockTopics });
+        if (url.includes('/get_user_stats')) return Promise.resolve({ data: mockUserStats });
+        return Promise.resolve({ data: [] });
+    });
+
     render(<Dashboard />);
 
     await waitFor(() => {
@@ -55,10 +67,20 @@ describe('Dashboard Component', () => {
     expect(screen.getByText('Algebra')).toBeInTheDocument();
     expect(screen.getByText('Level 1')).toBeInTheDocument();
     expect(screen.getByText('10%')).toBeInTheDocument();
+
+    // Check Stats
+    expect(screen.getByText('150')).toBeInTheDocument(); // Score
+    expect(screen.getByText('5')).toBeInTheDocument(); // Streak
+    expect(screen.getByText('Novice')).toBeInTheDocument(); // Badge
   });
 
   it('handles empty data', async () => {
-    axios.get.mockResolvedValueOnce({ data: [] });
+    axios.get.mockImplementation((url) => {
+        if (url.includes('/get_topics')) return Promise.resolve({ data: [] });
+        if (url.includes('/get_user_stats')) return Promise.resolve({ data: { score: 0, streak: 0, badges: [] } });
+        return Promise.resolve({ data: [] });
+    });
+
     render(<Dashboard />);
 
     await waitFor(() => {
@@ -67,7 +89,12 @@ describe('Dashboard Component', () => {
   });
 
   it('navigates back when back button clicked', async () => {
-    axios.get.mockResolvedValueOnce({ data: [] });
+    axios.get.mockImplementation((url) => {
+        if (url.includes('/get_topics')) return Promise.resolve({ data: [] });
+        if (url.includes('/get_user_stats')) return Promise.resolve({ data: { score: 0, streak: 0, badges: [] } });
+        return Promise.resolve({ data: [] });
+    });
+
     render(<Dashboard />);
 
     await waitFor(() => {

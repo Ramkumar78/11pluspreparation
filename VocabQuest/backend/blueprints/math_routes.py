@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 import random
 from database import Session, UserStats, MathQuestion, TopicProgress
-from utils import generate_arithmetic
+from utils import generate_arithmetic, check_badges
 
 math_bp = Blueprint('math', __name__)
 
@@ -163,6 +163,7 @@ def check_math():
         # For child friendliness, we are lenient. Only drop if level > 1
         pass
 
+    new_badges = check_badges(user)
     session.commit()
 
     result = {
@@ -171,7 +172,8 @@ def check_math():
         "explanation": explanation,
         "score": user.total_score,
         "new_level": topic_prog.mastery_level, # Return specific topic level
-        "topic": actual_topic
+        "topic": actual_topic,
+        "new_badges": new_badges
     }
     session.close()
     return jsonify(result)
