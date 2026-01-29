@@ -1,12 +1,17 @@
 import os
+import sys
 import requests
 import time
 import random
+
+# Add parent directory to path to allow importing seed_list
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from seed_list import WORD_LIST
-from scraper import get_cartoon_image
+import scraper
 
 # Path to store images relative to this script
-IMAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'frontend', 'public', 'images')
+IMAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'frontend', 'public', 'images')
 
 def download_images():
     if not os.path.exists(IMAGE_DIR):
@@ -36,7 +41,7 @@ def download_images():
 
         print(f"[{i+1}/{len(WORD_LIST)}] {word}: Downloading...", flush=True)
         
-        url = get_cartoon_image(word, definition, synonym)
+        url = scraper.get_cartoon_image(word, definition, synonym)
 
         max_retries = 5
         success = False
