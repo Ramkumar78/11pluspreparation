@@ -51,9 +51,10 @@ def client(monkeypatch, test_db):
         def __getattr__(self, attr):
             return getattr(self.session, attr)
 
-    # Monkeypatch the Session in app.py to return our test_db session
+    # Monkeypatch the Session in app.py and blueprints to return our test_db session
     TestSessionMaker = lambda: NoCloseSession(test_db)
     monkeypatch.setattr('app.Session', TestSessionMaker)
+    monkeypatch.setattr('blueprints.math_routes.Session', TestSessionMaker)
 
     with app.test_client() as client:
         yield client

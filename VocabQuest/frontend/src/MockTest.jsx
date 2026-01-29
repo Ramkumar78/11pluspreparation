@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, CheckCircle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-export default function MockTest({ onBack, type = 'mixed' }) {
+export default function MockTest() {
+  const navigate = useNavigate();
+  const { type: paramType } = useParams();
+  const type = paramType || 'mixed';
+
   const [test, setTest] = useState(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState({}); // { id: value }
@@ -106,7 +111,7 @@ export default function MockTest({ onBack, type = 'mixed' }) {
             </div>
           ))}
         </div>
-        <button onClick={onBack} className="mt-8 w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition">Return to Dashboard</button>
+        <button onClick={() => navigate('/')} className="mt-8 w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition">Return to Dashboard</button>
       </div>
     );
   }
@@ -118,7 +123,7 @@ export default function MockTest({ onBack, type = 'mixed' }) {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10 px-4 font-sans">
       {/* Header */}
       <div className="w-full max-w-2xl flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm">
-        <button onClick={onBack} className="text-gray-500 hover:text-indigo-600"><ArrowLeft /></button>
+        <button onClick={() => navigate('/')} className="text-gray-500 hover:text-indigo-600"><ArrowLeft /></button>
         <div className="flex items-center gap-2 font-mono text-xl font-bold text-gray-700">
             <Clock className="text-orange-500" />
             {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}

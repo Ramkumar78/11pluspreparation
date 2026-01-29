@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Activity, BookOpen, ArrowLeft } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
-export default function Dashboard({ onBack }) {
+export default function Dashboard() {
+  const navigate = useNavigate();
   const [topics, setTopics] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,7 @@ export default function Dashboard({ onBack }) {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 font-sans">
-      <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-6 font-bold">
+      <button onClick={() => navigate('/')} className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 mb-6 font-bold">
         <ArrowLeft /> Back to Home
       </button>
 

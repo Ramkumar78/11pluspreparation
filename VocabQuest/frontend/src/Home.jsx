@@ -1,7 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Play, Star, ShieldCheck, Zap, BookOpen, Clock, LayoutDashboard } from 'lucide-react';
 
-export default function Home({ onStart, onViewChange }) {
+export default function Home() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex flex-col items-center justify-center text-white p-4">
 
@@ -25,7 +28,7 @@ export default function Home({ onStart, onViewChange }) {
 
         <div className="flex flex-col md:flex-row gap-4 flex-wrap justify-center mb-6">
           <button
-            onClick={() => onStart('vocab')}
+            onClick={() => navigate('/game/vocab')}
             className="group relative inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(55,48,163)] hover:shadow-[0_6px_0_rgb(55,48,163)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
@@ -33,7 +36,7 @@ export default function Home({ onStart, onViewChange }) {
           </button>
 
           <button
-            onClick={() => onStart('math')}
+            onClick={() => navigate('/game/math')}
             className="group relative inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-400 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(194,65,12)] hover:shadow-[0_6px_0_rgb(194,65,12)] hover:translate-y-1 transition-all"
           >
             <Play className="w-8 h-8 fill-current text-yellow-300" />
@@ -41,7 +44,7 @@ export default function Home({ onStart, onViewChange }) {
           </button>
 
           <button
-            onClick={() => onStart('comprehension')}
+            onClick={() => navigate('/game/comprehension')}
             className="group relative inline-flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xl py-6 px-8 rounded-full shadow-[0_10px_0_rgb(5,150,105)] hover:shadow-[0_6px_0_rgb(5,150,105)] hover:translate-y-1 transition-all"
           >
             <BookOpen className="w-8 h-8 text-yellow-300" />
@@ -50,15 +53,15 @@ export default function Home({ onStart, onViewChange }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl mb-8">
-            <button onClick={() => onStart('mock_math')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => navigate('/mock/math')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <Clock className="text-orange-300" /> MATHS MOCK
             </button>
-            <button onClick={() => onStart('mock_english')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => navigate('/mock/english')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <Clock className="text-emerald-300" /> ENGLISH MOCK
             </button>
         </div>
         <div className="w-full max-w-2xl mb-8">
-            <button onClick={() => onViewChange('dashboard')} className="w-full bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+            <button onClick={() => navigate('/dashboard')} className="w-full bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <LayoutDashboard className="text-yellow-300" /> MY DASHBOARD
             </button>
         </div>
