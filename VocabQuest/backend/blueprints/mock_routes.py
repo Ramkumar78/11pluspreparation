@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import random
 import json
 from sqlalchemy.sql.expression import func
-from database import Session, UserStats, MathQuestion, Word, ComprehensionPassage, ComprehensionQuestion
+from database import Session, UserStats, MathQuestion, Word, ComprehensionPassage, ComprehensionQuestion, ScoreHistory
 from utils import sanitize_filename
 
 mock_bp = Blueprint('mock', __name__)
@@ -153,6 +153,15 @@ def submit_mock():
     # Simple logic: if score > 80%, boost level
     if max_score > 0 and (score / max_score) > 0.8:
         user.current_level = min(10, user.current_level + 1)
+
+    # Save Score History
+    history = ScoreHistory(
+        score=score,
+        max_score=max_score,
+        mode="Mock Test",
+        details=json.dumps({"percentage": int((score/max_score)*100) if max_score > 0 else 0})
+    )
+    session.add(history)
 
     session.commit()
     session.close()

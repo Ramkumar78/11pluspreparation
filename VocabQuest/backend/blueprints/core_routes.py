@@ -1,8 +1,24 @@
 from flask import Blueprint, jsonify
 import json
-from database import Session, TopicProgress, UserStats
+from database import Session, TopicProgress, UserStats, ScoreHistory
+from sqlalchemy import desc
 
 core_bp = Blueprint('core', __name__)
+
+@core_bp.route('/leaderboard', methods=['GET'])
+def get_leaderboard():
+    session = Session()
+    scores = session.query(ScoreHistory).order_by(desc(ScoreHistory.score)).limit(10).all()
+    result = []
+    for s in scores:
+        result.append({
+            "score": s.score,
+            "max_score": s.max_score,
+            "mode": s.mode,
+            "date": s.timestamp.strftime("%Y-%m-%d %H:%M")
+        })
+    session.close()
+    return jsonify(result)
 
 @core_bp.route('/get_user_stats', methods=['GET'])
 def get_user_stats():

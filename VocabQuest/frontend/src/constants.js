@@ -9,3 +9,5 @@ export const MOCK_TYPES = {
   ENGLISH: 'english',
   MIXED: 'mixed',
 };
+
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Activity, BookOpen, ArrowLeft, Trophy } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import { API_URL } from './constants';
 
 export default function Dashboard() {
   const navigate = useNavigate();
