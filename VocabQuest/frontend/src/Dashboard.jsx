@@ -5,6 +5,7 @@ import { Activity, BookOpen, ArrowLeft, Trophy } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import { API_URL } from './constants';
 
 export default function Dashboard() {
   const navigate = useNavigate();

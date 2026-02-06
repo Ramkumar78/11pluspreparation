@@ -1,6 +1,8 @@
 import json
 from sqlalchemy import text
 from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion, ScoreHistory
+import logging
+from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
@@ -61,6 +63,13 @@ def init_db():
     migrate_db()
 
     session = Session()
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def seed_database():
+    session = Session()
+    logger.info("Starting database seeding...")
 
     # 1. Init User Stats if not exists
     if not session.query(UserStats).first():
@@ -90,6 +99,7 @@ def init_db():
 
     # 3. Seed Math Questions
     print("Seeding Math Questions...")
+    logger.info("Seeding Math Questions...")
     existing_math = {m.text: m for m in session.query(MathQuestion).all()}
 
     # Track topics for TopicProgress init
@@ -123,6 +133,7 @@ def init_db():
 
     # 5. Seed Comprehension Passages
     print("Seeding Comprehension Passages...")
+    logger.info("Seeding Comprehension Passages...")
     existing_passages = {p.title: p for p in session.query(ComprehensionPassage).all()}
 
     for c in COMPREHENSION_LIST:
@@ -141,6 +152,8 @@ def init_db():
             passage.topic = c["topic"]
 
         # Seed Questions for this passage
+        # Simple check: delete existing and re-add or check by text. Re-adding is safer for updates.
+        # For simplicity in this script, we'll check by text.
         existing_qs = {q.question_text: q for q in session.query(ComprehensionQuestion).filter_by(passage_id=passage.id).all()}
 
         for q_data in c["questions"]:
@@ -162,3 +175,4 @@ def init_db():
 
     session.commit()
     session.close()
+    logger.info("Database seeding completed.")

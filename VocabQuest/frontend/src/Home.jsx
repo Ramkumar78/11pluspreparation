@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Play, Star, ShieldCheck, Zap, BookOpen, Clock, LayoutDashboard } from 'lucide-react';
+import { Play, Star, ShieldCheck, Zap, BookOpen, Clock, LayoutDashboard, Trophy } from 'lucide-react';
 import { MODES, MOCK_TYPES } from './constants';
 
 export default function Home() {
@@ -61,9 +61,12 @@ export default function Home() {
                 <Clock className="text-emerald-300" /> ENGLISH MOCK
             </button>
         </div>
-        <div className="w-full max-w-2xl mb-8">
-            <button onClick={() => navigate('/dashboard')} className="w-full bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+        <div className="w-full max-w-2xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button onClick={() => navigate('/dashboard')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <LayoutDashboard className="text-yellow-300" /> MY DASHBOARD
+            </button>
+             <button onClick={() => navigate('/leaderboard')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
+                <Trophy className="text-yellow-300" /> LEADERBOARD
             </button>
         </div>
 
