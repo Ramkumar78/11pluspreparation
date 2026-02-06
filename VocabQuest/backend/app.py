@@ -19,6 +19,12 @@ from blueprints.comprehension_routes import comprehension_bp
 from blueprints.mock_routes import mock_bp
 from blueprints.core_routes import core_bp
 
+from seeder import seed_database
+
+# Configure Logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 
 # Configure CORS
@@ -50,6 +56,11 @@ def init_db_command():
         logging.info("Database seeded successfully.")
     except Exception as e:
         logging.error(f"Error seeding database: {e}")
+@app.cli.command("seed-db")
+def seed_db_command():
+    """Seeds the database with initial data."""
+    seed_database()
+    print("Database seeded successfully.")
 
 def find_available_port(start_port, max_port=5100):
     """Finds the first available port in the range."""

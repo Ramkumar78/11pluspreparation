@@ -2,6 +2,7 @@
 import pytest
 from app import app
 from seeder import seed_database
+from seeder import seed_database as init_db
 from database import Session, ComprehensionPassage
 import os
 import shutil

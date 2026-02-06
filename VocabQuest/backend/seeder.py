@@ -5,6 +5,8 @@ from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def seed_database():
