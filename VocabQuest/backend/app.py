@@ -6,6 +6,12 @@ from flask import Flask
 from flask_cors import CORS
 from extensions import limiter
 
+from seeder import seed_database
+
+# Configure Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 # Blueprints
 from blueprints.vocab_routes import vocab_bp
 from blueprints.math_routes import math_bp
@@ -42,6 +48,14 @@ app.register_blueprint(comprehension_bp)
 app.register_blueprint(mock_bp)
 app.register_blueprint(core_bp)
 
+@app.cli.command("init-db")
+def init_db_command():
+    """Initialize the database with seed data."""
+    try:
+        seed_database()
+        logging.info("Database seeded successfully.")
+    except Exception as e:
+        logging.error(f"Error seeding database: {e}")
 @app.cli.command("seed-db")
 def seed_db_command():
     """Seeds the database with initial data."""

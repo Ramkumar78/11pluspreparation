@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
+import logging
 import datetime
 
 Base = declarative_base()
@@ -85,20 +86,20 @@ def migrate_db():
         try:
             conn.execute(text("SELECT word_type FROM words LIMIT 1"))
         except Exception:
-            print("Migrating: Adding word_type column...")
+            logging.info("Migrating: Adding word_type column...")
             conn.execute(text("ALTER TABLE words ADD COLUMN word_type VARCHAR"))
 
         # Check for synonym column
         try:
             conn.execute(text("SELECT synonym FROM words LIMIT 1"))
         except Exception:
-            print("Migrating: Adding synonym column...")
+            logging.info("Migrating: Adding synonym column...")
             conn.execute(text("ALTER TABLE words ADD COLUMN synonym VARCHAR"))
 
         try:
             conn.execute(text("SELECT explanation FROM math_questions LIMIT 1"))
         except Exception:
-            print("Migrating: Adding explanation column to math_questions...")
+            logging.info("Migrating: Adding explanation column to math_questions...")
             conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
 
         # Create TopicProgress table if it doesn't exist
@@ -117,14 +118,14 @@ def migrate_db():
         try:
             conn.execute(text("SELECT image_url FROM comprehension_passages LIMIT 1"))
         except Exception:
-            print("Migrating: Adding image_url column to comprehension_passages...")
+            logging.info("Migrating: Adding image_url column to comprehension_passages...")
             conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
 
         # Check for badges column
         try:
             conn.execute(text("SELECT badges FROM user_stats LIMIT 1"))
         except Exception:
-            print("Migrating: Adding badges column to user_stats...")
+            logging.info("Migrating: Adding badges column to user_stats...")
             conn.execute(text("ALTER TABLE user_stats ADD COLUMN badges TEXT DEFAULT '[]'"))
 
         # Create ScoreHistory table if it doesn't exist

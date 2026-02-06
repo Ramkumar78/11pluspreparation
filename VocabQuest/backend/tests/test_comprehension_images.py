@@ -1,6 +1,7 @@
 
 import pytest
 from app import app
+from seeder import seed_database
 from seeder import seed_database as init_db
 from database import Session, ComprehensionPassage
 import os
@@ -11,7 +12,7 @@ def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         with app.app_context():
-            init_db()
+            seed_database()
         yield client
 
 def test_next_comprehension_includes_image(client):
