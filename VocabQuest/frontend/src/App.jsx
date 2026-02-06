@@ -4,6 +4,7 @@ import Game from './Game';
 import Home from './Home';
 import Dashboard from './Dashboard';
 import MockTest from './MockTest';
+import Leaderboard from './Leaderboard';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/game/:mode" element={<Game />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/mock/:type" element={<MockTest />} />
+      <Route path="/leaderboard" element={<Leaderboard />} />
     </Routes>
   );
 }

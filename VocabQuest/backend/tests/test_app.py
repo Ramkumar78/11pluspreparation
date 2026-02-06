@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 # Ensure backend path is in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from app import app, init_db
+from app import app
 from database import Base, UserStats, Word
 
 @pytest.fixture(scope='function')
@@ -48,7 +48,7 @@ def client(monkeypatch, test_db):
 
     # Mock the Session factory used in app.py and blueprints
     TestSessionMaker = lambda: NoCloseSession(test_db)
-    monkeypatch.setattr('app.Session', TestSessionMaker)
+    monkeypatch.setattr('seeder.Session', TestSessionMaker)
     monkeypatch.setattr('blueprints.vocab_routes.Session', TestSessionMaker)
 
     # Mock get_cartoon_image just in case

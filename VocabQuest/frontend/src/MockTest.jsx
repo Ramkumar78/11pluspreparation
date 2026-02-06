@@ -3,9 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, CheckCircle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { MODES, MOCK_TYPES } from './constants';
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import { MODES, MOCK_TYPES, API_URL } from './constants';
 
 export default function MockTest() {
   const navigate = useNavigate();
