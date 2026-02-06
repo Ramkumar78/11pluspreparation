@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r VocabQuest/backend/requirements.txt
+        pip install bandit safety
+
+    - name: Run Unit Tests
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/VocabQuest/backend
+        pytest VocabQuest/backend/tests
+
+    - name: Run Bandit (Security Analysis)
+      # Skips:
+      # B311: Standard pseudo-random generators (used for game logic)
+      # B104: Hardcoded bind to all interfaces (used for container/dev)
+      # B110: Try, Except, Pass (used in migration logic)
+      run: |
+        bandit -r VocabQuest/backend -x VocabQuest/backend/tests -s B311,B104,B110
+
+    - name: Run Safety (Dependency Check)
+      run: |
+        safety check -r VocabQuest/backend/requirements.txt

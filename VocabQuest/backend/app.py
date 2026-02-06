@@ -46,9 +46,9 @@ def init_db_command():
     """Initialize the database with seed data."""
     try:
         seed_database()
-        print("Database seeded successfully.")
+        logging.info("Database seeded successfully.")
     except Exception as e:
-        print(f"Error seeding database: {e}")
+        logging.error(f"Error seeding database: {e}")
 
 def find_available_port(start_port, max_port=5100):
     """Finds the first available port in the range."""
