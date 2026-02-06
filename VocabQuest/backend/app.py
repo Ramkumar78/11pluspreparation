@@ -2,15 +2,10 @@ import socket
 from flask import Flask
 from flask_cors import CORS
 from extensions import limiter
-from seeder import init_db
+from seeder import init_db, seed_database
 import json
 import os
 import logging
-from flask import Flask
-from flask_cors import CORS
-from extensions import limiter
-
-from seeder import seed_database
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -22,12 +17,6 @@ from blueprints.math_routes import math_bp
 from blueprints.comprehension_routes import comprehension_bp
 from blueprints.mock_routes import mock_bp
 from blueprints.core_routes import core_bp
-
-from seeder import seed_database
-
-# Configure Logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 

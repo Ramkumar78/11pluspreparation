@@ -29,6 +29,7 @@ class MathQuestion(Base):
 class ScoreHistory(Base):
     __tablename__ = 'score_history'
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, default=1)
     score = Column(Integer, default=0)
     max_score = Column(Integer, default=0)
     mode = Column(String)
@@ -42,14 +43,6 @@ class UserStats(Base):
     total_score = Column(Integer, default=0)
     streak = Column(Integer, default=0)
     badges = Column(Text, default="[]") # JSON list of badges
-
-class ScoreHistory(Base):
-    __tablename__ = 'score_history'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, default=1)
-    score = Column(Integer, default=0)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
-    mode = Column(String, nullable=True)
 
 class TopicProgress(Base):
     __tablename__ = 'topic_progress'
