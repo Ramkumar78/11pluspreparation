@@ -1,8 +1,7 @@
 import json
 from sqlalchemy import text
-from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion, ScoreHistory
+from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 import logging
-from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
