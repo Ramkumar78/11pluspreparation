@@ -39,3 +39,53 @@ jobs:
     - name: Run Safety (Dependency Check)
       run: |
         safety check -r VocabQuest/backend/requirements.txt
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install Backend Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r VocabQuest/backend/requirements.txt
+
+    - name: Start Backend
+      run: |
+        export PYTHONPATH=$PYTHONPATH:$(pwd)/VocabQuest/backend
+        nohup python VocabQuest/backend/app.py > backend.log 2>&1 &
+        npx wait-on tcp:5000
+
+    - name: Install Frontend Dependencies
+      working-directory: VocabQuest/frontend
+      run: npm install
+
+    - name: Start Frontend
+      working-directory: VocabQuest/frontend
+      run: |
+        nohup npm run dev -- --port 5173 > frontend.log 2>&1 &
+        npx wait-on tcp:5173
+
+    - name: Install E2E Dependencies
+      working-directory: VocabQuest/e2e
+      run: npm install
+
+    - name: Install Playwright Browsers
+      working-directory: VocabQuest/e2e
+      run: npx playwright install --with-deps chromium
+
+    - name: Run E2E Tests
+      working-directory: VocabQuest/e2e
+      run: |
+        npx bddgen
+        npx playwright test
