@@ -24,6 +24,10 @@ VocabQuest/backend/vocab.db
 # Logs
 *.log
 
+# Testing
+.coverage
+.pytest_cache/
+
 # Docker
 .docker/
 

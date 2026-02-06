@@ -1,5 +1,7 @@
 # 🦁 ScholarQuest: The Ultimate 11+ Prep Adventure!
 
+[![CI](https://github.com/Ramkumar78/11pluspreparation/actions/workflows/ci.yml/badge.svg)](https://github.com/Ramkumar78/11pluspreparation/actions/workflows/ci.yml)
+
 **ScholarQuest** (formerly VocabQuest) is a dual-subject learning tool designed to master 11+ preparation. It keeps young minds (ages 8-12) engaged with high-octane challenges in Vocabulary, Mathematics, and Comprehension.
 
 **Focused on the specific requirements of:**
