@@ -1,10 +1,68 @@
 import json
+from sqlalchemy import text
+from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion, ScoreHistory
 import logging
 from database import Session, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
 
+def migrate_db():
+    """Simple migration to add missing columns/tables."""
+    with engine.connect() as conn:
+        # Check for word_type column
+        try:
+            conn.execute(text("SELECT word_type FROM words LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding word_type column...")
+            conn.execute(text("ALTER TABLE words ADD COLUMN word_type VARCHAR"))
+
+        # Check for synonym column
+        try:
+            conn.execute(text("SELECT synonym FROM words LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding synonym column...")
+            conn.execute(text("ALTER TABLE words ADD COLUMN synonym VARCHAR"))
+
+        try:
+            conn.execute(text("SELECT explanation FROM math_questions LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding explanation column to math_questions...")
+            conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
+
+        # Create TopicProgress table if it doesn't exist
+        try:
+            conn.execute(text("SELECT mastery_level FROM topic_progress LIMIT 1"))
+        except Exception:
+            pass
+
+        # Create Comprehension tables if they don't exist
+        try:
+            conn.execute(text("SELECT title FROM comprehension_passages LIMIT 1"))
+        except Exception:
+            # Tables are created by create_all, but this checks connectivity
+            pass
+
+        try:
+            conn.execute(text("SELECT image_url FROM comprehension_passages LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding image_url column to comprehension_passages...")
+            conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
+
+        # Check for badges column
+        try:
+            conn.execute(text("SELECT badges FROM user_stats LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding badges column to user_stats...")
+            conn.execute(text("ALTER TABLE user_stats ADD COLUMN badges TEXT DEFAULT '[]'"))
+
+        conn.commit()
+
+def init_db():
+    # Run migrations first
+    migrate_db()
+
+    session = Session()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,6 +98,7 @@ def seed_database():
             ))
 
     # 3. Seed Math Questions
+    print("Seeding Math Questions...")
     logger.info("Seeding Math Questions...")
     existing_math = {m.text: m for m in session.query(MathQuestion).all()}
 
@@ -73,6 +132,7 @@ def seed_database():
         session.add(TopicProgress(topic="Mental Maths", mastery_level=1))
 
     # 5. Seed Comprehension Passages
+    print("Seeding Comprehension Passages...")
     logger.info("Seeding Comprehension Passages...")
     existing_passages = {p.title: p for p in session.query(ComprehensionPassage).all()}
 

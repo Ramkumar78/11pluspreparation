@@ -1,4 +1,8 @@
 import socket
+from flask import Flask
+from flask_cors import CORS
+from extensions import limiter
+from seeder import init_db
 import json
 import os
 import logging
@@ -71,5 +75,9 @@ def find_available_port(start_port, max_port=5100):
     return start_port
 
 if __name__ == '__main__':
+    # Initialize Data
+    with app.app_context():
+        init_db()
+
     port = find_available_port(5000)
     app.run(host='0.0.0.0', port=port)
