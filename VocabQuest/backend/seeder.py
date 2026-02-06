@@ -5,8 +5,11 @@ from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
 
+logger = logging.getLogger(__name__)
+
 def seed_database():
     session = Session()
+    logger.info("Starting database seeding...")
 
     # 1. Init User Stats if not exists
     if not session.query(UserStats).first():
@@ -35,7 +38,7 @@ def seed_database():
             ))
 
     # 3. Seed Math Questions
-    logging.info("Seeding Math Questions...")
+    logger.info("Seeding Math Questions...")
     existing_math = {m.text: m for m in session.query(MathQuestion).all()}
 
     # Track topics for TopicProgress init
@@ -68,7 +71,7 @@ def seed_database():
         session.add(TopicProgress(topic="Mental Maths", mastery_level=1))
 
     # 5. Seed Comprehension Passages
-    logging.info("Seeding Comprehension Passages...")
+    logger.info("Seeding Comprehension Passages...")
     existing_passages = {p.title: p for p in session.query(ComprehensionPassage).all()}
 
     for c in COMPREHENSION_LIST:
@@ -110,3 +113,4 @@ def seed_database():
 
     session.commit()
     session.close()
+    logger.info("Database seeding completed.")

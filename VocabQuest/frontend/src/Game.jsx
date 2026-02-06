@@ -3,12 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { Trophy, Flame, ArrowLeft, Lightbulb, Clock, Zap, RotateCcw } from 'lucide-react';
-import { MODES } from './constants';
+import { MODES, API_URL } from './constants';
 import VocabGame from './components/VocabGame';
 import MathGame from './components/MathGame';
 import ComprehensionGame from './components/ComprehensionGame';
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export default function Game() {
   const navigate = useNavigate();

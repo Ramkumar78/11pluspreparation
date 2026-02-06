@@ -61,6 +61,7 @@ def client(monkeypatch, test_db):
 
     # Monkeypatch the Session in app.py and blueprints to return our test_db session
     TestSessionMaker = lambda: NoCloseSession(test_db)
+    monkeypatch.setattr('seeder.Session', TestSessionMaker)
     monkeypatch.setattr('blueprints.math_routes.Session', TestSessionMaker)
     monkeypatch.setattr('blueprints.core_routes.Session', TestSessionMaker)
 

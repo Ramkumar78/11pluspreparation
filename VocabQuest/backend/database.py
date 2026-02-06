@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Text, DateTime
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 import os
 import logging
+import datetime
 
 Base = declarative_base()
 
@@ -24,6 +25,15 @@ class MathQuestion(Base):
     difficulty = Column(Integer, default=3)
     topic = Column(String) # e.g., "Algebra", "Fractions"
     explanation = Column(String, nullable=True)
+
+class ScoreHistory(Base):
+    __tablename__ = 'score_history'
+    id = Column(Integer, primary_key=True)
+    score = Column(Integer, default=0)
+    max_score = Column(Integer, default=0)
+    mode = Column(String)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    details = Column(Text, nullable=True)
 
 class UserStats(Base):
     __tablename__ = 'user_stats'
@@ -117,6 +127,13 @@ def migrate_db():
         except Exception:
             logging.info("Migrating: Adding badges column to user_stats...")
             conn.execute(text("ALTER TABLE user_stats ADD COLUMN badges TEXT DEFAULT '[]'"))
+
+        # Create ScoreHistory table if it doesn't exist
+        try:
+            conn.execute(text("SELECT score FROM score_history LIMIT 1"))
+        except Exception:
+            # Table created by create_all usually, but here just in case
+            pass
 
         conn.commit()
 

@@ -48,7 +48,7 @@ def client(monkeypatch, test_db):
 
     # Mock the Session factory used in app.py and blueprints
     TestSessionMaker = lambda: NoCloseSession(test_db)
-    # app.Session is no longer used in app.py
+    monkeypatch.setattr('seeder.Session', TestSessionMaker)
     monkeypatch.setattr('blueprints.vocab_routes.Session', TestSessionMaker)
 
     # Mock get_cartoon_image just in case

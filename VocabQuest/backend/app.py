@@ -10,6 +10,7 @@ from seeder import seed_database
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Blueprints
 from blueprints.vocab_routes import vocab_bp
