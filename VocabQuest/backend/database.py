@@ -33,7 +33,7 @@ class ScoreHistory(Base):
     score = Column(Integer, default=0)
     max_score = Column(Integer, default=0)
     mode = Column(String)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
     details = Column(Text, nullable=True)
 
 class UserStats(Base):
