@@ -24,6 +24,7 @@ export default function Game() {
   const [currentCompQuestion, setCurrentCompQuestion] = useState(null);
   const [isTimed, setIsTimed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
+  const [topic, setTopic] = useState("");
   const [newBadge, setNewBadge] = useState(null);
 
   // Blitz Mode State
@@ -36,7 +37,7 @@ export default function Game() {
 
   useEffect(() => {
     loadNextChallenge();
-  }, [mode]);
+  }, [mode, topic]);
 
   // Per-Question Timer
   useEffect(() => {
@@ -75,7 +76,9 @@ export default function Game() {
     setTimeLeft(60);
     try {
       let endpoint = '/next_word';
-      if (mode === MODES.MATH) endpoint = '/next_math';
+      if (mode === MODES.MATH) {
+        endpoint = `/next_math${topic ? `?topic=${encodeURIComponent(topic)}` : ''}`;
+      }
       if (mode === MODES.COMPREHENSION) endpoint = '/next_comprehension';
 
       const res = await axios.get(`${API_URL}${endpoint}`);
@@ -417,6 +420,8 @@ export default function Game() {
                 inputRef={inputRef}
                 handleSubmit={handleSubmit}
                 feedback={feedback}
+                topic={topic}
+                onTopicChange={setTopic}
             />
         )}
 
