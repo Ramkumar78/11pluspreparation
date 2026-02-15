@@ -74,6 +74,17 @@ class ComprehensionQuestion(Base):
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
+class VerbalReasoningQuestion(Base):
+    __tablename__ = 'verbal_reasoning_questions'
+    id = Column(Integer, primary_key=True)
+    question_type = Column(String, nullable=False)
+    question_text = Column(String, nullable=False)
+    content = Column(Text, nullable=True)
+    options = Column(String, nullable=True) # JSON
+    answer = Column(String, nullable=False)
+    difficulty = Column(Integer, default=3)
+    explanation = Column(String, nullable=True)
+
 class UserErrors(Base):
     __tablename__ = 'user_errors'
     id = Column(Integer, primary_key=True)

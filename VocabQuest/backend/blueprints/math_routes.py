@@ -2,8 +2,29 @@ from flask import Blueprint, jsonify, request
 import random
 from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
 from utils import generate_arithmetic, check_badges
+from math_seed import sutton_challenge_questions
 
 math_bp = Blueprint('math', __name__)
+
+@math_bp.route('/api/math/challenge', methods=['GET'])
+def math_challenge():
+    """Serves a random Sutton Challenge question."""
+    selected = random.choice(sutton_challenge_questions)
+
+    # Standardize response format with regular math questions
+    response = {
+        "id": -1, # Using -1 to indicate it's not a DB question
+        "type": "math",
+        "topic": selected["topic"],
+        "question": selected["text"],
+        "question_type": "Challenge",
+        "generated_answer_check": selected["answer"],
+        "explanation_text": selected["explanation_text"],
+        "user_level": 10, # Challenge mode implies high level
+        "score": 0,
+        "streak": 0
+    }
+    return jsonify(response)
 
 @math_bp.route('/next_math', methods=['GET'])
 def next_math():
