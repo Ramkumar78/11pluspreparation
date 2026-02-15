@@ -357,5 +357,40 @@ COMPREHENSION_LIST = [
                 "evidence": "He had grown into a beautiful white swan!"
             }
         ]
+    },
+    {
+        "title": "The Eagle",
+        "topic": "Poetry",
+        "image_prompt": "An eagle perched high on a jagged cliff overlooking a blue ocean, powerful wings, realistic style",
+        "content": """He clasps the crag with crooked hands;
+Close to the sun in lonely lands,
+Ringed with the azure world, he stands.
+
+The wrinkled sea beneath him crawls;
+He watches from his mountain walls,
+And like a thunderbolt he falls.""",
+        "questions": [
+            {
+                "text": "What does the poet mean by 'crooked hands'?",
+                "options": ["The eagle has broken wings", "The eagle's claws/talons", "The eagle is an old man", "The mountain rocks"],
+                "answer": "The eagle's claws/talons",
+                "explanation": "The poet uses a metaphor, describing the eagle's sharp, curved claws as 'hands' holding the rock.",
+                "evidence": "He clasps the crag with crooked hands"
+            },
+            {
+                "text": "Why does the sea seem to 'crawl'?",
+                "options": ["It is full of bugs", "It is moving slowly because it is seen from very high up", "It is a monster", "It is tired"],
+                "answer": "It is moving slowly because it is seen from very high up",
+                "explanation": "From a great height, the movement of the waves looks slow and small, like something crawling.",
+                "evidence": "The wrinkled sea beneath him crawls"
+            },
+            {
+                "text": "Which word describes the eagle's attack?",
+                "options": ["Stands", "Crawls", "Thunderbolt", "Azure"],
+                "answer": "Thunderbolt",
+                "explanation": "The simile 'like a thunderbolt he falls' suggests speed and power.",
+                "evidence": "And like a thunderbolt he falls"
+            }
+        ]
     }
 ]
