@@ -46,3 +46,14 @@ def test_spag_new_questions_availability():
     # Check if all new_ids are in present_ids
     missing_ids = new_ids - present_ids
     assert not missing_ids, f"Missing new SPaG question IDs: {missing_ids}"
+
+def test_spag_new_questions_200_series_availability():
+    """
+    Test that new questions (IDs 200-204) can be retrieved.
+    """
+    new_ids = {200, 201, 202, 203, 204}
+    present_ids = {q['id'] for q in SPAG_QUESTIONS}
+
+    # Check if all new_ids are in present_ids
+    missing_ids = new_ids - present_ids
+    assert not missing_ids, f"Missing new SPaG question IDs: {missing_ids}"

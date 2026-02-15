@@ -88,5 +88,50 @@ SPAG_QUESTIONS = [
         ],
         "answer": "The mouse was chased by the cat.",
         "explanation": "In passive voice, the subject (mouse) has the action done to it."
+    },
+    {
+        "id": 200,
+        "type": "grammar",
+        "question": "Choose the correct pronoun: 'Between you and ___, I think the idea is brilliant.'",
+        "options": ["I", "me", "myself", "mine"],
+        "answer": "me",
+        "explanation": "After a preposition like 'between', you must use the object pronoun 'me', not the subject pronoun 'I'."
+    },
+    {
+        "id": 201,
+        "type": "spelling",
+        "question": "Which word is spelled incorrectly?",
+        "options": ["Necessary", "Definite", "Seperate", "Argument"],
+        "answer": "Seperate",
+        "explanation": "The correct spelling is 'Separate' (remember: there is 'a rat' in sep-a-rat-e)."
+    },
+    {
+        "id": 202,
+        "type": "grammar",
+        "question": "Identify the passive verb: 'The cake was eaten by the dog.'",
+        "options": ["The cake", "was eaten", "by", "dog"],
+        "answer": "was eaten",
+        "explanation": "Passive voice is formed with 'to be' + past participle. 'Was eaten' shows the subject receiving the action."
+    },
+    {
+        "id": 203,
+        "type": "vocabulary_context",
+        "question": "Select the correct homophone: 'The horse tossed its ___.'",
+        "options": ["main", "mane", "mein", "mayn"],
+        "answer": "mane",
+        "explanation": "'Mane' is the hair on a horse's neck. 'Main' means primary or important."
+    },
+    {
+        "id": 204,
+        "type": "punctuation",
+        "question": "Which sentence uses the semi-colon correctly?",
+        "options": [
+            "I like cake; it is tasty.",
+            "I like; cake it is tasty.",
+            "I like cake it is; tasty.",
+            "I like cake, it is; tasty."
+        ],
+        "answer": "I like cake; it is tasty.",
+        "explanation": "A semi-colon joins two independent clauses that are closely related."
     }
 ]
