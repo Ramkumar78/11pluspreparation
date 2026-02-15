@@ -1,7 +1,7 @@
 import pytest
 import sys
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -106,9 +106,11 @@ def test_math_standard_written_logic(client, test_db):
     test_db.commit()
 
     # 3. Request 'Ratio'
-    response = client.get('/next_math?topic=Ratio')
-    assert response.status_code == 200
-    data = response.get_json()
+    # Mock random.random to avoid triggering the dynamic generator (0.9 > 0.6)
+    with patch('blueprints.math_routes.random.random', return_value=0.9):
+        response = client.get('/next_math?topic=Ratio')
+        assert response.status_code == 200
+        data = response.get_json()
 
     # Should be the Standard Written question
     assert data['question'] == "Hard SW Question"
