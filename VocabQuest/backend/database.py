@@ -25,6 +25,7 @@ class MathQuestion(Base):
     difficulty = Column(Integer, default=3)
     topic = Column(String) # e.g., "Algebra", "Fractions"
     explanation = Column(String, nullable=True)
+    question_type = Column(String, default="Multiple Choice")
 
 class ScoreHistory(Base):
     __tablename__ = 'score_history'
@@ -110,6 +111,12 @@ def migrate_db():
         except Exception:
             logging.info("Migrating: Adding explanation column to math_questions...")
             conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
+
+        try:
+            conn.execute(text("SELECT question_type FROM math_questions LIMIT 1"))
+        except Exception:
+            logging.info("Migrating: Adding question_type column to math_questions...")
+            conn.execute(text("ALTER TABLE math_questions ADD COLUMN question_type VARCHAR DEFAULT 'Multiple Choice'"))
 
         # Create TopicProgress table if it doesn't exist
         try:

@@ -124,7 +124,8 @@ def check_answer():
         "correct_word": word.text, # Keep for backward compatibility if needed, or remove. keeping for safety but plan said standardize.
         "new_level": user.current_level,
         "score": user.total_score,
-        "new_badges": new_badges
+        "new_badges": new_badges,
+        "streak": user.streak
     }
     session.close()
     return jsonify(result)

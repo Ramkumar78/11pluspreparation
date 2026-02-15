@@ -60,6 +60,9 @@ export default function Home() {
             <button onClick={() => navigate(`/mock/${MOCK_TYPES.ENGLISH}`)} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">
                 <Clock className="text-emerald-300" /> ENGLISH MOCK
             </button>
+             <button onClick={() => navigate(`/mock/${MOCK_TYPES.SET_SIMULATION}`)} className="col-span-1 md:col-span-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 border-2 border-pink-300 p-4 rounded-xl font-black flex items-center justify-center gap-2 transition text-xl shadow-lg">
+                <Clock className="text-white" /> SET SIMULATION (45 MINS)
+            </button>
         </div>
         <div className="w-full max-w-2xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
             <button onClick={() => navigate('/dashboard')} className="bg-indigo-800/50 hover:bg-indigo-800/70 border-2 border-indigo-400 p-4 rounded-xl font-bold flex items-center justify-center gap-2 transition text-lg">

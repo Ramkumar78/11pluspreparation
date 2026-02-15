@@ -60,6 +60,56 @@ def get_mock_test():
                     "passage_image": p_image,
                     "topic": passage.topic
                 })
+
+    elif test_type == 'set_simulation':
+        duration = 45
+        # SET Simulation: 20 Math, 15 Vocab, 1 Comprehension Passage
+
+        # 1. Math (20 questions)
+        math_qs = session.query(MathQuestion).order_by(func.random()).limit(20).all()
+        for m in math_qs:
+            test_items.append({
+                "id": m.id,
+                "type": "math",
+                "question": m.text,
+                "topic": m.topic,
+                "difficulty": m.difficulty
+            })
+
+        # 2. Vocab (15 questions)
+        vocab_qs = session.query(Word).order_by(func.random()).limit(15).all()
+        for v in vocab_qs:
+            test_items.append({
+                "id": v.id,
+                "type": "vocab",
+                "question": v.definition,
+                "image": f"/images/{v.text}.jpg",
+                "length": len(v.text),
+                "difficulty": v.difficulty
+            })
+
+        # 3. Comprehension (1 Passage)
+        passage = session.query(ComprehensionPassage).order_by(func.random()).first()
+        if passage:
+            p_image = passage.image_url
+            if not p_image:
+                p_image = f"/images/comprehension/{sanitize_filename(passage.title)}.jpg"
+
+            questions = session.query(ComprehensionQuestion).filter_by(passage_id=passage.id).all()
+            for q in questions:
+                test_items.append({
+                    "id": q.id,
+                    "type": "comprehension",
+                    "question": q.question_text,
+                    "options": json.loads(q.options),
+                    "passage_title": passage.title,
+                    "passage_content": passage.content,
+                    "passage_image": p_image,
+                    "topic": passage.topic
+                })
+
+        random.shuffle(test_items)
+
     else:
         # Mixed (Original behavior)
         math_qs = session.query(MathQuestion).order_by(func.random()).limit(10).all()
@@ -111,12 +161,14 @@ def submit_mock():
         is_correct = False
         correct_val = ""
         explanation = ""
+        topic = "General"
 
         if item['type'] == 'math':
             q = session.query(MathQuestion).filter_by(id=item['id']).first()
             if q:
                 correct_val = q.answer
                 explanation = q.explanation
+                topic = q.topic
                 if str(item['user_answer']).strip().lower() == str(q.answer).strip().lower():
                     is_correct = True
 
@@ -124,6 +176,7 @@ def submit_mock():
             w = session.query(Word).filter_by(id=item['id']).first()
             if w:
                 correct_val = w.text
+                topic = "Vocabulary"
                 if str(item['user_answer']).strip().lower() == w.text.lower():
                     is_correct = True
 
@@ -132,6 +185,7 @@ def submit_mock():
             if q:
                 correct_val = q.correct_answer
                 explanation = q.explanation
+                topic = "Comprehension"
                 # Exact match expected for multiple choice options usually, but let's be safe with strip/lower
                 if str(item['user_answer']).strip().lower() == q.correct_answer.lower():
                     is_correct = True
@@ -145,7 +199,9 @@ def submit_mock():
             "correct": is_correct,
             "your_answer": item['user_answer'],
             "correct_answer": correct_val,
-            "explanation": explanation
+            "explanation": explanation,
+            "time_taken": item.get('time_taken', 0),
+            "topic": topic
         })
 
     # Update User Stats
@@ -155,11 +211,15 @@ def submit_mock():
         user.current_level = min(10, user.current_level + 1)
 
     # Save Score History
+    details_data = {
+        "percentage": int((score/max_score)*100) if max_score > 0 else 0,
+        "breakdown": results_breakdown
+    }
     history = ScoreHistory(
         score=score,
         max_score=max_score,
         mode="Mock Test",
-        details=json.dumps({"percentage": int((score/max_score)*100) if max_score > 0 else 0})
+        details=json.dumps(details_data)
     )
     session.add(history)
 

@@ -135,4 +135,48 @@ describe('MockTest Component', () => {
 
     expect(screen.getByText('100%')).toBeInTheDocument();
   });
+
+  it('includes timing data in submission', async () => {
+    axios.get.mockResolvedValueOnce({ data: mockTest });
+    axios.post.mockResolvedValueOnce({ data: mockResult });
+
+    render(<MockTest />);
+
+    // Wait for load
+    await waitFor(() => {
+        expect(screen.getByText('2 + 2')).toBeInTheDocument();
+    });
+
+    // Answer first question
+    const input = screen.getByPlaceholderText('Type answer...');
+    fireEvent.change(input, { target: { value: '4' } });
+
+    // Click next
+    const nextBtn = screen.getByText('Next Question');
+    fireEvent.click(nextBtn);
+
+    // Answer second question
+    const input2 = screen.getByPlaceholderText('Type answer...');
+    fireEvent.change(input2, { target: { value: 'test' } });
+
+    // Submit
+    const finishBtn = screen.getByText('Finish Test');
+    fireEvent.click(finishBtn);
+
+    // Expect submit call with time_taken
+    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining('/submit_mock'), expect.objectContaining({
+        answers: expect.arrayContaining([
+            expect.objectContaining({
+                id: 1,
+                user_answer: '4',
+                time_taken: expect.any(Number)
+            }),
+            expect.objectContaining({
+                id: 2,
+                user_answer: 'test',
+                time_taken: expect.any(Number)
+            })
+        ])
+    }));
+  });
 });
