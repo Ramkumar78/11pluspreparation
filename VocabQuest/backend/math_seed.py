@@ -1,3 +1,6 @@
+import random
+import math
+
 # Comprehensive 11+ Maths Questions targeting Wilson's, Wallington, Sutton, Nonsuch
 # Topics: Number, Algebra, Geometry, Ratio, Data, Measurement, BIDMAS
 
@@ -517,3 +520,234 @@ sutton_challenge_questions = [
         "explanation_text": "Net gain per day is 1 foot. After 17 days, it has climbed 17 feet. On the 18th day, it climbs 3 feet, reaching 20 feet (top) and climbs out before slipping back."
     }
 ]
+
+
+def generate_algebra_substitution(level):
+    """Generates 'Sutton SET' style algebra substitution questions."""
+    # Variables and simple positive integer values
+    vars = ['a', 'b', 'x', 'y', 'n', 'p']
+    v1_name, v2_name = random.sample(vars, 2)
+    v1_val = random.randint(2, 8)
+    v2_val = random.randint(2, 8)
+
+    # Ensure distinct values to make it interesting, but not strictly required
+    while v2_val == v1_val:
+        v2_val = random.randint(2, 8)
+
+    # Patterns:
+    # 1. c1*v1 + c2*v2
+    # 2. c1*v1 - c2*v2 (ensure positive)
+    # 3. v1^2 + v2
+    # 4. 2(v1 + v2)
+    pattern = random.choice([1, 2, 3, 4])
+
+    question_text = f"If ${v1_name} = {v1_val}$ and ${v2_name} = {v2_val}$, what is the value of "
+    expr_str = ""
+    ans_val = 0
+    explanation = ""
+
+    if pattern == 1:
+        c1 = random.randint(2, 5)
+        c2 = random.randint(2, 5)
+        expr_str = f"${c1}{v1_name} + {c2}{v2_name}$?"
+        ans_val = c1 * v1_val + c2 * v2_val
+        explanation = f"Substitute values: {c1}({v1_val}) + {c2}({v2_val}) = {c1*v1_val} + {c2*v2_val} = {ans_val}."
+
+    elif pattern == 2:
+        c1 = random.randint(3, 6)
+        c2 = random.randint(1, 2)
+        # Ensure positive
+        while (c1 * v1_val) <= (c2 * v2_val):
+             c1 += 1
+        expr_str = f"${c1}{v1_name} - {c2}{v2_name}$?"
+        ans_val = c1 * v1_val - c2 * v2_val
+        explanation = f"Substitute values: {c1}({v1_val}) - {c2}({v2_val}) = {c1*v1_val} - {c2*v2_val} = {ans_val}."
+
+    elif pattern == 3:
+        expr_str = f"${v1_name}^2 + {v2_name}$?"
+        ans_val = v1_val**2 + v2_val
+        explanation = f"Substitute values: {v1_val}² + {v2_val} = {v1_val**2} + {v2_val} = {ans_val}."
+
+    elif pattern == 4:
+        expr_str = f"$2({v1_name} + {v2_name})$?"
+        ans_val = 2 * (v1_val + v2_val)
+        explanation = f"Brackets first: ({v1_val} + {v2_val}) = {v1_val+v2_val}. Then multiply by 2: 2 x {v1_val+v2_val} = {ans_val}."
+
+    question_text += expr_str
+
+    # Generate Distractors
+    options = set()
+    options.add(ans_val)
+    while len(options) < 5:
+        # Generate close numbers
+        diff = random.randint(-5, 5)
+        if diff == 0: continue
+        opt = ans_val + diff
+        if opt > 0:
+            options.add(opt)
+
+    options_list = list(options)
+    random.shuffle(options_list)
+
+    return {
+        "question": question_text,
+        "options": [str(x) for x in options_list],
+        "answer": str(ans_val),
+        "explanation": explanation
+    }
+
+
+def generate_ratio_proportion(level):
+    """Generates word problems for Ratio & Proportion."""
+    # Pattern 1: Sharing a total
+    # Pattern 2: Scaling a recipe (Proportion)
+
+    pattern = random.choice([1, 2])
+
+    question_text = ""
+    ans_val = 0
+    explanation = ""
+
+    if pattern == 1:
+        # Share Total
+        ratio_a = random.randint(2, 5)
+        ratio_b = random.randint(2, 5)
+        total_parts = ratio_a + ratio_b
+        multiplier = random.randint(2, 12) * 5 # Multiples of 5 are nice numbers usually
+        total_amount = total_parts * multiplier
+
+        # Determine question target
+        target = random.choice(['larger', 'smaller', 'specific'])
+
+        question_text = f"Share {total_amount} sweets in the ratio {ratio_a}:{ratio_b}. "
+
+        val_a = ratio_a * multiplier
+        val_b = ratio_b * multiplier
+
+        if target == 'larger':
+            question_text += "How many does the larger share get?"
+            ans_val = max(val_a, val_b)
+            explanation = f"Total parts = {ratio_a}+{ratio_b}={total_parts}. 1 part = {total_amount}/{total_parts}={multiplier}. Larger share is {max(ratio_a, ratio_b)} parts x {multiplier} = {ans_val}."
+        elif target == 'smaller':
+            question_text += "How many does the smaller share get?"
+            ans_val = min(val_a, val_b)
+            explanation = f"Total parts = {total_parts}. 1 part = {multiplier}. Smaller share is {min(ratio_a, ratio_b)} parts x {multiplier} = {ans_val}."
+        else: # specific (first one)
+            question_text += f"How many sweets correspond to the '{ratio_a}' part?"
+            ans_val = val_a
+            explanation = f"Total parts = {total_parts}. 1 part = {multiplier}. The share for {ratio_a} is {ratio_a} x {multiplier} = {ans_val}."
+
+    elif pattern == 2:
+        # Recipe / Proportion
+        # "If 4 cakes cost 20, how much for 6?"
+        item_count_1 = random.randint(2, 5)
+        cost_1 = item_count_1 * random.randint(3, 8) # Ensure divisible
+        item_count_2 = item_count_1 + random.randint(1, 5)
+
+        question_text = f"If {item_count_1} toy cars cost £{cost_1}, how much do {item_count_2} cars cost?"
+        unit_cost = cost_1 // item_count_1
+        ans_val = unit_cost * item_count_2
+        explanation = f"Find the cost of 1 car: £{cost_1} / {item_count_1} = £{unit_cost}. Then for {item_count_2} cars: {item_count_2} x £{unit_cost} = £{ans_val}."
+
+    # Generate Distractors
+    options = set()
+    options.add(ans_val)
+    while len(options) < 5:
+        diff = random.choice([-10, -5, -2, -1, 1, 2, 5, 10, 20])
+        opt = ans_val + diff
+        if opt > 0:
+            options.add(opt)
+
+    options_list = list(options)
+    random.shuffle(options_list)
+
+    return {
+        "question": question_text,
+        "options": [str(x) for x in options_list],
+        "answer": str(ans_val),
+        "explanation": explanation
+    }
+
+
+def generate_fdp_conversion(level):
+    """Generates rapid-fire FDP conversion questions."""
+    # Types: Frac->Dec, Frac->Perc, Dec->Frac, Dec->Perc, Perc->Frac, Perc->Dec
+    # We focus on common equivalents as per 11+ requirements
+
+    equivalents = [
+        {"frac": "1/2", "dec": "0.5", "perc": "50%"},
+        {"frac": "1/4", "dec": "0.25", "perc": "25%"},
+        {"frac": "3/4", "dec": "0.75", "perc": "75%"},
+        {"frac": "1/5", "dec": "0.2", "perc": "20%"},
+        {"frac": "2/5", "dec": "0.4", "perc": "40%"},
+        {"frac": "3/5", "dec": "0.6", "perc": "60%"},
+        {"frac": "4/5", "dec": "0.8", "perc": "80%"},
+        {"frac": "1/10", "dec": "0.1", "perc": "10%"},
+        {"frac": "3/10", "dec": "0.3", "perc": "30%"},
+        {"frac": "7/10", "dec": "0.7", "perc": "70%"},
+        {"frac": "9/10", "dec": "0.9", "perc": "90%"},
+        {"frac": "1/8", "dec": "0.125", "perc": "12.5%"},
+        {"frac": "1/3", "dec": "0.33...", "perc": "33.3%"},
+        {"frac": "2/3", "dec": "0.66...", "perc": "66.7%"},
+    ]
+
+    item = random.choice(equivalents)
+    type_q = random.choice(["F2D", "F2P", "D2F", "D2P", "P2F", "P2D"])
+
+    question_text = ""
+    ans_val = ""
+    distractors = []
+    explanation = ""
+
+    if type_q == "F2D":
+        question_text = f"What is {item['frac']} as a decimal?"
+        ans_val = item['dec']
+        # Distractors: pick other decimals
+        others = [x['dec'] for x in equivalents if x['dec'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"To convert to a decimal, divide the top by the bottom: {item['frac']} = {item['dec']}."
+
+    elif type_q == "F2P":
+        question_text = f"What is {item['frac']} as a percentage?"
+        ans_val = item['perc']
+        others = [x['perc'] for x in equivalents if x['perc'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"To convert to a percentage, multiply by 100: {item['frac']} = {item['perc']}."
+
+    elif type_q == "D2F":
+        question_text = f"What is {item['dec']} as a fraction?"
+        ans_val = item['frac']
+        others = [x['frac'] for x in equivalents if x['frac'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"The decimal {item['dec']} is equivalent to the fraction {item['frac']}."
+
+    elif type_q == "D2P":
+        question_text = f"What is {item['dec']} as a percentage?"
+        ans_val = item['perc']
+        others = [x['perc'] for x in equivalents if x['perc'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"To convert decimal to percentage, multiply by 100: {item['dec']} = {item['perc']}."
+
+    elif type_q == "P2F":
+        question_text = f"What is {item['perc']} as a fraction?"
+        ans_val = item['frac']
+        others = [x['frac'] for x in equivalents if x['frac'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"{item['perc']} means {item['perc'].replace('%','')} per 100. As a fraction, this simplifies to {item['frac']}."
+
+    elif type_q == "P2D":
+        question_text = f"What is {item['perc']} as a decimal?"
+        ans_val = item['dec']
+        others = [x['dec'] for x in equivalents if x['dec'] != ans_val]
+        distractors = random.sample(others, 4)
+        explanation = f"To convert percentage to decimal, divide by 100: {item['perc']} = {item['dec']}."
+
+    options = [ans_val] + distractors
+    random.shuffle(options)
+
+    return {
+        "question": question_text,
+        "options": options,
+        "answer": ans_val,
+        "explanation": explanation
+    }
