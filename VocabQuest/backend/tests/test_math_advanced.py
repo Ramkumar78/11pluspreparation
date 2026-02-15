@@ -1,7 +1,7 @@
 import pytest
 import sys
 import os
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -73,7 +73,8 @@ def client(monkeypatch, test_db):
     with app.test_client() as client:
         yield client
 
-def test_math_standard_written_logic(client, test_db):
+@patch('blueprints.math_routes.random.random', return_value=0.9)
+def test_math_standard_written_logic(mock_random, client, test_db):
     """
     Test that 'Standard Written' questions are prioritized when
     mastery_level > 7 and topic is 'Ratio' or 'Algebra'.
@@ -132,7 +133,8 @@ def test_math_standard_written_logic(client, test_db):
     data = response.get_json()
     assert data['question'] in ["Easy MC", "Easy SW"]
 
-def test_math_algebra_standard_written(client, test_db):
+@patch('blueprints.math_routes.random.random', return_value=0.9)
+def test_math_algebra_standard_written(mock_random, client, test_db):
     """Test specific logic for Algebra as well."""
     q_sw = MathQuestion(
         text="Algebra SW",
