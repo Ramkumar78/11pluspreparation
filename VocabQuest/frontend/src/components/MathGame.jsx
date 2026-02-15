@@ -46,11 +46,12 @@ export default function MathGame({
           onChange={(e) => setInput(e.target.value)}
           maxLength={10}
           disabled={status !== "playing" || !canType}
-          type="number"
+          type="text"
+          inputMode="text"
           className={`flex-1 p-4 rounded-xl border-4 text-2xl focus:outline-none text-center uppercase tracking-widest shadow-inner font-bold transition-all
                   ${!canType ? 'bg-gray-200 border-gray-300 text-gray-400 cursor-wait' : 'border-indigo-100 focus:border-indigo-500 text-indigo-800 bg-white'}
               `}
-          placeholder={canType ? "ENTER NUMBER" : "WAIT..."}
+          placeholder={canType ? "ENTER ANSWER" : "WAIT..."}
         />
         <button
           type="submit"

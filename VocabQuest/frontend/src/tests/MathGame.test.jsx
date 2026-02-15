@@ -44,10 +44,29 @@ describe('MathGame Component', () => {
     const setInput = vi.fn();
     render(<MathGame {...defaultProps} setInput={setInput} />);
 
-    const input = screen.getByPlaceholderText('ENTER NUMBER');
+    const input = screen.getByPlaceholderText('ENTER ANSWER');
     fireEvent.change(input, { target: { value: '10' } });
 
     expect(setInput).toHaveBeenCalledWith('10');
+  });
+
+  it('accepts special characters like :, /, .', () => {
+    const setInput = vi.fn();
+    render(<MathGame {...defaultProps} setInput={setInput} />);
+
+    const input = screen.getByPlaceholderText('ENTER ANSWER');
+
+    // Test Ratio
+    fireEvent.change(input, { target: { value: '2:3' } });
+    expect(setInput).toHaveBeenCalledWith('2:3');
+
+    // Test Fraction
+    fireEvent.change(input, { target: { value: '1/2' } });
+    expect(setInput).toHaveBeenCalledWith('1/2');
+
+    // Test Decimal
+    fireEvent.change(input, { target: { value: '3.14' } });
+    expect(setInput).toHaveBeenCalledWith('3.14');
   });
 
   it('displays feedback when provided', () => {
@@ -61,7 +80,7 @@ describe('MathGame Component', () => {
     render(<MathGame {...defaultProps} status="wrong" canType={false} />);
 
     // Check if input is disabled
-    const input = screen.getByRole('spinbutton'); // input type="number"
+    const input = screen.getByRole('textbox');
     expect(input).toBeDisabled();
 
     // Check if topic selector is disabled
