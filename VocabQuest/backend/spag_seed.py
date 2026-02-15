@@ -38,5 +38,55 @@ SPAG_QUESTIONS = [
         "options": ["The", "scenary", "was", "beautiful"],
         "answer": "scenary",
         "explanation": "The correct spelling is 'scenery'."
+    },
+    {
+        "id": 101,
+        "type": "grammar",
+        "question": "Which word completes the sentence? 'The dog wagged _____ tail.'",
+        "options": ["it's", "its", "its'", "it"],
+        "answer": "its",
+        "explanation": "'Its' is the possessive form. 'It's' means 'it is'."
+    },
+    {
+        "id": 102,
+        "type": "grammar",
+        "question": "Identify the type of noun underlined: 'The *flock* of sheep moved across the field.'",
+        "options": ["Proper", "Abstract", "Collective", "Common"],
+        "answer": "Collective",
+        "explanation": "A flock is a group of sheep, which is a collective noun."
+    },
+    {
+        "id": 103,
+        "type": "punctuation",
+        "question": "Choose the correctly punctuated sentence.",
+        "options": [
+            "Its a beautiful day, isn't it?",
+            "It's a beautiful day, isnt it?",
+            "It's a beautiful day, isn't it?",
+            "Its a beautiful day isnt it?"
+        ],
+        "answer": "It's a beautiful day, isn't it?",
+        "explanation": "Needs an apostrophe for 'It is' (It's) and 'is not' (isn't), plus a comma before the question tag."
+    },
+    {
+        "id": 104,
+        "type": "spelling",
+        "question": "Select the correct spelling.",
+        "options": ["Neccessary", "Necessary", "Necesary", "Neccesary"],
+        "answer": "Necessary",
+        "explanation": "Remember: One Collar, Two Sleeves (one C, two S's)."
+    },
+    {
+        "id": 105,
+        "type": "grammar",
+        "question": "Which sentence is written in the Passive Voice?",
+        "options": [
+            "The cat chased the mouse.",
+            "The mouse was chased by the cat.",
+            "The cat is chasing the mouse.",
+            "The mouse ran away."
+        ],
+        "answer": "The mouse was chased by the cat.",
+        "explanation": "In passive voice, the subject (mouse) has the action done to it."
     }
 ]
