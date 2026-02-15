@@ -9,19 +9,22 @@ COMPREHENSION_LIST = [
                 "text": "What did the gust of wind reveal?",
                 "options": ["A robin", "A key", "The knob of a door", "A secret window"],
                 "answer": "The knob of a door",
-                "explanation": "The text states: 'One of the ivy streamers... blew aside, revealing... the round knob of a door.'"
+                "explanation": "The text states: 'One of the ivy streamers... blew aside, revealing... the round knob of a door.'",
+                "evidence": "revealing something that had been hidden for ten years. It was the round knob of a door."
             },
             {
                 "text": "How long had the object been hidden?",
                 "options": ["Ten years", "Five years", "One year", "Forever"],
                 "answer": "Ten years",
-                "explanation": "The text explicitly says it 'revealing something that had been hidden for ten years.'"
+                "explanation": "The text explicitly says it 'revealing something that had been hidden for ten years.'",
+                "evidence": "revealing something that had been hidden for ten years."
             },
             {
                 "text": "How did Mary feel when she saw the knob?",
                 "options": ["Scared and lonely", "Delighted and excited", "Angry and upset", "Bored and tired"],
                 "answer": "Delighted and excited",
-                "explanation": "The text describes her reaction: 'Mary's heart began to thump... in her delight and excitement.'"
+                "explanation": "The text describes her reaction: 'Mary's heart began to thump... in her delight and excitement.'",
+                "evidence": "Mary's heart began to thump and her hands to shake a little in her delight and excitement."
             }
         ]
     },
@@ -35,13 +38,15 @@ COMPREHENSION_LIST = [
                 "text": "Why was Alice getting tired?",
                 "options": ["She was running", "She was reading a boring book", "She was sitting by her sister with nothing to do", "She was making a daisy-chain"],
                 "answer": "She was sitting by her sister with nothing to do",
-                "explanation": "The text says 'Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do'."
+                "explanation": "The text says 'Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do'.",
+                "evidence": "Alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do"
             },
             {
                 "text": "What was strange about the rabbit?",
                 "options": ["It was blue", "It had pink eyes", "It was huge", "It was singing"],
                 "answer": "It had pink eyes",
-                "explanation": "The text describes it as 'a White Rabbit with pink eyes'."
+                "explanation": "The text describes it as 'a White Rabbit with pink eyes'.",
+                "evidence": "when suddenly a White Rabbit with pink eyes ran close by her."
             }
         ]
     },
@@ -55,13 +60,15 @@ COMPREHENSION_LIST = [
                 "text": "What was the Mole doing all morning?",
                 "options": ["Sleeping", "Spring-cleaning his home", "Gardening", "Cooking"],
                 "answer": "Spring-cleaning his home",
-                "explanation": "The text opens with 'The Mole had been working very hard all the morning, spring-cleaning his little home.'"
+                "explanation": "The text opens with 'The Mole had been working very hard all the morning, spring-cleaning his little home.'",
+                "evidence": "The Mole had been working very hard all the morning, spring-cleaning his little home."
             },
             {
                 "text": "How did the Mole feel after his work?",
                 "options": ["Energetic", "Hungry", "Aching and weary", "Happy"],
                 "answer": "Aching and weary",
-                "explanation": "The text mentions he had 'an aching back and weary arms'."
+                "explanation": "The text mentions he had 'an aching back and weary arms'.",
+                "evidence": "till he had dust in his throat and eyes, and splashes of whitewash all over his black fur, and an aching back and weary arms."
             }
         ]
     },
@@ -75,13 +82,15 @@ COMPREHENSION_LIST = [
                 "text": "At what age did Wendy realize she would grow up?",
                 "options": ["Ten", "Five", "Two", "Twelve"],
                 "answer": "Two",
-                "explanation": "The text says 'One day when she was two years old... henceforth Wendy knew that she must grow up.'"
+                "explanation": "The text says 'One day when she was two years old... henceforth Wendy knew that she must grow up.'",
+                "evidence": "One day when she was two years old"
             },
             {
                 "text": "Who made the comment about remaining like that forever?",
                 "options": ["Her father", "Mrs. Darling", "Peter Pan", "Her nanny"],
                 "answer": "Mrs. Darling",
-                "explanation": "The text states 'Mrs. Darling put her hand to her heart and cried...'"
+                "explanation": "The text states 'Mrs. Darling put her hand to her heart and cried...'",
+                "evidence": "Mrs. Darling put her hand to her heart and cried, 'Oh, why can't you remain like this for ever!'"
             }
         ]
     },
@@ -95,13 +104,15 @@ COMPREHENSION_LIST = [
                 "text": "Which two countries compete in The Ashes?",
                 "options": ["England and India", "Australia and New Zealand", "England and Australia", "South Africa and England"],
                 "answer": "England and Australia",
-                "explanation": "The first sentence states: 'The Ashes is a Test cricket series played between England and Australia.'"
+                "explanation": "The first sentence states: 'The Ashes is a Test cricket series played between England and Australia.'",
+                "evidence": "The Ashes is a Test cricket series played between England and Australia."
             },
             {
                 "text": "What physical object is the prize for the series?",
                 "options": ["A gold cup", "A small terracotta urn", "A silver plate", "A wooden bat"],
                 "answer": "A small terracotta urn",
-                "explanation": "The text concludes by saying: 'The prize is a small terracotta urn...'"
+                "explanation": "The text concludes by saying: 'The prize is a small terracotta urn...'",
+                "evidence": "The prize is a small terracotta urn which is said to contain the ashes of a burnt cricket bail."
             }
         ]
     },
@@ -115,13 +126,15 @@ COMPREHENSION_LIST = [
                 "text": "How often are the Olympic Games held?",
                 "options": ["Every year", "Every two years", "Every four years", "Every ten years"],
                 "answer": "Every four years",
-                "explanation": "The text states 'The Olympic Games are held every four years'."
+                "explanation": "The text states 'The Olympic Games are held every four years'.",
+                "evidence": "The Olympic Games are held every four years"
             },
             {
                 "text": "Where were the ancient Olympic Games held?",
                 "options": ["Rome, Italy", "Olympia, Greece", "Paris, France", "London, England"],
                 "answer": "Olympia, Greece",
-                "explanation": "The text mentions they were 'held in Olympia, Greece'."
+                "explanation": "The text mentions they were 'held in Olympia, Greece'.",
+                "evidence": "held in Olympia, Greece, from the 8th century BC to the 4th century AD."
             }
         ]
     },
@@ -135,13 +148,15 @@ COMPREHENSION_LIST = [
                 "text": "On what surface is Wimbledon played?",
                 "options": ["Clay", "Hard court", "Grass", "Carpet"],
                 "answer": "Grass",
-                "explanation": "The text states it is 'played on outdoor grass courts' and is the only major still played on grass."
+                "explanation": "The text states it is 'played on outdoor grass courts' and is the only major still played on grass.",
+                "evidence": "played on outdoor grass courts."
             },
             {
                 "text": "Since when has Wimbledon been held?",
                 "options": ["1900", "1877", "1850", "2000"],
                 "answer": "1877",
-                "explanation": "The text mentions it has been held 'since 1877'."
+                "explanation": "The text mentions it has been held 'since 1877'.",
+                "evidence": "since 1877"
             }
         ]
     },
@@ -155,13 +170,15 @@ COMPREHENSION_LIST = [
                 "text": "When was the first World Cup held?",
                 "options": ["1930", "1942", "1950", "1900"],
                 "answer": "1930",
-                "explanation": "The text mentions 'the inaugural tournament in 1930'."
+                "explanation": "The text mentions 'the inaugural tournament in 1930'.",
+                "evidence": "since the inaugural tournament in 1930"
             },
             {
                 "text": "Why was the tournament not held in 1942 and 1946?",
                 "options": ["Lack of funds", "Second World War", "Bad weather", "No teams qualified"],
                 "answer": "Second World War",
-                "explanation": "The text states it was not held 'because of the Second World War'."
+                "explanation": "The text states it was not held 'because of the Second World War'.",
+                "evidence": "because of the Second World War."
             }
         ]
     },
@@ -175,13 +192,15 @@ COMPREHENSION_LIST = [
                 "text": "During which war did Florence Nightingale rise to prominence?",
                 "options": ["World War I", "The Boer War", "The Crimean War", "The Civil War"],
                 "answer": "The Crimean War",
-                "explanation": "The text mentions she came to prominence 'during the Crimean War'."
+                "explanation": "The text mentions she came to prominence 'during the Crimean War'.",
+                "evidence": "during the Crimean War"
             },
             {
                 "text": "What famous nickname was she given?",
                 "options": ["The Lady with the Lamp", "The Angel of Mercy", "The Iron Lady", "The Mother of Nursing"],
                 "answer": "The Lady with the Lamp",
-                "explanation": "The text refers to her persona as 'The Lady with the Lamp'."
+                "explanation": "The text refers to her persona as 'The Lady with the Lamp'.",
+                "evidence": "The Lady with the Lamp"
             }
         ]
     },
@@ -195,13 +214,15 @@ COMPREHENSION_LIST = [
                 "text": "What is Shakespeare often called?",
                 "options": ["The King of Poets", "The Bard of Avon", "The Great Playwright", "The Prince of Tales"],
                 "answer": "The Bard of Avon",
-                "explanation": "The text states he is often called 'England's national poet and the Bard of Avon'."
+                "explanation": "The text states he is often called 'England's national poet and the Bard of Avon'.",
+                "evidence": "England's national poet and the 'Bard of Avon'"
             },
             {
                 "text": "Approximately how many plays did he write?",
                 "options": ["10", "39", "100", "20"],
                 "answer": "39",
-                "explanation": "The text mentions 'some 39 plays'."
+                "explanation": "The text mentions 'some 39 plays'.",
+                "evidence": "consist of some 39 plays"
             }
         ]
     },
@@ -215,13 +236,15 @@ COMPREHENSION_LIST = [
                 "text": "What scientific theory is Darwin best known for?",
                 "options": ["Gravity", "Relativity", "Evolution", "Electricity"],
                 "answer": "Evolution",
-                "explanation": "The text says he is 'best known for his contributions to the science of evolution'."
+                "explanation": "The text says he is 'best known for his contributions to the science of evolution'.",
+                "evidence": "best known for his contributions to the science of evolution."
             },
             {
                 "text": "What did he call the process of evolution?",
                 "options": ["Artificial selection", "Natural selection", "Divine selection", "Random selection"],
                 "answer": "Natural selection",
-                "explanation": "The text states he called the process 'natural selection'."
+                "explanation": "The text states he called the process 'natural selection'.",
+                "evidence": "resulted from a process that he called natural selection."
             }
         ]
     },
@@ -235,13 +258,15 @@ COMPREHENSION_LIST = [
                 "text": "What fruit is famously associated with Newton's discovery of gravity?",
                 "options": ["A pear", "An orange", "An apple", "A grape"],
                 "answer": "An apple",
-                "explanation": "The text mentions the story of him being inspired by 'watching the fall of an apple from a tree'."
+                "explanation": "The text mentions the story of him being inspired by 'watching the fall of an apple from a tree'.",
+                "evidence": "watching the fall of an apple from a tree."
             },
             {
                 "text": "What major concept did he formulate in 'Principia Mathematica'?",
                 "options": ["Laws of motion and universal gravitation", "Theory of relativity", "Evolution", "Electricity"],
                 "answer": "Laws of motion and universal gravitation",
-                "explanation": "The text states he 'formulated the laws of motion and universal gravitation' in his book."
+                "explanation": "The text states he 'formulated the laws of motion and universal gravitation' in his book.",
+                "evidence": "he formulated the laws of motion and universal gravitation."
             }
         ]
     },
@@ -255,13 +280,15 @@ COMPREHENSION_LIST = [
                 "text": "What caused Oliver to approach the master?",
                 "options": ["He was desperate with hunger", "He was angry", "He wanted to leave", "He lost his spoon"],
                 "answer": "He was desperate with hunger",
-                "explanation": "The text states: 'Child as he was, he was desperate with hunger, and reckless with misery.'"
+                "explanation": "The text states: 'Child as he was, he was desperate with hunger, and reckless with misery.'",
+                "evidence": "Child as he was, he was desperate with hunger, and reckless with misery."
             },
             {
                 "text": "What exactly did Oliver say to the master?",
                 "options": ["Can I have bread?", "Please, sir, I want some more.", "I am hungry.", "Give me food."],
                 "answer": "Please, sir, I want some more.",
-                "explanation": "The text quotes him explicitly saying: 'Please, sir, I want some more.'"
+                "explanation": "The text quotes him explicitly saying: 'Please, sir, I want some more.'",
+                "evidence": "said: 'Please, sir, I want some more.'"
             }
         ]
     },
@@ -275,13 +302,15 @@ COMPREHENSION_LIST = [
                 "text": "Who was the first person to step on the Moon?",
                 "options": ["Buzz Aldrin", "Neil Armstrong", "Michael Collins", "Yuri Gagarin"],
                 "answer": "Neil Armstrong",
-                "explanation": "The text says 'Neil Armstrong was the first person to ever step onto the Moon.'"
+                "explanation": "The text says 'Neil Armstrong was the first person to ever step onto the Moon.'",
+                "evidence": "Neil Armstrong was the first person to ever step onto the Moon."
             },
             {
                 "text": "What was the name of the rocket?",
                 "options": ["Apollo 13", "Gemini 1", "Apollo 11", "Starship"],
                 "answer": "Apollo 11",
-                "explanation": "The text mentions they flew 'in a rocket called Apollo 11'."
+                "explanation": "The text mentions they flew 'in a rocket called Apollo 11'.",
+                "evidence": "in a rocket called Apollo 11."
             }
         ]
     },
@@ -295,13 +324,15 @@ COMPREHENSION_LIST = [
                 "text": "What is an elephant's nose called?",
                 "options": ["A snout", "A beak", "A trunk", "A horn"],
                 "answer": "A trunk",
-                "explanation": "The text says 'they have a very special nose called a trunk'."
+                "explanation": "The text says 'they have a very special nose called a trunk'.",
+                "evidence": "they have a very special nose called a trunk."
             },
             {
                 "text": "What can an elephant do with its trunk?",
                 "options": ["Fly", "Pick up things and drink", "Dig tunnels", "See in the dark"],
                 "answer": "Pick up things and drink",
-                "explanation": "The text mentions picking up peanuts, lifting logs, and drinking water."
+                "explanation": "The text mentions picking up peanuts, lifting logs, and drinking water.",
+                "evidence": "An elephant can use its trunk to pick up a tiny peanut or to lift a heavy log. They also use it to drink water"
             }
         ]
     },
@@ -315,13 +346,15 @@ COMPREHENSION_LIST = [
                 "text": "Why did the other animals tease the duckling?",
                 "options": ["He was too small", "He was yellow", "He was big and grey", "He was loud"],
                 "answer": "He was big and grey",
-                "explanation": "The text says 'This one was big and grey... The other animals teased him'."
+                "explanation": "The text says 'This one was big and grey... The other animals teased him'.",
+                "evidence": "This one was big and grey and looked different. The other animals teased him"
             },
             {
                 "text": "What did the duckling turn into?",
                 "options": ["A goose", "A beautiful white swan", "A hawk", "A bigger duck"],
                 "answer": "A beautiful white swan",
-                "explanation": "The text concludes: 'He had grown into a beautiful white swan!'"
+                "explanation": "The text concludes: 'He had grown into a beautiful white swan!'",
+                "evidence": "He had grown into a beautiful white swan!"
             }
         ]
     }

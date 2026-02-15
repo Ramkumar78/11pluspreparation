@@ -71,6 +71,7 @@ class ComprehensionQuestion(Base):
     options = Column(String, nullable=False) # JSON string of options
     correct_answer = Column(String, nullable=False)
     explanation = Column(String, nullable=True) # Evidence from text
+    evidence_text = Column(String, nullable=True) # Exact evidence snippet
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
@@ -157,6 +158,12 @@ def migrate_db():
         except Exception:
             logging.info("Migrating: Adding image_url column to comprehension_passages...")
             conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
+
+        try:
+            conn.execute(text("SELECT evidence_text FROM comprehension_questions LIMIT 1"))
+        except Exception:
+            logging.info("Migrating: Adding evidence_text column to comprehension_questions...")
+            conn.execute(text("ALTER TABLE comprehension_questions ADD COLUMN evidence_text VARCHAR"))
 
         # Check for badges column
         try:

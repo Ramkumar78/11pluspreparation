@@ -55,6 +55,12 @@ def migrate_db():
             print("Migrating: Adding image_url column to comprehension_passages...")
             conn.execute(text("ALTER TABLE comprehension_passages ADD COLUMN image_url VARCHAR"))
 
+        try:
+            conn.execute(text("SELECT evidence_text FROM comprehension_questions LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding evidence_text column to comprehension_questions...")
+            conn.execute(text("ALTER TABLE comprehension_questions ADD COLUMN evidence_text VARCHAR"))
+
         # Check for badges column
         try:
             conn.execute(text("SELECT badges FROM user_stats LIMIT 1"))
@@ -171,7 +177,8 @@ def seed_database():
                     question_text=q_data["text"],
                     options=json.dumps(q_data["options"]),
                     correct_answer=q_data["answer"],
-                    explanation=q_data["explanation"]
+                    explanation=q_data["explanation"],
+                    evidence_text=q_data.get("evidence")
                 )
                 session.add(new_q)
             else:
@@ -180,6 +187,7 @@ def seed_database():
                 q_obj.options = json.dumps(q_data["options"])
                 q_obj.correct_answer = q_data["answer"]
                 q_obj.explanation = q_data["explanation"]
+                q_obj.evidence_text = q_data.get("evidence")
 
     # 6. Seed Verbal Reasoning Questions
     print("Seeding Verbal Reasoning Questions...")
