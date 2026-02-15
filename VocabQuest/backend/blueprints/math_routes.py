@@ -1,8 +1,14 @@
 from flask import Blueprint, jsonify, request
 import random
+import json
 from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
 from utils import generate_arithmetic, check_badges
-from math_seed import sutton_challenge_questions
+from math_seed import (
+    sutton_challenge_questions,
+    generate_algebra_substitution,
+    generate_ratio_proportion,
+    generate_fdp_conversion
+)
 
 math_bp = Blueprint('math', __name__)
 
@@ -60,8 +66,33 @@ def next_math():
     max_diff = min(10, current_level + 2)
 
     q_type_str = "Mental"
+    q_options = []
+    q_explanation = ""
 
-    if selected_topic and selected_topic != "Mental Maths":
+    # --- New Generator Logic ---
+    generated_data = None
+    use_generator = False
+
+    if selected_topic == "Algebra" and random.random() < 0.6:
+         generated_data = generate_algebra_substitution(current_level)
+         use_generator = True
+    elif selected_topic == "Ratio" and random.random() < 0.6:
+         generated_data = generate_ratio_proportion(current_level)
+         use_generator = True
+    elif selected_topic in ["Fractions", "Percentages"] and random.random() < 0.6:
+         generated_data = generate_fdp_conversion(current_level)
+         use_generator = True
+
+    if use_generator and generated_data:
+        q_text = generated_data['question']
+        q_ans = generated_data['answer']
+        q_id = -1
+        topic_display = selected_topic
+        q_type_str = "Sutton SET Generated"
+        q_options = generated_data.get('options', [])
+        q_explanation = generated_data.get('explanation', "")
+
+    elif selected_topic and selected_topic != "Mental Maths":
         # Fetch DB question for specific topic
         query = session.query(MathQuestion).filter(
             MathQuestion.topic == selected_topic,
@@ -89,6 +120,12 @@ def next_math():
             q_id = selected.id
             topic_display = selected.topic
             q_type_str = getattr(selected, 'question_type', "Multiple Choice")
+            q_explanation = getattr(selected, 'explanation', "")
+            if selected.options:
+                try:
+                    q_options = json.loads(selected.options)
+                except:
+                    q_options = []
         else:
             # Fallback if topic valid but no questions (shouldn't happen with good seed)
             q_text = "No questions available for this topic yet."
@@ -100,6 +137,7 @@ def next_math():
         q_id = -1
         topic_display = "Mental Maths"
         q_type_str = "Mental"
+        q_explanation = f"The answer is {q_ans}."
 
     else:
         # Mixed Mode (Default behaviour)
@@ -114,14 +152,22 @@ def next_math():
                 q_id = selected.id
                 topic_display = selected.topic
                 q_type_str = getattr(selected, 'question_type', "Multiple Choice")
+                q_explanation = getattr(selected, 'explanation', "")
+                if selected.options:
+                    try:
+                        q_options = json.loads(selected.options)
+                    except:
+                        q_options = []
             else:
                 q_text, q_ans = generate_arithmetic(current_level)
                 topic_display = "Mental Maths"
                 q_type_str = "Mental"
+                q_explanation = f"The answer is {q_ans}."
         else:
             q_text, q_ans = generate_arithmetic(current_level)
             topic_display = "Mental Maths"
             q_type_str = "Mental"
+            q_explanation = f"The answer is {q_ans}."
 
     response = {
         "id": q_id,
@@ -130,6 +176,8 @@ def next_math():
         "question": q_text,
         "question_type": q_type_str,
         "generated_answer_check": q_ans if q_id == -1 else None,
+        "options": q_options,
+        "explanation": q_explanation,
         "user_level": current_level,
         "score": user.total_score,
         "streak": user.streak
