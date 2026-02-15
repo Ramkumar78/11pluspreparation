@@ -102,6 +102,46 @@ VERBAL_LIST = [
         "answer": "UFBN",
         "difficulty": 6,
         "explanation": "The code is +1 letter (Next letter in alphabet). T->U, E->F, A->B, M->N."
+    },
+    {
+        "type": "analogy",
+        "text": "Complete the analogy.",
+        "content": "Puppy is to Dog as Kitten is to ___?",
+        "answer": "Cat",
+        "difficulty": 2,
+        "explanation": "A puppy is a young dog; a kitten is a young cat."
+    },
+    {
+        "type": "analogy",
+        "text": "Complete the analogy.",
+        "content": "Doctor is to Hospital as Teacher is to ___?",
+        "answer": "School",
+        "difficulty": 2,
+        "explanation": "A doctor works in a hospital; a teacher works in a school."
+    },
+    {
+        "type": "code_breaking",
+        "text": "If CODE is coded as DPEF, how is READ coded?",
+        "content": "READ",
+        "answer": "SFBE",
+        "difficulty": 5,
+        "explanation": "The rule is +1 letter. R->S, E->F, A->B, D->E."
+    },
+    {
+        "type": "missing_letters",
+        "text": "Fill in the missing letters to complete the word.",
+        "content": "He was very _ n _ i _ u s about the test.",
+        "answer": "anxious",
+        "difficulty": 4,
+        "explanation": "The word is 'anxious'."
+    },
+    {
+        "type": "odd_one_out",
+        "text": "Which word is the odd one out?",
+        "content": "Square, Triangle, Circle, Rectangle",
+        "answer": "Circle",
+        "difficulty": 3,
+        "explanation": "A circle has one curved side; the others are polygons with straight sides."
     }
 ]
 
