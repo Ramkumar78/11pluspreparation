@@ -6,6 +6,7 @@ from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from math_geometry_seed import GEOMETRY_LIST
 from comprehension_seed import COMPREHENSION_LIST
+from comprehension_nonfiction import NONFICTION_LIST
 from verbal_seed import VERBAL_LIST
 
 def migrate_db():
@@ -154,7 +155,9 @@ def seed_database():
     logger.info("Seeding Comprehension Passages...")
     existing_passages = {p.title: p for p in session.query(ComprehensionPassage).all()}
 
-    for c in COMPREHENSION_LIST:
+    ALL_COMPREHENSION = COMPREHENSION_LIST + NONFICTION_LIST
+
+    for c in ALL_COMPREHENSION:
         passage = existing_passages.get(c["title"])
         if not passage:
             passage = ComprehensionPassage(
