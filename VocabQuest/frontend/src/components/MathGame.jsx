@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Lightbulb } from 'lucide-react';
 
 export default function MathGame({
   gameState,
@@ -14,6 +15,15 @@ export default function MathGame({
   hideTopicSelector
 }) {
   const topics = ["Mental Maths", "BIDMAS", "Fractions", "Percentages", "Ratio", "Algebra", "Geometry", "Statistics"];
+  const [showExplanation, setShowExplanation] = useState(false);
+
+  useEffect(() => {
+    if (status === 'wrong') {
+      setShowExplanation(true);
+    } else if (status === 'playing') {
+      setShowExplanation(false);
+    }
+  }, [status]);
 
   return (
     <>
@@ -38,6 +48,18 @@ export default function MathGame({
           {gameState.question}
         </p>
       </div>
+
+      {showExplanation && (
+        <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 mb-6 flex flex-col items-center max-w-lg mx-auto animate-in fade-in slide-in-from-top-4 duration-300">
+             <div className="flex items-center gap-2 mb-2 text-yellow-800 font-bold text-lg">
+                 <Lightbulb className="w-6 h-6" />
+                 <span>Worked Solution</span>
+             </div>
+             <p className="text-yellow-900 text-center font-medium">
+                 {gameState.explanation || "Step 1: Calculate total... Step 2: Divide by..."}
+             </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col md:flex-row gap-4 max-w-lg mx-auto relative">
         <input
