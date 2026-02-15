@@ -1,9 +1,38 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 import json
-from database import Session, TopicProgress, UserStats, ScoreHistory, UserErrors
+from database import Session, TopicProgress, UserStats, ScoreHistory, UserErrors, Mistakes
 from sqlalchemy import desc
 
 core_bp = Blueprint('core', __name__)
+
+@core_bp.route('/api/record_mistake', methods=['POST'])
+def record_mistake():
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    required_fields = ['question_type', 'question_text', 'user_answer', 'correct_answer']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
+
+    session = Session()
+    try:
+        new_mistake = Mistakes(
+            user_id=data.get('user_id', 1), # Default to 1 if not provided
+            question_type=data['question_type'],
+            question_text=data['question_text'],
+            user_answer=data['user_answer'],
+            correct_answer=data['correct_answer']
+        )
+        session.add(new_mistake)
+        session.commit()
+        return jsonify({"message": "Mistake recorded successfully"}), 200
+    except Exception as e:
+        session.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        session.close()
 
 @core_bp.route('/leaderboard', methods=['GET'])
 def get_leaderboard():
