@@ -82,6 +82,17 @@ class UserErrors(Base):
     mode = Column(String, nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
+class VerbalReasoningQuestion(Base):
+    __tablename__ = 'verbal_reasoning_questions'
+    id = Column(Integer, primary_key=True)
+    question_type = Column(String, nullable=False) # e.g. "move_one_letter"
+    question_text = Column(String, nullable=False)
+    content = Column(Text, nullable=True) # JSON or text data needed for question
+    options = Column(Text, nullable=True) # JSON options
+    answer = Column(String, nullable=False)
+    difficulty = Column(Integer, default=3)
+    explanation = Column(Text, nullable=True)
+
 # Init DB
 db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})
