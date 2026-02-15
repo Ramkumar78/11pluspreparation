@@ -7,6 +7,7 @@ import { MODES, API_URL } from './constants';
 import VocabGame from './components/VocabGame';
 import MathGame from './components/MathGame';
 import ComprehensionGame from './components/ComprehensionGame';
+import StreakVisualizer from './components/StreakVisualizer';
 
 export default function Game() {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ export default function Game() {
   const [timeLeft, setTimeLeft] = useState(60);
   const [topic, setTopic] = useState("");
   const [newBadge, setNewBadge] = useState(null);
+  const [showStreak, setShowStreak] = useState(false);
+  const [currentStreak, setCurrentStreak] = useState(0);
 
   // Blitz Mode State
   const [isBlitz, setIsBlitz] = useState(false);
@@ -38,6 +41,13 @@ export default function Game() {
   useEffect(() => {
     loadNextChallenge();
   }, [mode, topic]);
+
+  // Auto-TTS for Vocab Mode
+  useEffect(() => {
+    if (mode === MODES.VOCAB && gameState && gameState.tts_text) {
+        speakWord(gameState.tts_text);
+    }
+  }, [gameState, mode]);
 
   // Per-Question Timer
   useEffect(() => {
@@ -246,6 +256,10 @@ export default function Game() {
                 setStatus("correct");
                 setFeedback("🎉 Excellent!");
                 checkAndShowBadges(res);
+                if (res.data.streak > 0 && res.data.streak % 5 === 0) {
+                    setCurrentStreak(res.data.streak);
+                    setShowStreak(true);
+                }
                 if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 speakWord(res.data.correct_word);
                 setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);
@@ -272,6 +286,10 @@ export default function Game() {
                 setStatus("correct");
                 setFeedback("🎉 Correct!");
                 checkAndShowBadges(res);
+                if (res.data.streak > 0 && res.data.streak % 5 === 0) {
+                    setCurrentStreak(res.data.streak);
+                    setShowStreak(true);
+                }
                 if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 setTimeout(loadNextChallenge, isBlitz ? 500 : 1500);
             } else {
@@ -360,6 +378,8 @@ export default function Game() {
            </div>
         </div>
       )}
+
+      {showStreak && <StreakVisualizer streak={currentStreak} onClose={() => setShowStreak(false)} />}
 
       {newBadge && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
