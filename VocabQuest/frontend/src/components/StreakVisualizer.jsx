@@ -1,35 +1,48 @@
-import React, { useEffect } from 'react';
-import { Sparkles, Trophy } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { Sparkles, Trophy, X } from 'lucide-react';
 
 export default function StreakVisualizer({ streak, onClose }) {
+  const audioContextRef = useRef(null);
+
   useEffect(() => {
     // Play sound on mount
     const playSound = () => {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+        // Clean up previous context if any
+        if (audioContextRef.current) {
+          audioContextRef.current.close().catch(() => {});
+        }
 
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+        const ctx = new AudioContext();
+        audioContextRef.current = ctx;
 
-      // Play a cheerful "Level Up" sound
-      const now = ctx.currentTime;
-      osc.type = 'triangle';
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-      // Arpeggio C-E-G-C
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-      osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-      osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+        osc.connect(gain);
+        gain.connect(ctx.destination);
 
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        // Play a cheerful "Level Up" sound
+        const now = ctx.currentTime;
+        osc.type = 'triangle';
 
-      osc.start(now);
-      osc.stop(now + 0.8);
+        // Arpeggio C-E-G-C
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+        osc.start(now);
+        osc.stop(now + 0.8);
+      } catch (err) {
+        console.warn("Audio playback failed:", err);
+      }
     };
 
     playSound();
@@ -39,12 +52,27 @@ export default function StreakVisualizer({ streak, onClose }) {
       onClose();
     }, 3000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+      }
+    };
   }, [onClose]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
       <div className="relative bg-gradient-to-br from-yellow-300 to-orange-400 p-8 rounded-3xl shadow-2xl flex flex-col items-center text-center transform scale-110 border-4 border-white animate-bounce">
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute top-2 right-2 bg-white/20 hover:bg-white/40 text-white rounded-full p-1 transition-colors z-10"
+        >
+          <X size={24} />
+        </button>
+
         <div className="absolute -top-12 animate-pulse">
             <Sparkles size={64} className="text-yellow-100 drop-shadow-lg" />
         </div>
