@@ -1,3 +1,69 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Focus Mode Styles */
+
+/* 1. Global Reset for Focus Mode */
+.focus-mode-active {
+    background-color: #f3f4f6; /* gray-100 */
+    color: #1f2937; /* gray-800 */
+}
+
+/* 2. Override Gradients */
+.focus-mode-active .bg-gradient-to-br,
+.focus-mode-active .bg-gradient-to-b,
+.focus-mode-active .bg-gradient-to-r,
+.focus-mode-active .bg-gradient-to-tr {
+    background: #f3f4f6 !important;
+}
+
+/* 3. Override Text Colors */
+/* Change text-white to dark gray on containers */
+.focus-mode-active .text-white {
+    color: #1f2937 !important;
+}
+
+/* BUT keep text-white for buttons and specific elements that still have background colors */
+.focus-mode-active button.text-white,
+.focus-mode-active .bg-indigo-600.text-white,
+.focus-mode-active .bg-indigo-500.text-white,
+.focus-mode-active .bg-orange-500.text-white,
+.focus-mode-active .bg-emerald-600.text-white,
+.focus-mode-active .bg-pink-600.text-white,
+.focus-mode-active .bg-red-500.text-white,
+.focus-mode-active .group.text-white
+{
+    color: #ffffff !important;
+}
+
+/* Change light text colors to darker ones for contrast on white background */
+.focus-mode-active .text-indigo-100 {
+    color: #4b5563 !important; /* gray-600 */
+}
+.focus-mode-active .text-yellow-300 {
+    color: #d97706 !important; /* amber-600 */
+}
+.focus-mode-active .text-yellow-400 {
+    color: #d97706 !important;
+}
+
+/* 4. Flatten Glassmorphism and Cards */
+.focus-mode-active .bg-white\/10 {
+    background-color: #ffffff !important;
+    border: 1px solid #e5e7eb !important; /* gray-200 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    backdrop-filter: none !important;
+}
+
+/* 5. Disable Animations and Hide Playful Elements */
+.focus-mode-active .animate-bounce {
+    animation: none !important;
+    display: none !important; /* Hides the bouncing lion */
+}
+.focus-mode-active .animate-pulse {
+    animation: none !important;
+}
+.focus-mode-active .animate-fade-in-up {
+    animation: none !important;
+}
