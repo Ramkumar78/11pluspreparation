@@ -417,5 +417,64 @@ MATH_LIST = [
         "topic": "Algebra Indices",
         "diff": 9,
         "explanation": "Divide numbers: 12÷4 = 3. Subtract powers for a: a⁵ ÷ a² = a³. Subtract powers for b: b² ÷ b = b. Result: 3a³b."
+    },
+
+    # --- STANDARD WRITTEN (High Level) ---
+    {
+        "text": "A recipe for 4 people uses 200g of flour and 150ml of milk. How much flour is needed for 6 people?",
+        "answer": "300",
+        "topic": "Ratio",
+        "diff": 8,
+        "explanation": "Ratio is 4 people : 200g. 1 person : 50g. 6 people : 300g.",
+        "question_type": "Standard Written"
+    },
+    {
+        "text": "Solve for x: 3(2x + 4) = 30",
+        "answer": "3",
+        "topic": "Algebra",
+        "diff": 8,
+        "explanation": "Expand: 6x + 12 = 30. Subtract 12: 6x = 18. Divide by 6: x = 3.",
+        "question_type": "Standard Written"
+    },
+    {
+        "text": "The ratio of red to blue marbles is 3:5. If there are 24 red marbles, how many blue marbles are there?",
+        "answer": "40",
+        "topic": "Ratio",
+        "diff": 8,
+        "explanation": "3 parts = 24. 1 part = 8. Blue is 5 parts. 5 * 8 = 40.",
+        "question_type": "Standard Written"
+    },
+    {
+        "text": "Alice is 3 times as old as Bob. In 10 years, Alice will be twice as old as Bob. How old is Bob now?",
+        "answer": "10",
+        "topic": "Algebra",
+        "diff": 9,
+        "explanation": "Let Bob = b, Alice = 3b. (3b + 10) = 2(b + 10). 3b + 10 = 2b + 20. b = 10.",
+        "question_type": "Standard Written"
+    },
+    {
+        "text": "Share £80 between Ann and Ben in the ratio 3:5. How much does Ben get?",
+        "answer": "50",
+        "topic": "Ratio",
+        "diff": 8,
+        "explanation": "Total parts = 8. 1 part = 10. Ben gets 5 parts = 50.",
+        "question_type": "Standard Written"
+    },
+    {
+        "text": "A rectangular garden has a perimeter of 40m. The length is 4m more than the width. Find the width.",
+        "answer": "8",
+        "topic": "Algebra",
+        "diff": 9,
+        "explanation": "2(w + w + 4) = 40. 4w + 8 = 40. 4w = 32. w = 8.",
+        "question_type": "Standard Written"
+    },
+    # Control question to test filtering
+    {
+        "text": "Control Question: High Diff Multiple Choice Ratio",
+        "answer": "100",
+        "topic": "Ratio",
+        "diff": 9,
+        "explanation": "Just a test.",
+        "question_type": "Multiple Choice"
     }
 ]

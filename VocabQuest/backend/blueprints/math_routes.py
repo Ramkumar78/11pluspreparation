@@ -38,13 +38,25 @@ def next_math():
     min_diff = max(1, current_level - 1)
     max_diff = min(10, current_level + 2)
 
+    q_type_str = "Mental"
+
     if selected_topic and selected_topic != "Mental Maths":
         # Fetch DB question for specific topic
-        questions = session.query(MathQuestion).filter(
+        query = session.query(MathQuestion).filter(
             MathQuestion.topic == selected_topic,
             MathQuestion.difficulty >= min_diff,
             MathQuestion.difficulty <= max_diff
-        ).all()
+        )
+
+        # New logic: Fetch 'Standard Written' questions when mastery_level > 7 for specific topics
+        if current_level > 7 and selected_topic in ["Ratio", "Algebra"]:
+            sw_questions = query.filter(MathQuestion.question_type == "Standard Written").all()
+            if sw_questions:
+                questions = sw_questions
+            else:
+                questions = query.all()
+        else:
+            questions = query.all()
 
         # Fallback if no questions in that difficulty range for this topic
         if not questions:
@@ -55,6 +67,7 @@ def next_math():
             q_text = selected.text
             q_id = selected.id
             topic_display = selected.topic
+            q_type_str = getattr(selected, 'question_type', "Multiple Choice")
         else:
             # Fallback if topic valid but no questions (shouldn't happen with good seed)
             q_text = "No questions available for this topic yet."
@@ -65,6 +78,7 @@ def next_math():
         q_text, q_ans = generate_arithmetic(current_level)
         q_id = -1
         topic_display = "Mental Maths"
+        q_type_str = "Mental"
 
     else:
         # Mixed Mode (Default behaviour)
@@ -78,18 +92,22 @@ def next_math():
                 q_text = selected.text
                 q_id = selected.id
                 topic_display = selected.topic
+                q_type_str = getattr(selected, 'question_type', "Multiple Choice")
             else:
                 q_text, q_ans = generate_arithmetic(current_level)
                 topic_display = "Mental Maths"
+                q_type_str = "Mental"
         else:
             q_text, q_ans = generate_arithmetic(current_level)
             topic_display = "Mental Maths"
+            q_type_str = "Mental"
 
     response = {
         "id": q_id,
         "type": "math",
         "topic": topic_display,
         "question": q_text,
+        "question_type": q_type_str,
         "generated_answer_check": q_ans if q_id == -1 else None,
         "user_level": current_level,
         "score": user.total_score,
