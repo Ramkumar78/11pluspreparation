@@ -19,6 +19,7 @@ from blueprints.mock_routes import mock_bp
 from blueprints.core_routes import core_bp
 from blueprints.repair_routes import repair_bp
 from blueprints.verbal_reasoning_routes import verbal_reasoning_bp
+from blueprints.spag_routes import spag_bp
 
 app = Flask(__name__)
 
@@ -44,6 +45,7 @@ app.register_blueprint(mock_bp)
 app.register_blueprint(core_bp)
 app.register_blueprint(repair_bp)
 app.register_blueprint(verbal_reasoning_bp)
+app.register_blueprint(spag_bp)
 
 @app.cli.command("init-db")
 def init_db_command():
