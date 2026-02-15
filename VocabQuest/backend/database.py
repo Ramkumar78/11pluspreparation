@@ -74,23 +74,22 @@ class ComprehensionQuestion(Base):
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
-class VerbalReasoningQuestion(Base):
-    __tablename__ = 'verbal_reasoning_questions'
-    id = Column(Integer, primary_key=True)
-    question_type = Column(String, nullable=False)
-    question_text = Column(String, nullable=False)
-    content = Column(Text, nullable=True)
-    options = Column(String, nullable=True) # JSON
-    answer = Column(String, nullable=False)
-    difficulty = Column(Integer, default=3)
-    explanation = Column(String, nullable=True)
-
 class UserErrors(Base):
     __tablename__ = 'user_errors'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, default=1)
     question_id = Column(Integer, nullable=False)
     mode = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
+
+class Mistakes(Base):
+    __tablename__ = 'mistakes'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, default=1)
+    question_type = Column(String, nullable=False)
+    question_text = Column(String, nullable=False)
+    user_answer = Column(String, nullable=False)
+    correct_answer = Column(String, nullable=False)
     timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
 class VerbalReasoningQuestion(Base):
@@ -182,6 +181,9 @@ def migrate_db():
              # But if create_all ran before UserErrors was defined, we need to create it now.
              logging.info("Migrating: Creating user_errors table...")
              UserErrors.__table__.create(engine)
+
+        # Create Mistakes table if it doesn't exist
+        Mistakes.__table__.create(engine, checkfirst=True)
 
         conn.commit()
 
