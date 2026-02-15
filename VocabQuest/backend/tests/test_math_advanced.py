@@ -73,7 +73,7 @@ def client(monkeypatch, test_db):
     with app.test_client() as client:
         yield client
 
-@patch('blueprints.math_routes.random.random')
+@patch('blueprints.math_routes.random.random', return_value=0.9)
 def test_math_standard_written_logic(mock_random, client, test_db):
     """
     Test that 'Standard Written' questions are prioritized when
@@ -138,7 +138,7 @@ def test_math_standard_written_logic(mock_random, client, test_db):
     data = response.get_json()
     assert data['question'] in ["Easy MC", "Easy SW"]
 
-@patch('blueprints.math_routes.random.random')
+@patch('blueprints.math_routes.random.random', return_value=0.9)
 def test_math_algebra_standard_written(mock_random, client, test_db):
     """Test specific logic for Algebra as well."""
     # Ensure random.random() > 0.6 so we skip the generator logic

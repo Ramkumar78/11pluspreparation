@@ -357,5 +357,34 @@ COMPREHENSION_LIST = [
                 "evidence": "He had grown into a beautiful white swan!"
             }
         ]
+    },
+    {
+        "title": "The Honeybee",
+        "topic": "Science & Nature",
+        "image_prompt": "Detailed illustration of a honeybee on a flower, honeycomb background, scientific drawing style",
+        "content": """The honeybee is a marvel of nature, living in highly organised colonies that can contain up to 60,000 individuals. Within the hive, there is a strict hierarchy consisting of three types of bees: the queen, the drones, and the workers. The queen is the sole reproductive female, whose only task is to lay eggs—up to 2,000 a day in summer. The drones are male bees, whose primary function is to mate with a new queen; they possess no stinger and gather no pollen. The vast majority of the colony consists of worker bees, which are sterile females. These industrious insects perform all the labour: cleaning the hive, feeding the larvae, producing wax to build honeycombs, and foraging for nectar and pollen. Remarkably, worker bees communicate the location of food sources to one another through a complex series of movements known as the 'waggle dance'.""",
+        "questions": [
+            {
+                "text": "Which member of the hive is responsible for gathering food?",
+                "options": ["The Queen", "The Drone", "The Worker", "The Larvae"],
+                "answer": "The Worker",
+                "explanation": "The text states that worker bees perform labour including 'foraging for nectar and pollen'.",
+                "evidence": "The vast majority of the colony consists of worker bees... These industrious insects perform all the labour... foraging for nectar and pollen."
+            },
+            {
+                "text": "What is the primary function of the drone bee?",
+                "options": ["To defend the hive", "To mate with a queen", "To make honey", "To do the waggle dance"],
+                "answer": "To mate with a queen",
+                "explanation": "The text explicitly states: 'The drones are male bees, whose primary function is to mate with a new queen'.",
+                "evidence": "whose primary function is to mate with a new queen"
+            },
+            {
+                "text": "How do bees communicate the location of flowers?",
+                "options": ["Buzzing loudly", "Releasing scents", "The waggle dance", "Touching antennae"],
+                "answer": "The waggle dance",
+                "explanation": "The text mentions a 'complex series of movements known as the waggle dance'.",
+                "evidence": "communicate the location of food sources to one another through a complex series of movements known as the 'waggle dance'."
+            }
+        ]
     }
 ]
