@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Clock, CheckCircle, XCircle, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -16,6 +16,8 @@ export default function MockTest() {
   const [timeLeft, setTimeLeft] = useState(1200); // 20 mins default
   const [result, setResult] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [timings, setTimings] = useState({}); // { id: seconds }
+  const [startTime, setStartTime] = useState(Date.now());
 
   useEffect(() => {
     // Fetch new mock test
@@ -27,6 +29,17 @@ export default function MockTest() {
       .catch(err => console.error(err));
   }, [type]);
 
+  // Reset start time when question changes
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, [currentIdx, test]);
+
+  // Ref to handle stale closure in timer
+  const handleSubmitTestRef = useRef();
+  useEffect(() => {
+    handleSubmitTestRef.current = handleSubmitTest;
+  });
+
   // Timer
   useEffect(() => {
     if (result) return;
@@ -36,7 +49,9 @@ export default function MockTest() {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleSubmitTest();
+          if (handleSubmitTestRef.current) {
+             handleSubmitTestRef.current();
+          }
           return 0;
         }
         return prev - 1;
@@ -52,19 +67,27 @@ export default function MockTest() {
   };
 
   const nextQuestion = () => {
+    if (!test) return;
+    const elapsed = (Date.now() - startTime) / 1000;
+    const currentQ = test.items[currentIdx];
+
     if (currentIdx < test.items.length - 1) {
+      setTimings(prev => ({ ...prev, [currentQ.id]: elapsed }));
       setCurrentIdx(currentIdx + 1);
     } else {
-      handleSubmitTest();
+      handleSubmitTest({ [currentQ.id]: elapsed });
     }
   };
 
-  const handleSubmitTest = async () => {
+  const handleSubmitTest = async (finalTiming = {}) => {
     setSubmitting(true);
+    const allTimings = { ...timings, ...finalTiming };
+
     const payload = test.items.map(item => ({
       id: item.id,
       type: item.type,
-      user_answer: answers[item.id] || ""
+      user_answer: answers[item.id] || "",
+      time_taken: allTimings[item.id] || 0
     }));
 
     try {
