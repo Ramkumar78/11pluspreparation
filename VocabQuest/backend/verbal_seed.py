@@ -62,6 +62,46 @@ VERBAL_LIST = [
         "answer": "car",
         "difficulty": 1,
         "explanation": "A car is a common vehicle with four wheels."
+    },
+    {
+        "type": "antonym",
+        "text": "Select the word that is most OPPOSITE in meaning to the word in capital letters.",
+        "content": "ANCIENT",
+        "answer": "Modern",
+        "difficulty": 4,
+        "explanation": "Ancient means very old. Modern means new or current."
+    },
+    {
+        "type": "antonym",
+        "text": "Select the word that is most OPPOSITE in meaning to the word in capital letters.",
+        "content": "EXPAND",
+        "answer": "Contract",
+        "difficulty": 5,
+        "explanation": "Expand means to get bigger. Contract means to get smaller."
+    },
+    {
+        "type": "odd_one_out",
+        "text": "Find the word that does not belong in the group.",
+        "content": "Apple, Pear, Potato, Grape, Banana",
+        "answer": "Potato",
+        "difficulty": 3,
+        "explanation": "Potato is a vegetable (tuber); the others are fruits."
+    },
+    {
+        "type": "odd_one_out",
+        "text": "Find the word that does not belong in the group.",
+        "content": "Sprint, Jog, Walk, Sleep, Run",
+        "answer": "Sleep",
+        "difficulty": 2,
+        "explanation": "Sleep is a state of rest; the others are forms of movement."
+    },
+    {
+        "type": "code_breaking",
+        "text": "If CODE is coded as DPEF, how is TEAM coded?",
+        "content": "TEAM",
+        "answer": "UFBN",
+        "difficulty": 6,
+        "explanation": "The code is +1 letter (Next letter in alphabet). T->U, E->F, A->B, M->N."
     }
 ]
 
