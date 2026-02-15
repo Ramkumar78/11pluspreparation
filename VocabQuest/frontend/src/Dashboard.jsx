@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Activity, BookOpen, ArrowLeft, Trophy } from 'lucide-react';
+import { Activity, BookOpen, ArrowLeft, Trophy, Wrench, AlertCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 import { API_URL } from './constants';
@@ -99,6 +99,43 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Repair Mode Card */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-red-100 flex flex-col relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 opacity-10">
+                 <Wrench size={100} className="text-red-500" />
+             </div>
+             <div className="flex items-center gap-3 mb-4 z-10">
+                <div className="p-3 rounded-lg bg-red-100 text-red-600">
+                  <Wrench size={24} />
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-800">Mistake Bank</h3>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Repair Mode</span>
+                </div>
+             </div>
+
+             <div className="mb-4 z-10">
+                 <p className="text-gray-500 text-sm mb-2">Re-attempt your failed questions to earn double points and clear your errors!</p>
+                 <div className="flex items-center gap-2">
+                     <AlertCircle size={16} className={userStats.error_count > 0 ? "text-red-500" : "text-green-500"} />
+                     <span className={`font-bold ${userStats.error_count > 0 ? "text-red-600" : "text-green-600"}`}>
+                         {userStats.error_count || 0} Errors Pending
+                     </span>
+                 </div>
+             </div>
+
+             <button
+                onClick={() => navigate('/game/repair')}
+                disabled={!userStats.error_count || userStats.error_count === 0}
+                className={`mt-auto w-full py-3 rounded-xl font-bold transition z-10 flex items-center justify-center gap-2
+                    ${(!userStats.error_count || userStats.error_count === 0)
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-red-500 text-white hover:bg-red-600 shadow-md hover:shadow-lg'}`}
+             >
+                {(!userStats.error_count || userStats.error_count === 0) ? 'No Errors!' : 'Start Repair Session'}
+             </button>
+          </div>
+
         {topics.map((t, idx) => (
           <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             <div className="flex justify-between items-start mb-4">

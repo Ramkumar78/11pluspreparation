@@ -2,6 +2,7 @@ export const MODES = {
   VOCAB: 'vocab',
   MATH: 'math',
   COMPREHENSION: 'comprehension',
+  REPAIR: 'repair',
 };
 
 export const MOCK_TYPES = {

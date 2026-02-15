@@ -74,16 +74,13 @@ class ComprehensionQuestion(Base):
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
-class VerbalReasoningQuestion(Base):
-    __tablename__ = 'verbal_reasoning_questions'
+class UserErrors(Base):
+    __tablename__ = 'user_errors'
     id = Column(Integer, primary_key=True)
-    question_type = Column(String, nullable=False) # 'move_one_letter', 'missing_word'
-    question_text = Column(String, nullable=False) # Instruction
-    content = Column(String, nullable=True) # Puzzle/Sentence
-    options = Column(String, nullable=True) # JSON
-    answer = Column(String, nullable=False)
-    difficulty = Column(Integer, default=3)
-    explanation = Column(String, nullable=True)
+    user_id = Column(Integer, default=1)
+    question_id = Column(Integer, nullable=False)
+    mode = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
 
 # Init DB
 db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
@@ -153,6 +150,16 @@ def migrate_db():
         except Exception:
             # Table created by create_all usually, but here just in case
             pass
+
+        # Create UserErrors table if it doesn't exist
+        try:
+            conn.execute(text("SELECT question_id FROM user_errors LIMIT 1"))
+        except Exception:
+             # If table doesn't exist, create it via metadata or raw SQL.
+             # Since Base.metadata.create_all handles creation, this check is mostly for schema updates on existing DBs.
+             # But if create_all ran before UserErrors was defined, we need to create it now.
+             logging.info("Migrating: Creating user_errors table...")
+             UserErrors.__table__.create(engine)
 
         conn.commit()
 

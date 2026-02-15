@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 import random
 import bleach
 from extensions import limiter
-from database import Session, Word, UserStats, ScoreHistory
+from database import Session, Word, UserStats, ScoreHistory, UserErrors
 from utils import check_badges
 
 vocab_bp = Blueprint('vocab', __name__)
@@ -61,6 +61,7 @@ def check_answer():
 
     word_id = data.get('id')
     raw_spelling = data.get('spelling', '')
+    repair_mode = data.get('repair_mode', False)
 
     # Input Validation
     if not isinstance(word_id, int):
@@ -85,7 +86,16 @@ def check_answer():
     if is_correct:
         # Correct Logic
         user.streak += 1
-        user.total_score += 10 + (user.streak * 2)
+        points = 10 + (user.streak * 2)
+        if repair_mode:
+            points *= 2 # Double points for repair mode
+
+            # Remove from UserErrors
+            error = session.query(UserErrors).filter_by(user_id=user.id, question_id=word_id, mode='vocab').first()
+            if error:
+                session.delete(error)
+
+        user.total_score += points
 
         # Record Score History
         session.add(ScoreHistory(score=user.total_score, mode='vocab'))
@@ -99,6 +109,11 @@ def check_answer():
         user.streak = 0
         # Decrease difficulty immediately
         user.current_level = max(1, user.current_level - 1)
+
+        # Add to UserErrors if not already there
+        existing_error = session.query(UserErrors).filter_by(user_id=user.id, question_id=word_id, mode='vocab').first()
+        if not existing_error:
+            session.add(UserErrors(user_id=user.id, question_id=word_id, mode='vocab'))
 
     new_badges = check_badges(user)
     session.commit()

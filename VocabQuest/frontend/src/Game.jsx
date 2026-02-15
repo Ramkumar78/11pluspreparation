@@ -88,13 +88,23 @@ export default function Game() {
       let endpoint = '/next_word';
       if (mode === MODES.MATH) {
         endpoint = `/next_math${topic ? `?topic=${encodeURIComponent(topic)}` : ''}`;
+      } else if (mode === MODES.COMPREHENSION) {
+        endpoint = '/next_comprehension';
+      } else if (mode === MODES.REPAIR) {
+        endpoint = '/next_repair';
       }
-      if (mode === MODES.COMPREHENSION) endpoint = '/next_comprehension';
 
       const res = await axios.get(`${API_URL}${endpoint}`);
+
+      if (mode === MODES.REPAIR && res.data.empty) {
+          setGameState({ empty: true, message: res.data.message });
+          setStatus("finished");
+          return;
+      }
+
       setGameState(res.data);
 
-      if (mode === MODES.MATH) {
+      if (mode === MODES.MATH || (mode === MODES.REPAIR && res.data.type === 'math')) {
         setMathAnswer(res.data.generated_answer_check);
         setExplanation(res.data.explanation);
       } else if (mode === MODES.COMPREHENSION) {
@@ -244,11 +254,12 @@ export default function Game() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    if (mode === MODES.VOCAB) {
+    if (mode === MODES.VOCAB || (mode === MODES.REPAIR && gameState.type === 'vocab')) {
         try {
             const res = await axios.post(`${API_URL}/check_answer`, {
                 id: gameState.id,
-                spelling: input
+                spelling: input,
+                repair_mode: mode === MODES.REPAIR
             });
 
             if (res.data.correct) {
@@ -273,12 +284,13 @@ export default function Game() {
         } catch (err) {
             console.error(err);
         }
-    } else if (mode === MODES.MATH) {
+    } else if (mode === MODES.MATH || (mode === MODES.REPAIR && gameState.type === 'math')) {
         try {
             const res = await axios.post(`${API_URL}/check_math`, {
                 id: gameState.id,
                 answer: input,
-                correct_answer: mathAnswer
+                correct_answer: mathAnswer,
+                repair_mode: mode === MODES.REPAIR
             });
 
             if (res.data.correct) {
@@ -416,7 +428,18 @@ export default function Game() {
 
       <div className={`bg-white p-8 rounded-3xl shadow-2xl w-full border-4 border-indigo-200 relative ${mode === MODES.COMPREHENSION ? 'max-w-4xl' : 'max-w-2xl'}`}>
 
-        {mode === MODES.VOCAB && (
+        {gameState.empty && (
+            <div className="text-center p-8">
+                <Trophy size={64} className="mx-auto text-yellow-500 mb-4" />
+                <h2 className="text-2xl font-black text-indigo-900 mb-2">Mistake Bank Empty!</h2>
+                <p className="text-gray-600 mb-6">{gameState.message}</p>
+                <button onClick={() => navigate('/dashboard')} className="bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition">
+                    Back to Dashboard
+                </button>
+            </div>
+        )}
+
+        {(mode === MODES.VOCAB || (mode === MODES.REPAIR && gameState.type === 'vocab')) && !gameState.empty && (
             <VocabGame
                 gameState={gameState}
                 input={input}
@@ -430,7 +453,7 @@ export default function Game() {
             />
         )}
 
-        {mode === MODES.MATH && (
+        {(mode === MODES.MATH || (mode === MODES.REPAIR && gameState.type === 'math')) && !gameState.empty && (
             <MathGame
                 gameState={gameState}
                 input={input}
@@ -442,6 +465,7 @@ export default function Game() {
                 feedback={feedback}
                 topic={topic}
                 onTopicChange={setTopic}
+                hideTopicSelector={mode === MODES.REPAIR}
             />
         )}
 

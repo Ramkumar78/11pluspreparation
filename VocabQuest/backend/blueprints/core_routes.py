@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 import json
-from database import Session, TopicProgress, UserStats, ScoreHistory
+from database import Session, TopicProgress, UserStats, ScoreHistory, UserErrors
 from sqlalchemy import desc
 
 core_bp = Blueprint('core', __name__)
@@ -36,11 +36,14 @@ def get_user_stats():
         except:
             badges = []
 
+    error_count = session.query(UserErrors).filter_by(user_id=user.id).count()
+
     result = {
         "score": user.total_score,
         "streak": user.streak,
         "level": user.current_level,
-        "badges": badges
+        "badges": badges,
+        "error_count": error_count
     }
     session.close()
     return jsonify(result)
