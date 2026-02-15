@@ -176,7 +176,8 @@ def check_math():
         "score": user.total_score,
         "new_level": topic_prog.mastery_level, # Return specific topic level
         "topic": actual_topic,
-        "new_badges": new_badges
+        "new_badges": new_badges,
+        "streak": user.streak
     }
     session.close()
     return jsonify(result)
