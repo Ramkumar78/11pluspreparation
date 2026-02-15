@@ -3,8 +3,18 @@ import random
 import json
 from database import Session, UserStats, VerbalReasoningQuestion, TopicProgress, ScoreHistory
 from utils import check_badges
+from verbal_seed import CLOZE_LIST
 
 verbal_reasoning_bp = Blueprint('verbal_reasoning', __name__)
+
+@verbal_reasoning_bp.route('/cloze', methods=['GET'])
+def get_cloze():
+    """Returns a random Cloze (sentence completion) task."""
+    if not CLOZE_LIST:
+        return jsonify({"error": "No cloze questions available"}), 404
+
+    question = random.choice(CLOZE_LIST)
+    return jsonify(question)
 
 @verbal_reasoning_bp.route('/next_verbal', methods=['GET'])
 def next_verbal():
