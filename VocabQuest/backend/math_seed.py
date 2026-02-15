@@ -479,6 +479,43 @@ MATH_LIST = [
         "diff": 9,
         "explanation": "Just a test.",
         "question_type": "Multiple Choice"
+    },
+
+    # --- SUTTON SET: Advanced Ratio & Percentage ---
+    {
+        "text": "In a school of 1200 students, 45% are boys. 20% of the boys play cricket. How many boys play cricket?",
+        "answer": "108",
+        "topic": "Percentages",
+        "diff": 8,
+        "explanation": "First, find the number of boys: 45% of 1200. 10% is 120, so 40% is 480, 5% is 60. Total boys = 540. Now find 20% of 540. 10% is 54, so 20% is 108."
+    },
+    {
+        "text": "The ratio of apples to oranges in a box is 3:5. If there are 12 more oranges than apples, how many fruit are there in total?",
+        "answer": "48",
+        "topic": "Ratio",
+        "diff": 9,
+        "explanation": "Difference in parts is 5 - 3 = 2 parts. We know 2 parts = 12 fruit. So 1 part = 6 fruit. Total parts = 3 + 5 = 8 parts. Total fruit = 8 * 6 = 48."
+    },
+    {
+        "text": "A car travels 90km in 1 hour 15 minutes. At the same speed, how far will it travel in 2 hours?",
+        "answer": "144",
+        "topic": "Speed/Distance",
+        "diff": 8,
+        "explanation": "1 hr 15 mins = 75 mins. Speed = 90km / 75mins = 1.2 km/min. In 2 hours (120 mins), distance = 1.2 * 120 = 144km."
+    },
+    {
+        "text": "Three friends share a prize. Alice gets 1/3, Bob gets 2/5, and Charlie gets the rest. If Charlie gets £24, what was the total prize?",
+        "answer": "90",
+        "topic": "Fractions",
+        "diff": 9,
+        "explanation": "Alice + Bob = 1/3 + 2/5 = 5/15 + 6/15 = 11/15. Charlie gets the remainder: 1 - 11/15 = 4/15. If 4/15 = £24, then 1/15 = £6. Total (15/15) = 15 * 6 = £90."
+    },
+    {
+        "text": "Product A costs £40 and is reduced by 20%. Product B costs £50 and is reduced by £15. Which is cheaper now, and by how much?",
+        "answer": "A by 3",
+        "topic": "Percentages",
+        "diff": 8,
+        "explanation": "Product A: 20% of 40 is 8. Price = 32. Product B: 50 - 15 = 35. Product A (£32) is cheaper than B (£35) by £3. Enter '3' or 'A by 3'."
     }
 ]
 
