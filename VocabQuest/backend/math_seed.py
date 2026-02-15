@@ -478,3 +478,42 @@ MATH_LIST = [
         "question_type": "Multiple Choice"
     }
 ]
+
+# SUTTON CHALLENGE QUESTIONS
+sutton_challenge_questions = [
+    {
+        "text": "If 3 cats catch 3 mice in 3 minutes, how many cats are needed to catch 100 mice in 100 minutes?",
+        "answer": "3",
+        "topic": "Logic",
+        "diff": 10,
+        "explanation_text": "Don't be tricked! 3 cats take 3 mins for 3 mice. This means 1 cat takes 3 mins to catch 1 mouse. In 100 minutes, 1 cat could catch (100÷3) = 33 mice. But simpler: The RATE is the same. The cats work in parallel. 3 cats catch 1 mouse per minute (combined). So in 100 minutes, the SAME 3 cats catch 100 mice."
+    },
+    {
+        "text": "A train leaves Station A at 60 mph. Another train leaves Station B towards A at 40 mph. The stations are 100 miles apart. How long until they meet?",
+        "answer": "1 hour",
+        "topic": "Speed/Distance",
+        "diff": 9,
+        "explanation_text": "They are moving towards each other, so add their speeds: 60 + 40 = 100 mph. Distance is 100 miles. Time = Distance / Speed = 100 / 100 = 1 hour."
+    },
+    {
+        "text": "It takes 5 machines 5 minutes to make 5 widgets. How long does it take 100 machines to make 100 widgets?",
+        "answer": "5 minutes",
+        "topic": "Work/Time",
+        "diff": 9,
+        "explanation_text": "Each machine takes 5 minutes to make 1 widget (since 5 machines make 5 widgets in 5 minutes). So 100 machines working simultaneously will make 100 widgets in 5 minutes."
+    },
+    {
+        "text": "When I was 6 years old, my sister was half my age. Now I am 70. How old is my sister?",
+        "answer": "67",
+        "topic": "Age Problem",
+        "diff": 8,
+        "explanation_text": "When you were 6, your sister was 3 (half of 6). The age difference is 3 years. When you are 70, she is still 3 years younger, so 70 - 3 = 67."
+    },
+    {
+        "text": "A snail is at the bottom of a 20-foot well. Each day, it climbs up 3 feet, but at night it slips back 2 feet. How many days will it take to reach the top?",
+        "answer": "18",
+        "topic": "Logic",
+        "diff": 10,
+        "explanation_text": "Net gain per day is 1 foot. After 17 days, it has climbed 17 feet. On the 18th day, it climbs 3 feet, reaching 20 feet (top) and climbs out before slipping back."
+    }
+]
