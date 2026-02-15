@@ -64,3 +64,31 @@ VERBAL_LIST = [
         "explanation": "A car is a common vehicle with four wheels."
     }
 ]
+
+CLOZE_LIST = [
+    {
+        "sentence": "The _____ brown fox jumps over the lazy dog.",
+        "missing_word": "quick",
+        "options": ["slow", "quick", "lazy", "red", "happy"]
+    },
+    {
+        "sentence": "She has a _____ of chocolates.",
+        "missing_word": "box",
+        "options": ["box", "bag", "cup", "plate", "spoon"]
+    },
+    {
+        "sentence": "The cat sat on the _____.",
+        "missing_word": "mat",
+        "options": ["mat", "bat", "hat", "rat", "fat"]
+    },
+    {
+        "sentence": "He went to the _____ to buy some bread.",
+        "missing_word": "shop",
+        "options": ["shop", "park", "school", "beach", "gym"]
+    },
+    {
+        "sentence": "The sun rises in the _____.",
+        "missing_word": "east",
+        "options": ["east", "west", "north", "south", "sky"]
+    }
+]
