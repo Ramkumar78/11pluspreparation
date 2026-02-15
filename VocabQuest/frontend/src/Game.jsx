@@ -213,19 +213,24 @@ export default function Game() {
     }
   };
 
-  const handleCompOptionClick = async (option) => {
+  const handleCompOptionClick = async (option, evidence = null) => {
       if (status !== 'playing') return;
 
       try {
           const res = await axios.post(`${API_URL}/check_comprehension`, {
               question_id: compQuestionId,
-              answer: option
+              answer: option,
+              evidence: evidence
           });
 
           if (res.data.correct) {
               if (isBlitz) setBlitzStats(s => ({ ...s, correct: s.correct + 1, total: s.total + 1 }));
               setStatus("correct");
-              setFeedback("🎉 Correct!");
+              setFeedback(
+                  res.data.evidence_bonus
+                  ? "🎉 Correct! +5 Bonus Evidence Points!"
+                  : "🎉 Correct!"
+              );
               checkAndShowBadges(res);
               if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
               setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);

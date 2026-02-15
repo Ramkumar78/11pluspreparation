@@ -71,9 +71,26 @@ def check_comprehension():
 
     is_correct = (user_answer.lower() == question.correct_answer.lower())
 
+    evidence_bonus = False
+    evidence_found = data.get('evidence', '').strip()
+
     # Update score
     if is_correct:
         user.total_score += 15 # Comprehensions might be worth more
+
+        # Check for Evidence Bonus
+        if evidence_found and question.evidence_text:
+            # Check if user selected text overlaps with evidence
+            # Simple check: if evidence_text contains user selection (sufficient length) OR user selection contains evidence_text
+            clean_evidence = evidence_found.lower()
+            clean_target = question.evidence_text.lower()
+
+            # Ensure user selected enough text (e.g. at least 5 chars) to avoid random clicks
+            if len(clean_evidence) > 5:
+                if clean_target in clean_evidence or clean_evidence in clean_target:
+                    user.total_score += 5
+                    evidence_bonus = True
+
         user.streak += 1
     else:
         user.streak = 0
@@ -86,7 +103,8 @@ def check_comprehension():
         "correct_answer": question.correct_answer,
         "explanation": question.explanation,
         "score": user.total_score,
-        "new_badges": new_badges
+        "new_badges": new_badges,
+        "evidence_bonus": evidence_bonus
     }
 
     session.close()
