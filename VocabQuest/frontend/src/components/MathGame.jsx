@@ -10,25 +10,28 @@ export default function MathGame({
   handleSubmit,
   feedback,
   topic,
-  onTopicChange
+  onTopicChange,
+  hideTopicSelector
 }) {
   const topics = ["Mental Maths", "BIDMAS", "Fractions", "Percentages", "Ratio", "Algebra", "Geometry", "Statistics"];
 
   return (
     <>
-      <div className="mb-4 flex justify-center">
-        <select
-          value={topic || ""}
-          onChange={(e) => onTopicChange && onTopicChange(e.target.value)}
-          className="p-2 border-2 border-indigo-200 rounded-lg text-indigo-700 font-bold focus:outline-none focus:border-indigo-500"
-          disabled={status !== "playing"}
-        >
-           <option value="">Mixed (Default)</option>
-           {topics.map(t => (
-               <option key={t} value={t}>{t}</option>
-           ))}
-        </select>
-      </div>
+      {!hideTopicSelector && (
+          <div className="mb-4 flex justify-center">
+            <select
+              value={topic || ""}
+              onChange={(e) => onTopicChange && onTopicChange(e.target.value)}
+              className="p-2 border-2 border-indigo-200 rounded-lg text-indigo-700 font-bold focus:outline-none focus:border-indigo-500"
+              disabled={status !== "playing"}
+            >
+               <option value="">Mixed (Default)</option>
+               {topics.map(t => (
+                   <option key={t} value={t}>{t}</option>
+               ))}
+            </select>
+          </div>
+      )}
 
       <div className="mb-8 px-2 text-center min-h-[200px] flex items-center justify-center">
         <p className="text-3xl md:text-4xl font-black text-indigo-900 leading-tight drop-shadow-sm">

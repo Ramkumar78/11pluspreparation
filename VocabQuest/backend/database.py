@@ -73,6 +73,14 @@ class ComprehensionQuestion(Base):
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
+class UserErrors(Base):
+    __tablename__ = 'user_errors'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, default=1)
+    question_id = Column(Integer, nullable=False)
+    mode = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(datetime.timezone.utc))
+
 # Init DB
 db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})
@@ -135,6 +143,16 @@ def migrate_db():
         except Exception:
             # Table created by create_all usually, but here just in case
             pass
+
+        # Create UserErrors table if it doesn't exist
+        try:
+            conn.execute(text("SELECT question_id FROM user_errors LIMIT 1"))
+        except Exception:
+             # If table doesn't exist, create it via metadata or raw SQL.
+             # Since Base.metadata.create_all handles creation, this check is mostly for schema updates on existing DBs.
+             # But if create_all ran before UserErrors was defined, we need to create it now.
+             logging.info("Migrating: Creating user_errors table...")
+             UserErrors.__table__.create(engine)
 
         conn.commit()
 

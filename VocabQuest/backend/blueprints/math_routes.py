@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 import random
-from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory
+from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
 from utils import generate_arithmetic, check_badges
 
 math_bp = Blueprint('math', __name__)
@@ -103,6 +103,7 @@ def check_math():
     data = request.json
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
+    repair_mode = data.get('repair_mode', False)
 
     session = Session()
     user = session.query(UserStats).first()
@@ -141,12 +142,27 @@ def check_math():
     # Update Global Stats
     if is_correct:
         user.streak += 1
-        user.total_score += 10
+        points = 10
+        if repair_mode:
+            points *= 2
+            # Remove from UserErrors
+            if q_id and int(q_id) > 0:
+                error = session.query(UserErrors).filter_by(user_id=user.id, question_id=q_id, mode='math').first()
+                if error:
+                    session.delete(error)
+
+        user.total_score += points
 
         # Record Score History
         session.add(ScoreHistory(score=user.total_score, mode='math'))
     else:
         user.streak = 0
+
+        # Add to UserErrors if DB question
+        if q_id and int(q_id) > 0:
+            existing = session.query(UserErrors).filter_by(user_id=user.id, question_id=q_id, mode='math').first()
+            if not existing:
+                session.add(UserErrors(user_id=user.id, question_id=q_id, mode='math'))
 
     # Update Topic Stats
     topic_prog = session.query(TopicProgress).filter_by(topic=actual_topic).first()
