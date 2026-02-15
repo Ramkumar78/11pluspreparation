@@ -73,6 +73,17 @@ class ComprehensionQuestion(Base):
 
     passage = relationship("ComprehensionPassage", back_populates="questions")
 
+class VerbalReasoningQuestion(Base):
+    __tablename__ = 'verbal_reasoning_questions'
+    id = Column(Integer, primary_key=True)
+    question_type = Column(String, nullable=False) # 'move_one_letter', 'missing_word'
+    question_text = Column(String, nullable=False) # Instruction
+    content = Column(String, nullable=True) # Puzzle/Sentence
+    options = Column(String, nullable=True) # JSON
+    answer = Column(String, nullable=False)
+    difficulty = Column(Integer, default=3)
+    explanation = Column(String, nullable=True)
+
 # Init DB
 db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})

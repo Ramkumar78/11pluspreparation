@@ -1,10 +1,11 @@
 import json
 from sqlalchemy import text
-from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion
+from database import Session, engine, Word, UserStats, MathQuestion, TopicProgress, ComprehensionPassage, ComprehensionQuestion, VerbalReasoningQuestion
 import logging
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
 from comprehension_seed import COMPREHENSION_LIST
+from verbal_seed import VERBAL_LIST
 
 def migrate_db():
     """Simple migration to add missing columns/tables."""
@@ -171,6 +172,39 @@ def seed_database():
                 q_obj.options = json.dumps(q_data["options"])
                 q_obj.correct_answer = q_data["answer"]
                 q_obj.explanation = q_data["explanation"]
+
+    # 6. Seed Verbal Reasoning Questions
+    print("Seeding Verbal Reasoning Questions...")
+    logger.info("Seeding Verbal Reasoning Questions...")
+    existing_verbal = {v.content: v for v in session.query(VerbalReasoningQuestion).all()}
+
+    # Ensure Verbal Reasoning topic exists
+    vr_topic = session.query(TopicProgress).filter_by(topic="Verbal Reasoning").first()
+    if not vr_topic:
+        session.add(TopicProgress(topic="Verbal Reasoning", mastery_level=1))
+
+    for v in VERBAL_LIST:
+        # Use content as unique key since text (instruction) is repeated. If content is missing, use text.
+        key = v.get("content") or v.get("text")
+        existing_v = existing_verbal.get(key)
+
+        if not existing_v:
+             session.add(VerbalReasoningQuestion(
+                 question_type=v["type"],
+                 question_text=v["text"],
+                 content=v.get("content"),
+                 options=json.dumps(v.get("options")) if v.get("options") else None,
+                 answer=v["answer"],
+                 difficulty=v["difficulty"],
+                 explanation=v.get("explanation")
+             ))
+        else:
+             existing_v.question_type = v["type"]
+             existing_v.question_text = v["text"]
+             existing_v.options = json.dumps(v.get("options")) if v.get("options") else None
+             existing_v.answer = v["answer"]
+             existing_v.difficulty = v["difficulty"]
+             existing_v.explanation = v.get("explanation")
 
     session.commit()
     session.close()
