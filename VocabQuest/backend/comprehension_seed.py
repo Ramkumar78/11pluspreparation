@@ -390,6 +390,10 @@ And like a thunderbolt he falls.""",
                 "answer": "Thunderbolt",
                 "explanation": "The simile 'like a thunderbolt he falls' suggests speed and power.",
                 "evidence": "And like a thunderbolt he falls"
+            }
+        ]
+    },
+    {
         "title": "The Honeybee",
         "topic": "Science & Nature",
         "image_prompt": "Detailed illustration of a honeybee on a flower, honeycomb background, scientific drawing style",
