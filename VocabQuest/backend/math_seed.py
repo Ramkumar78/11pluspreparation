@@ -516,6 +516,43 @@ MATH_LIST = [
         "topic": "Percentages",
         "diff": 8,
         "explanation": "Product A: 20% of 40 is 8. Price = 32. Product B: 50 - 15 = 35. Product A (£32) is cheaper than B (£35) by £3. Enter '3' or 'A by 3'."
+    },
+
+    # --- SUTTON SET: ALGEBRA & NUMBER PROBLEMS ---
+    {
+        "text": "I think of a number, multiply it by 4, subtract 6, and the result is 30. What was my number?",
+        "answer": "9",
+        "topic": "Inverse Operations",
+        "diff": 6,
+        "explanation": "Work backwards: Start with 30. Opposite of subtract 6 is add 6 (36). Opposite of multiply by 4 is divide by 4. 36 ÷ 4 = 9."
+    },
+    {
+        "text": "If a = 5 and b = 2, what is the value of 3a² - 4b?",
+        "answer": "67",
+        "topic": "Algebra",
+        "diff": 8,
+        "explanation": "BIDMAS applies. Indices first: a² = 5x5 = 25. Then Multiply: 3 x 25 = 75. Then the other multiply: 4 x 2 = 8. Finally Subtract: 75 - 8 = 67."
+    },
+    {
+        "text": "The sum of three consecutive numbers is 48. What is the largest of these numbers?",
+        "answer": "17",
+        "topic": "Algebra Word Problems",
+        "diff": 7,
+        "explanation": "Divide the sum by 3 to find the middle number: 48 ÷ 3 = 16. The numbers are 15, 16, 17. The largest is 17."
+    },
+    {
+        "text": "Find the Nth term rule for this sequence: 7, 11, 15, 19...",
+        "answer": "4n + 3",
+        "topic": "Sequences",
+        "diff": 8,
+        "explanation": "The gap is +4, so it starts with 4n. The first term of the 4n table is 4. To get from 4 to 7, we add 3. So, 4n + 3."
+    },
+    {
+        "text": "A jacket costs £60 after a 20% discount. What was the original price?",
+        "answer": "75",
+        "topic": "Reverse Percentages",
+        "diff": 9,
+        "explanation": "£60 represents 80% of the original price (100% - 20%). 1% = £60 ÷ 80 = £0.75. 100% = £0.75 x 100 = £75."
     }
 ]
 

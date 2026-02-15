@@ -105,7 +105,7 @@ class VerbalReasoningQuestion(Base):
     explanation = Column(Text, nullable=True)
 
 # Init DB
-db_path = os.path.join(os.path.dirname(__file__), 'vocab.db')
+db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'vocab.db'))
 engine = create_engine(f'sqlite:///{db_path}', connect_args={"check_same_thread": False})
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
