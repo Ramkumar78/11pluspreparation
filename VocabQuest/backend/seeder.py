@@ -29,6 +29,12 @@ def migrate_db():
             print("Migrating: Adding explanation column to math_questions...")
             conn.execute(text("ALTER TABLE math_questions ADD COLUMN explanation VARCHAR"))
 
+        try:
+            conn.execute(text("SELECT question_type FROM math_questions LIMIT 1"))
+        except Exception:
+            print("Migrating: Adding question_type column to math_questions...")
+            conn.execute(text("ALTER TABLE math_questions ADD COLUMN question_type VARCHAR DEFAULT 'Multiple Choice'"))
+
         # Create TopicProgress table if it doesn't exist
         try:
             conn.execute(text("SELECT mastery_level FROM topic_progress LIMIT 1"))
@@ -112,13 +118,15 @@ def seed_database():
             existing_q.difficulty = m["diff"]
             existing_q.topic = m["topic"]
             existing_q.explanation = m.get("explanation", "")
+            existing_q.question_type = m.get("question_type", "Multiple Choice")
         else:
             session.add(MathQuestion(
                 text=m["text"],
                 answer=m["answer"],
                 difficulty=m["diff"],
                 topic=m["topic"],
-                explanation=m.get("explanation", "")
+                explanation=m.get("explanation", ""),
+                question_type=m.get("question_type", "Multiple Choice")
             ))
 
     # 4. Init Topic Progress for new topics
