@@ -4,6 +4,7 @@ from database import Session, engine, Word, UserStats, MathQuestion, TopicProgre
 import logging
 from seed_list import WORD_LIST
 from math_seed import MATH_LIST
+from math_geometry_seed import GEOMETRY_LIST
 from comprehension_seed import COMPREHENSION_LIST
 from verbal_seed import VERBAL_LIST
 
@@ -117,7 +118,10 @@ def seed_database():
     # Track topics for TopicProgress init
     unique_topics = set()
 
-    for m in MATH_LIST:
+    # Combine main math list and geometry list
+    ALL_MATH_QUESTIONS = MATH_LIST + GEOMETRY_LIST
+
+    for m in ALL_MATH_QUESTIONS:
         unique_topics.add(m["topic"])
         existing_q = existing_math.get(m["text"])
         if existing_q:
