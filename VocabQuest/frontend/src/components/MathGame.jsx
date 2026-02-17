@@ -16,6 +16,8 @@ export default function MathGame({
 }) {
   const topics = ["Mental Maths", "BIDMAS", "Fractions", "Percentages", "Ratio", "Algebra", "Geometry", "Statistics"];
   const [showExplanation, setShowExplanation] = useState(false);
+  const isBoss = gameState.is_boss;
+  const bossName = gameState.boss_name;
 
   useEffect(() => {
     if (status === 'wrong') {
@@ -27,7 +29,18 @@ export default function MathGame({
 
   return (
     <>
-      {!hideTopicSelector && (
+      {isBoss && (
+        <div className="mb-6 animate-pulse text-center">
+            <h2 className="text-4xl font-black text-red-600 drop-shadow-md tracking-widest uppercase">
+                ⚔️ BOSS BATTLE ⚔️
+            </h2>
+            <div className="text-xl font-bold text-red-800 mt-2 bg-red-100 inline-block px-4 py-1 rounded-full border-2 border-red-300">
+                {bossName}
+            </div>
+        </div>
+      )}
+
+      {!hideTopicSelector && !isBoss && (
           <div className="mb-4 flex justify-center">
             <select
               value={topic || ""}
@@ -43,8 +56,10 @@ export default function MathGame({
           </div>
       )}
 
-      <div className="mb-8 px-2 text-center min-h-[200px] flex items-center justify-center">
-        <p className="text-3xl md:text-4xl font-black text-indigo-900 leading-tight drop-shadow-sm">
+      <div className={`mb-8 px-2 text-center min-h-[200px] flex items-center justify-center rounded-3xl p-6 transition-all duration-500
+          ${isBoss ? 'bg-red-50 border-4 border-red-200 shadow-[0_0_30px_rgba(239,68,68,0.3)]' : ''}
+      `}>
+        <p className={`text-3xl md:text-4xl font-black leading-tight drop-shadow-sm ${isBoss ? 'text-red-900 scale-110' : 'text-indigo-900'}`}>
           {gameState.question}
         </p>
       </div>

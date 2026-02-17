@@ -295,7 +295,8 @@ export default function Game() {
                 id: gameState.id,
                 answer: input,
                 correct_answer: mathAnswer,
-                repair_mode: mode === MODES.REPAIR
+                repair_mode: mode === MODES.REPAIR,
+                is_boss: gameState.is_boss
             });
 
             if (res.data.correct) {
