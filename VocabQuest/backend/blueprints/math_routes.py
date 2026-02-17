@@ -10,6 +10,12 @@ from math_seed import (
     generate_fdp_conversion
 )
 
+BOSS_NAMES = [
+    "The Number Cruncher", "Count Calamity", "The Fraction Phantom",
+    "Captain Calculator", "The Geometry Giant", "Professor Percent",
+    "The Algebra Alien"
+]
+
 math_bp = Blueprint('math', __name__)
 
 @math_bp.route('/api/math/challenge', methods=['GET'])
@@ -61,9 +67,20 @@ def next_math():
             topic_display = selected_topic
 
     # 2. Select Question
-    # Range: -1 to +2 of current level to keep it challenging but doable
-    min_diff = max(1, current_level - 1)
-    max_diff = min(10, current_level + 2)
+    # Boss Battle Logic
+    is_boss = False
+    boss_name = None
+    boss_hp = 100
+
+    if user.streak > 0 and user.streak % 5 == 0:
+        is_boss = True
+        boss_name = random.choice(BOSS_NAMES)
+        min_diff = min(10, current_level + 2)
+        max_diff = min(10, current_level + 3)
+    else:
+        # Range: -1 to +2 of current level to keep it challenging but doable
+        min_diff = max(1, current_level - 1)
+        max_diff = min(10, current_level + 2)
 
     q_type_str = "Mental"
     q_options = []
@@ -73,7 +90,7 @@ def next_math():
     generated_data = None
     use_generator = False
 
-    if selected_topic == "Algebra" and random.random() < 0.6:
+    if not is_boss and selected_topic == "Algebra" and random.random() < 0.6:
          generated_data = generate_algebra_substitution(current_level)
          use_generator = True
     elif selected_topic == "Ratio" and random.random() < 0.6:
@@ -180,7 +197,10 @@ def next_math():
         "explanation": q_explanation,
         "user_level": current_level,
         "score": user.total_score,
-        "streak": user.streak
+        "streak": user.streak,
+        "is_boss": is_boss,
+        "boss_name": boss_name,
+        "boss_hp": boss_hp
     }
     session.close()
     return jsonify(response)
@@ -191,6 +211,7 @@ def check_math():
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
     repair_mode = data.get('repair_mode', False)
+    is_boss = data.get('is_boss', False)
 
     session = Session()
     user = session.query(UserStats).first()
@@ -230,6 +251,11 @@ def check_math():
     if is_correct:
         user.streak += 1
         points = 10
+
+        if is_boss:
+            points = 50
+            explanation += " BOSS DEFEATED! +50 POINTS!"
+
         if repair_mode:
             points *= 2
             # Remove from UserErrors
