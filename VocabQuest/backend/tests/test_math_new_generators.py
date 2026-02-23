@@ -13,6 +13,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from app import app
 from database import Base, UserStats, MathQuestion, TopicProgress
 from math_seed import generate_algebra_substitution, generate_ratio_proportion, generate_fdp_conversion
+from math_new_generators import generate_bearings, generate_pie_charts, generate_pictograms, generate_bar_charts, generate_transformations
 
 # Fixtures for Integration Tests
 @pytest.fixture(scope='function')
@@ -84,6 +85,47 @@ def test_generate_fdp_conversion():
         assert result["answer"] in result["options"]
         # Ensure explanation relates
         assert any(x in result["explanation"] for x in ["decimal", "fraction", "percentage", "%"])
+
+def test_generate_bearings():
+    for _ in range(5):
+        result = generate_bearings()
+        assert "text" in result
+        assert "answer" in result
+        assert "skill_tag" in result
+        assert result["skill_tag"] == "Bearings"
+        assert result["topic"] == "Geometry"
+        assert len(result["options"]) == 5
+
+def test_generate_pie_charts():
+    for _ in range(5):
+        result = generate_pie_charts()
+        assert "text" in result
+        assert "answer" in result
+        assert result["skill_tag"] == "Pie Charts"
+        assert result["topic"] == "Statistics"
+
+def test_generate_pictograms():
+    for _ in range(5):
+        result = generate_pictograms()
+        assert "text" in result
+        assert "answer" in result
+        assert result["skill_tag"] == "Pictograms"
+
+def test_generate_bar_charts():
+    for _ in range(5):
+        result = generate_bar_charts()
+        assert "text" in result
+        assert "answer" in result
+        assert result["skill_tag"] == "Bar Charts"
+
+def test_generate_transformations():
+    results = generate_transformations(5)
+    assert len(results) == 5
+    for q in results:
+        assert "text" in q
+        assert "answer" in q
+        assert "topic" in q
+        assert q["topic"] == "Transformations"
 
 # Integration Tests for Route
 
