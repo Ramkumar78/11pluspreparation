@@ -1,3 +1,13 @@
+try:
+    from verbal_new_generators import generate_hidden_words, generate_logical_deduction
+except ImportError:
+    try:
+        from VocabQuest.backend.verbal_new_generators import generate_hidden_words, generate_logical_deduction
+    except ImportError:
+        print("Warning: Could not import verbal generators. Skipping procedural generation.")
+        def generate_hidden_words(n=0): return []
+        def generate_logical_deduction(n=0): return []
+
 VERBAL_LIST = [
     {
         "type": "move_one_letter",
@@ -172,3 +182,7 @@ CLOZE_LIST = [
         "options": ["east", "west", "north", "south", "sky"]
     }
 ]
+
+# Append procedural questions
+VERBAL_LIST.extend(generate_hidden_words(10))
+VERBAL_LIST.extend(generate_logical_deduction(10))
