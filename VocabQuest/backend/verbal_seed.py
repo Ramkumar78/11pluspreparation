@@ -1,12 +1,27 @@
 try:
-    from verbal_new_generators import generate_hidden_words, generate_logical_deduction
+    from verbal_new_generators import (
+        generate_hidden_words,
+        generate_logical_deduction,
+        generate_letter_sequences,
+        generate_compound_words,
+        generate_statement_logic
+    )
 except ImportError:
     try:
-        from VocabQuest.backend.verbal_new_generators import generate_hidden_words, generate_logical_deduction
+        from VocabQuest.backend.verbal_new_generators import (
+            generate_hidden_words,
+            generate_logical_deduction,
+            generate_letter_sequences,
+            generate_compound_words,
+            generate_statement_logic
+        )
     except ImportError:
         print("Warning: Could not import verbal generators. Skipping procedural generation.")
         def generate_hidden_words(n=0): return []
         def generate_logical_deduction(n=0): return []
+        def generate_letter_sequences(n=0): return []
+        def generate_compound_words(n=0): return []
+        def generate_statement_logic(n=0): return []
 
 VERBAL_LIST = [
     {
@@ -186,3 +201,6 @@ CLOZE_LIST = [
 # Append procedural questions
 VERBAL_LIST.extend(generate_hidden_words(10))
 VERBAL_LIST.extend(generate_logical_deduction(10))
+VERBAL_LIST.extend(generate_letter_sequences(10))
+VERBAL_LIST.extend(generate_compound_words(10))
+VERBAL_LIST.extend(generate_statement_logic(10))

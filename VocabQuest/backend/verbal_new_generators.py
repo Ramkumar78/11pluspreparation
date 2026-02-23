@@ -177,3 +177,236 @@ def generate_logical_deduction(num_questions=10):
         })
 
     return questions
+
+def generate_letter_sequences(num_questions=10):
+    """
+    Generates Letter Sequence questions.
+    Example: A, C, E, G, ? -> I (Pattern: +2)
+    """
+    questions = []
+
+    # 0=A, 1=B, ..., 25=Z
+    # Convert index to char: chr(ord('A') + idx)
+    # Convert char to index: ord(char) - ord('A')
+
+    for _ in range(num_questions):
+        pattern_type = random.choice(['add', 'sub', 'alternating_add', 'alternating_sub_add', 'pairs'])
+
+        sequence = []
+        answer = ""
+        explanation = ""
+
+        if pattern_type == 'add':
+            step = random.randint(1, 4)
+            start = random.randint(0, 25 - (step * 5)) # Ensure we don't go out of bounds easily
+            current = start
+            for _ in range(5):
+                sequence.append(chr(ord('A') + current))
+                current = (current + step) % 26 # Wrap around if needed, though restricted start helps
+
+            # The last one added is the 5th element. The question asks for the next one?
+            # Let's show 4, ask for 5th.
+            sequence_str = ", ".join(sequence[:4])
+            answer = sequence[4]
+            explanation = f"The pattern is +{step} letters. {sequence[3]} + {step} -> {answer}."
+
+        elif pattern_type == 'sub':
+            step = random.randint(1, 3)
+            start = random.randint(step * 5, 25)
+            current = start
+            for _ in range(5):
+                sequence.append(chr(ord('A') + current))
+                current = (current - step) % 26
+
+            sequence_str = ", ".join(sequence[:4])
+            answer = sequence[4]
+            explanation = f"The pattern is -{step} letters (backwards). {sequence[3]} - {step} -> {answer}."
+
+        elif pattern_type == 'alternating_add':
+            step1 = random.randint(1, 2)
+            step2 = random.randint(3, 4)
+            start = random.randint(0, 15)
+            current = start
+            seq_indices = []
+
+            # A, C (+2), F (+3), H (+2), K (+3)
+            for i in range(5):
+                seq_indices.append(current)
+                sequence.append(chr(ord('A') + current))
+                if i % 2 == 0:
+                    current = (current + step1) % 26
+                else:
+                    current = (current + step2) % 26
+
+            sequence_str = ", ".join(sequence[:4])
+            answer = sequence[4]
+            explanation = f"The pattern alternates +{step1} and +{step2}."
+
+        elif pattern_type == 'alternating_sub_add':
+            # +X, -Y
+            step1 = random.randint(2, 4) # Add
+            step2 = random.randint(1, 2) # Sub
+            start = random.randint(5, 20)
+            current = start
+
+            for i in range(5):
+                sequence.append(chr(ord('A') + current))
+                if i % 2 == 0:
+                    current = (current + step1) % 26
+                else:
+                    current = (current - step2) % 26
+
+            sequence_str = ", ".join(sequence[:4])
+            answer = sequence[4]
+            explanation = f"The pattern is +{step1}, -{step2}."
+
+        elif pattern_type == 'pairs':
+            # AZ, BY, CX, DW...
+            # Forward index, Backward index
+            # A (0), Z (25) -> sum 25
+            # B (1), Y (24) -> sum 25
+            start = random.randint(0, 5)
+            sequence = []
+            for i in range(3): # 3 pairs = 6 letters
+                fwd = start + i
+                bwd = 25 - (start + i)
+                sequence.append(chr(ord('A') + fwd))
+                sequence.append(chr(ord('A') + bwd))
+
+            # Show 5, ask 6th
+            sequence_str = ", ".join(sequence[:5])
+            answer = sequence[5]
+            explanation = f"The sequence consists of opposite pairs in the alphabet (A-Z, B-Y, etc.)."
+
+        questions.append({
+            "type": "letter_sequence",
+            "text": "What is the next letter in the sequence?",
+            "content": sequence_str,
+            "answer": answer,
+            "difficulty": random.randint(4, 7),
+            "explanation": explanation
+        })
+
+    return questions
+
+def generate_compound_words(num_questions=10):
+    """
+    Generates Compound Word questions.
+    Find the word that completes the compound word.
+    """
+    compounds = [
+        ("foot", "ball"), ("sun", "flower"), ("rain", "coat"), ("pan", "cake"),
+        ("fire", "man"), ("super", "man"), ("grand", "mother"), ("week", "end"),
+        ("sea", "side"), ("tooth", "brush"), ("key", "board"), ("note", "book"),
+        ("door", "step"), ("black", "bird"), ("blue", "berry"), ("straw", "berry"),
+        ("star", "fish"), ("jelly", "fish"), ("cow", "boy"), ("milk", "man"),
+        ("snow", "ball"), ("basket", "ball"), ("butter", "fly"), ("dragon", "fly"),
+        ("post", "man"), ("po", "lice"), ("sun", "light"), ("moon", "light")
+    ]
+
+    # Pre-compute valid completions for each first word to avoid ambiguous distractors
+    valid_completions = {}
+    for w1, w2 in compounds:
+        if w1 not in valid_completions:
+            valid_completions[w1] = set()
+        valid_completions[w1].add(w2)
+
+    distractors_pool = ["ball", "man", "fly", "fish", "berry", "light", "stone", "water", "land", "house", "room", "top", "box"]
+
+    questions = []
+    attempts = 0
+
+    while len(questions) < num_questions and attempts < 1000:
+        attempts += 1
+        word1, word2 = random.choice(compounds)
+
+        correct = word2
+
+        # Generate distractors
+        opts = [correct]
+        while len(opts) < 4:
+            d = random.choice(distractors_pool)
+            # Ensure distractor is not the correct answer AND not another valid completion for this word
+            if d != correct and d not in opts:
+                if d in valid_completions[word1]:
+                    continue # Skip if this distractor makes another valid compound word (e.g. SUN + LIGHT when target is FLOWER)
+                opts.append(d)
+        random.shuffle(opts)
+
+        content = f"{word1.upper()} + [ ? ]"
+        text = f"Select the word that can be added to the end of '{word1.upper()}' to form a new compound word."
+        explanation = f"'{word1.title()}' + '{word2}' makes '{word1.title()}{word2}'."
+
+        # Check dupe
+        if any(q['content'] == content for q in questions):
+            continue
+
+        questions.append({
+            "type": "compound_word",
+            "text": text,
+            "content": content,
+            "answer": correct,
+            "difficulty": 3,
+            "explanation": explanation,
+            "options": opts
+        })
+
+    return questions
+
+def generate_statement_logic(num_questions=10):
+    """
+    Generates Statement Logic (Comparison) questions.
+    """
+    names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Henry", "Ivy", "Jack"]
+    properties = [
+        ("taller", "shorter", "tallest"),
+        ("older", "younger", "oldest"),
+        ("faster", "slower", "fastest"),
+        ("stronger", "weaker", "strongest"),
+        ("richer", "poorer", "richest")
+    ]
+
+    questions = []
+
+    for _ in range(num_questions):
+        A, B, C = random.sample(names, 3)
+        prop_adj, prop_opp, prop_sup = random.choice(properties)
+
+        # Scenario: A > B, B > C => A is most 'prop'
+        # Statements:
+        # 1. A is taller than B.
+        # 2. B is taller than C.
+        # Question: Who is the tallest?
+
+        stmt1 = f"{A} is {prop_adj} than {B}."
+        stmt2 = f"{B} is {prop_adj} than {C}."
+
+        question_text = f"Based on the statements, who is the {prop_sup}?"
+        answer = A
+        options = [A, B, C]
+        random.shuffle(options)
+
+        explanation = f"{A} is {prop_adj} than {B}, and {B} is {prop_adj} than {C}, so {A} is the {prop_sup}."
+
+        # Variation: Mix adjectives? "A is taller than B. C is shorter than B."
+        # => A > B, C < B => A > B > C. Tallest? A.
+
+        variation = random.choice([1, 2])
+        if variation == 2:
+            stmt1 = f"{A} is {prop_adj} than {B}."
+            stmt2 = f"{C} is {prop_opp} than {B}." # C < B
+            explanation = f"{A} is {prop_adj} than {B}. {C} is {prop_opp} than {B} means {B} is {prop_adj} than {C}. So {A} > {B} > {C}."
+
+        content = f"{stmt1} {stmt2}"
+
+        questions.append({
+            "type": "statement_logic",
+            "text": question_text,
+            "content": content,
+            "answer": answer,
+            "difficulty": random.randint(4, 6),
+            "explanation": explanation,
+            "options": options
+        })
+
+    return questions
