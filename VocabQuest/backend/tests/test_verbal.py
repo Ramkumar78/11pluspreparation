@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app import app
 from database import Base, UserStats, VerbalReasoningQuestion, TopicProgress
+from verbal_new_generators import generate_letter_sequences, generate_compound_words, generate_statement_logic
 
 @pytest.fixture(scope='function')
 def test_db():
@@ -107,3 +108,34 @@ def test_check_verbal_wrong(client, test_db):
 
     user = test_db.query(UserStats).first()
     assert user.streak == 0
+
+def test_generate_letter_sequences():
+    questions = generate_letter_sequences(5)
+    assert len(questions) == 5
+    for q in questions:
+        assert q['type'] == 'letter_sequence'
+        assert 'content' in q
+        assert 'answer' in q
+        assert len(q['answer']) == 1
+        assert q['answer'].isalpha()
+
+def test_generate_compound_words():
+    questions = generate_compound_words(5)
+    assert len(questions) == 5
+    for q in questions:
+        assert q['type'] == 'compound_word'
+        assert 'content' in q
+        assert 'answer' in q
+        assert 'options' in q
+        assert len(q['options']) == 4
+        assert q['answer'] in q['options']
+
+def test_generate_statement_logic():
+    questions = generate_statement_logic(5)
+    assert len(questions) == 5
+    for q in questions:
+        assert q['type'] == 'statement_logic'
+        assert 'content' in q
+        assert 'answer' in q
+        assert 'options' in q
+        assert q['answer'] in q['options']
