@@ -22,7 +22,7 @@ describe('Dashboard Component', () => {
       total: 25
     },
     {
-      topic: 'Algebra',
+      topic: 'Algebra Topic',
       level: 1,
       mastery: 10,
       correct: 1,
@@ -64,7 +64,7 @@ describe('Dashboard Component', () => {
     expect(screen.getByText('Level 2')).toBeInTheDocument();
     expect(screen.getByText('20%')).toBeInTheDocument();
 
-    expect(screen.getByText('Algebra')).toBeInTheDocument();
+    expect(screen.getByText('Algebra Topic')).toBeInTheDocument();
     expect(screen.getByText('Level 1')).toBeInTheDocument();
     expect(screen.getByText('10%')).toBeInTheDocument();
 

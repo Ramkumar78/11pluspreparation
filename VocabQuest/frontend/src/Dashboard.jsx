@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Activity, BookOpen, ArrowLeft, Trophy, Wrench, AlertCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+import SkillMatrix from './components/SkillMatrix';
 import { API_URL } from './constants';
 
 export default function Dashboard() {
@@ -64,6 +65,8 @@ export default function Dashboard() {
             </div>
           )}
       </div>
+
+      <SkillMatrix />
 
       {userStats && userStats.badges && userStats.badges.length > 0 && (
           <div className="mb-8">
