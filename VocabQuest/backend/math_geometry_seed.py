@@ -1,3 +1,12 @@
+try:
+    from math_new_generators import generate_transformations
+except ImportError:
+    try:
+        from VocabQuest.backend.math_new_generators import generate_transformations
+    except ImportError:
+        print("Warning: Could not import generate_transformations. Skipping procedural generation.")
+        def generate_transformations(n=0): return []
+
 GEOMETRY_LIST = [
     {
         "text": "A rectangle has an area of 48cm² and a width of 4cm. What is its perimeter?",
@@ -63,3 +72,6 @@ GEOMETRY_LIST = [
         "explanation": "Distance from A to B is 4 units (vertical). A square has equal sides, so the width must be 4. D is to the right of A. (2+4, 2) = (6, 2)."
     }
 ]
+
+# Append procedural questions
+GEOMETRY_LIST.extend(generate_transformations(20))
