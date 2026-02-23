@@ -1,3 +1,15 @@
+try:
+    from math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts
+except ImportError:
+    try:
+        from VocabQuest.backend.math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts
+    except ImportError:
+        print("Warning: Could not import math_new_generators. Skipping procedural stats/data.")
+        # Define dummy functions to prevent crashes if import fails
+        def generate_pie_charts(n=1): return None
+        def generate_pictograms(n=1): return None
+        def generate_bar_charts(n=1): return None
+
 DATA_PROBABILITY_LIST = [
     # --- PROBABILITY (Combined Events) ---
     {
@@ -77,3 +89,14 @@ DATA_PROBABILITY_LIST = [
         "explanation": "Everyone likes at least one, so Union = 100. Sum of individual = 70 + 60 = 130. Overlap (Both) = 130 - 100 = 30. Only Tea = Total Tea - Both = 60 - 30 = 30."
     }
 ]
+
+# Append procedural questions
+for _ in range(10):
+    q1 = generate_pie_charts()
+    if q1: DATA_PROBABILITY_LIST.append(q1)
+
+    q2 = generate_pictograms()
+    if q2: DATA_PROBABILITY_LIST.append(q2)
+
+    q3 = generate_bar_charts()
+    if q3: DATA_PROBABILITY_LIST.append(q3)

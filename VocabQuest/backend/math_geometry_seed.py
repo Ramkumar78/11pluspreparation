@@ -1,11 +1,12 @@
 try:
-    from math_new_generators import generate_transformations
+    from math_new_generators import generate_transformations, generate_bearings
 except ImportError:
     try:
-        from VocabQuest.backend.math_new_generators import generate_transformations
+        from VocabQuest.backend.math_new_generators import generate_transformations, generate_bearings
     except ImportError:
-        print("Warning: Could not import generate_transformations. Skipping procedural generation.")
+        print("Warning: Could not import math_new_generators. Skipping procedural generation.")
         def generate_transformations(n=0): return []
+        def generate_bearings(n=1): return None
 
 GEOMETRY_LIST = [
     {
@@ -75,3 +76,7 @@ GEOMETRY_LIST = [
 
 # Append procedural questions
 GEOMETRY_LIST.extend(generate_transformations(20))
+
+for _ in range(10):
+    q = generate_bearings()
+    if q: GEOMETRY_LIST.append(q)

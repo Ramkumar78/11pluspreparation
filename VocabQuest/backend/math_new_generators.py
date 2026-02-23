@@ -1,4 +1,5 @@
 import random
+import math
 
 def generate_transformations(num_questions=20):
     """
@@ -72,3 +73,201 @@ def generate_transformations(num_questions=20):
         })
 
     return questions
+
+def generate_bearings(level=1):
+    """
+    Generates bearing questions (e.g. Reciprocal Bearings).
+    """
+    # 1. Reciprocal Bearings (Back Bearing)
+    # Ensure angle is a nice number ending in 0 or 5 for easier mental math
+    angle = random.choice([x for x in range(10, 350, 10)])
+
+    # Text templates
+    templates = [
+        ("The bearing of B from A is {angle:03d}°. What is the bearing of A from B?", "reciprocal"),
+        ("A ship sails on a bearing of {angle:03d}°. What is the opposite bearing?", "reciprocal")
+    ]
+
+    text_template, q_type = random.choice(templates)
+
+    explanation = ""
+    ans = 0
+    if q_type == "reciprocal":
+        if angle < 180:
+            ans = angle + 180
+            explanation = f"Since the bearing is less than 180°, add 180°. {angle} + 180 = {ans}."
+        else:
+            ans = angle - 180
+            explanation = f"Since the bearing is more than 180°, subtract 180°. {angle} - 180 = {ans}."
+
+    question_text = text_template.format(angle=angle)
+    answer_str = f"{ans:03d}"
+
+    # Options
+    options = {answer_str}
+    while len(options) < 5:
+        distractor = random.choice([x for x in range(10, 360, 10)])
+        if distractor != ans:
+            options.add(f"{distractor:03d}")
+
+    return {
+        "text": question_text,
+        "answer": answer_str,
+        "topic": "Geometry",
+        "skill_tag": "Bearings",
+        "diff": 5,
+        "explanation": explanation,
+        "question_type": "Multiple Choice",
+        "options": sorted(list(options))
+    }
+
+def generate_pie_charts(level=1):
+    """
+    Generates Pie Chart interpretation questions.
+    """
+    # Type 1: Calculate Amount given Angle and Total
+    # Type 2: Calculate Angle given Amount and Total
+
+    total = random.choice([60, 72, 90, 120, 180, 360])
+    # Choose an amount that results in a clean angle (factor of 360)
+    # 360 degrees represents Total.
+    deg_per_unit = 360 // total
+
+    # Choose a random amount
+    amount = random.randint(1, total // 2)
+    angle = amount * deg_per_unit
+
+    q_type = random.choice(["calc_amount", "calc_angle"])
+
+    if q_type == "calc_amount":
+        question_text = f"In a pie chart representing {total} people, a sector has an angle of {angle}°. How many people does this represent?"
+        answer_str = str(amount)
+        # Simpler explanation
+        frac_simp = math.gcd(angle, 360)
+        explanation = f"The fraction of the circle is {angle}/360, which simplifies to {angle//frac_simp}/{360//frac_simp}. {angle//frac_simp}/{360//frac_simp} of {total} is {amount}."
+
+    else: # calc_angle
+        question_text = f"In a survey of {total} people, {amount} chose Blue. What angle would represent this on a pie chart?"
+        answer_str = str(angle)
+        explanation = f"Fraction of people is {amount}/{total}. Multiply by 360°. ({amount}/{total}) x 360 = {angle}°."
+
+    # Options
+    options = {answer_str}
+    while len(options) < 5:
+        offset = random.choice([-10, -5, 5, 10, 15, 20])
+        val = int(answer_str) + offset
+        if val > 0:
+            options.add(str(val))
+
+    return {
+        "text": question_text,
+        "answer": answer_str,
+        "topic": "Statistics",
+        "skill_tag": "Pie Charts",
+        "diff": 6,
+        "explanation": explanation,
+        "question_type": "Multiple Choice",
+        "options": sorted(list(options), key=lambda x: int(x))
+    }
+
+def generate_pictograms(level=1):
+    """
+    Generates text-based Pictogram questions.
+    """
+    # Use even numbers to avoid .5 issues with int math
+    symbol_val = random.choice([2, 4, 10])
+    rows = [
+        ("Monday", random.randint(1, 5), random.choice([0, 0.5])),
+        ("Tuesday", random.randint(1, 5), random.choice([0, 0.5])),
+        ("Wednesday", random.randint(1, 5), random.choice([0, 0.5]))
+    ]
+
+    target_day, whole, half = random.choice(rows)
+
+    question_text = f"A pictogram uses a symbol '*' to represent {symbol_val} items. On {target_day}, there are {whole} full symbols"
+    if half:
+        question_text += " and one half symbol."
+    else:
+        question_text += "."
+
+    question_text += f" How many items does this represent?"
+
+    val = whole * symbol_val + int(half * symbol_val)
+    answer_str = str(val)
+
+    explanation = f"Each full symbol is {symbol_val}. {whole} x {symbol_val} = {whole*symbol_val}. "
+    if half:
+        explanation += f"Half a symbol is {symbol_val//2}. Total = {whole*symbol_val} + {symbol_val//2} = {val}."
+    else:
+        explanation += f"Total = {val}."
+
+    options = {answer_str}
+    while len(options) < 5:
+        offset = random.choice([-symbol_val, -symbol_val//2, symbol_val//2, symbol_val])
+        if offset == 0: offset = 1
+        opt = int(answer_str) + offset
+        if opt > 0:
+            options.add(str(opt))
+
+    return {
+        "text": question_text,
+        "answer": answer_str,
+        "topic": "Statistics",
+        "skill_tag": "Pictograms",
+        "diff": 4,
+        "explanation": explanation,
+        "question_type": "Multiple Choice",
+        "options": sorted(list(options), key=lambda x: int(x))
+    }
+
+def generate_bar_charts(level=1):
+    """
+    Generates text-based Bar Chart questions.
+    """
+    # Compare two bars or sum them
+    categories = ["A", "B", "C", "D"]
+    vals = {k: random.randint(5, 20) for k in categories}
+
+    q_type = random.choice(["difference", "sum", "read"])
+
+    c1, c2 = random.sample(categories, 2)
+
+    intro = f"In a bar chart, bar A is {vals['A']}, bar B is {vals['B']}, bar C is {vals['C']}, and bar D is {vals['D']}."
+
+    if q_type == "difference":
+        question_text = f"{intro} How much taller is bar {c1} than bar {c2}? (If smaller, ignore sign)"
+        ans = abs(vals[c1] - vals[c2])
+        explanation = f"Bar {c1} is {vals[c1]}. Bar {c2} is {vals[c2]}. Difference is {vals[c1]} - {vals[c2]} = {ans}."
+        if vals[c2] > vals[c1]:
+             explanation = f"Bar {c2} is {vals[c2]}. Bar {c1} is {vals[c1]}. Difference is {vals[c2]} - {vals[c1]} = {ans}."
+
+    elif q_type == "sum":
+        question_text = f"{intro} What is the total height of bars {c1} and {c2}?"
+        ans = vals[c1] + vals[c2]
+        explanation = f"{vals[c1]} + {vals[c2]} = {ans}."
+
+    else: # read
+        question_text = f"{intro} What is the value of bar {c1}?"
+        ans = vals[c1]
+        explanation = f"The value is explicitly stated as {ans}."
+
+    answer_str = str(ans)
+
+    options = {answer_str}
+    while len(options) < 5:
+        offset = random.randint(-5, 5)
+        if offset == 0: offset = 1
+        opt = ans + offset
+        if opt >= 0:
+            options.add(str(opt))
+
+    return {
+        "text": question_text,
+        "answer": answer_str,
+        "topic": "Statistics",
+        "skill_tag": "Bar Charts",
+        "diff": 3,
+        "explanation": explanation,
+        "question_type": "Multiple Choice",
+        "options": sorted(list(options), key=lambda x: int(x))
+    }
