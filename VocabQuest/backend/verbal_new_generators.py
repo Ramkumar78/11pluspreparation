@@ -532,3 +532,246 @@ def generate_word_families(num_questions=10):
             })
 
     return questions
+def generate_number_sequences(num_questions=10):
+    """
+    Generates Number Sequence questions.
+    Patterns: Arithmetic, Geometric, Alternating, Squares/Cubes.
+    """
+    questions = []
+
+    for _ in range(num_questions):
+        pattern_type = random.choice(['arithmetic', 'geometric', 'squares', 'alternating'])
+        sequence = []
+        answer = ""
+        explanation = ""
+
+        if pattern_type == 'arithmetic':
+            start = random.randint(1, 50)
+            diff = random.randint(1, 15) * random.choice([1, -1])
+            if diff == 0: diff = 2
+
+            for i in range(6):
+                sequence.append(start + i * diff)
+
+            # Show 5, ask 6th
+            seq_display = ", ".join(map(str, sequence[:5]))
+            answer = str(sequence[5])
+            sign = "+" if diff > 0 else ""
+            explanation = f"The pattern is {sign}{diff}. {sequence[4]} {sign}{diff} = {answer}."
+
+        elif pattern_type == 'geometric':
+            start = random.randint(1, 5)
+            ratio = random.randint(2, 3)
+
+            curr = start
+            for _ in range(6):
+                sequence.append(curr)
+                curr *= ratio
+
+            seq_display = ", ".join(map(str, sequence[:5]))
+            answer = str(sequence[5])
+            explanation = f"The pattern is multiply by {ratio}. {sequence[4]} * {ratio} = {answer}."
+
+        elif pattern_type == 'squares':
+            start_n = random.randint(1, 5)
+            for i in range(6):
+                n = start_n + i
+                sequence.append(n*n)
+
+            seq_display = ", ".join(map(str, sequence[:5]))
+            answer = str(sequence[5])
+            explanation = f"The sequence is square numbers: {start_n}^2, {start_n+1}^2... The next is {start_n+5}^2 = {answer}."
+
+        elif pattern_type == 'alternating':
+            start = random.randint(10, 50)
+            op1 = random.randint(2, 5)
+            op2 = random.randint(1, 3)
+            # +op1, -op2
+
+            curr = start
+            for i in range(6):
+                sequence.append(curr)
+                if i % 2 == 0:
+                    curr += op1
+                else:
+                    curr -= op2
+
+            seq_display = ", ".join(map(str, sequence[:5]))
+            answer = str(sequence[5])
+            # The 6th term (index 5) comes after 5th term (index 4).
+            # Indices: 0, 1, 2, 3, 4, 5
+            # 0 -> 1 (+op1)
+            # 1 -> 2 (-op2)
+            # 2 -> 3 (+op1)
+            # 3 -> 4 (-op2)
+            # 4 -> 5 (+op1)
+            explanation = f"The pattern alternates +{op1} and -{op2}. {sequence[4]} + {op1} = {answer}."
+
+        questions.append({
+            "type": "number_sequence",
+            "text": "What is the next number in the sequence?",
+            "content": seq_display,
+            "answer": answer,
+            "difficulty": random.randint(4, 7),
+            "explanation": explanation
+        })
+
+    return questions
+
+def generate_letter_connections(num_questions=10):
+    """
+    Generates Word Ladder questions (Start -> ? -> End).
+    Uses BFS to find a path between two words.
+    """
+    # 1. Build Graph from COMMON_WORDS and TARGETS (only same length words)
+    # Group by length
+    words_by_len = {}
+    all_words = set(w.lower() for w in COMMON_WORDS + TARGETS)
+
+    for w in all_words:
+        if 3 <= len(w) <= 4:
+            l = len(w)
+            if l not in words_by_len: words_by_len[l] = []
+            words_by_len[l].append(w)
+
+    def is_neighbor(w1, w2):
+        diff = 0
+        for c1, c2 in zip(w1, w2):
+            if c1 != c2: diff += 1
+        return diff == 1
+
+    def get_path(start_word, length_limit=5):
+        # BFS
+        l = len(start_word)
+        pool = words_by_len.get(l, [])
+        queue = [(start_word, [start_word])]
+        visited = {start_word}
+
+        candidates = []
+
+        while queue:
+            curr, path = queue.pop(0)
+            if len(path) >= length_limit:
+                continue
+
+            # Find neighbors
+            for w in pool:
+                if w not in visited and is_neighbor(curr, w):
+                    new_path = path + [w]
+                    if len(new_path) >= 3: # Minimum path length 3 (Start -> Mid -> End)
+                        candidates.append(new_path)
+                    visited.add(w)
+                    queue.append((w, new_path))
+
+            if len(candidates) > 20: break # Don't search too long
+
+        return random.choice(candidates) if candidates else None
+
+    questions = []
+    attempts = 0
+    while len(questions) < num_questions and attempts < 100:
+        attempts += 1
+        # Pick random length (3 or 4)
+        l = random.choice([3, 4])
+        pool = words_by_len.get(l, [])
+        if not pool: continue
+
+        start = random.choice(pool)
+        path = get_path(start)
+
+        if path and 3 <= len(path) <= 4:
+            # Create question
+            # Path: A -> B -> C (len 3). Missing B.
+            # Path: A -> B -> C -> D (len 4). Missing B or C.
+
+            missing_idx = random.randint(1, len(path)-2)
+            missing_word = path[missing_idx]
+
+            display_path = list(path)
+            display_path[missing_idx] = "?"
+            content = " -> ".join([w.upper() for w in display_path])
+
+            text = "Complete the word ladder by changing one letter at a time."
+            explanation = f"Change one letter at a time: {' -> '.join([w.upper() for w in path])}."
+
+            # Simple distractors: random words of same length
+            distractors = []
+            while len(distractors) < 3:
+                d = random.choice(pool)
+                if d != missing_word and d not in path and d not in distractors:
+                    distractors.append(d)
+
+            options = [missing_word] + distractors
+            random.shuffle(options)
+
+            questions.append({
+                "type": "word_ladder",
+                "text": text,
+                "content": content,
+                "answer": missing_word,
+                "difficulty": 5,
+                "explanation": explanation,
+                "options": options
+            })
+
+    return questions
+
+def generate_seating_arrangements(num_questions=10):
+    """
+    Generates Logic Seating Arrangement questions.
+    """
+    names = ["Alice", "Bob", "Charlie", "David", "Eve"]
+
+    questions = []
+
+    for _ in range(num_questions):
+        # Linear Arrangement of 4 people
+        people = random.sample(names, 4)
+        # Arrangement: P1 P2 P3 P4 (Left to Right)
+
+        # Generate Clues
+        clues = []
+
+        # Clue 1: Direct relation (P1 next to P2)
+        p1, p2 = people[0], people[1]
+        clues.append(f"{p1} is sitting to the immediate left of {p2}.")
+
+        # Clue 2: Positional (P4 is on the far right)
+        clues.append(f"{people[3]} is sitting on the far right.")
+
+        # Clue 3: Relative (P2 is between P1 and P3)
+        clues.append(f"{people[1]} is sitting between {people[0]} and {people[2]}.")
+
+        random.shuffle(clues)
+        content = " ".join(clues)
+
+        # Question types
+        q_type = random.choice(['left', 'right', 'between'])
+
+        if q_type == 'left':
+            text = "Who is sitting on the far left?"
+            answer = people[0]
+            explanation = f"From the clues, the order is {people[0]}, {people[1]}, {people[2]}, {people[3]}. So {people[0]} is on the far left."
+        elif q_type == 'right':
+            # Actually 'next to' is ambiguous, let's say 'Who is immediately to the right of X?'
+            text = f"Who is immediately to the right of {people[2]}?"
+            answer = people[3]
+            explanation = f"The order is {people[0]}, {people[1]}, {people[2]}, {people[3]}. {people[3]} is to the right of {people[2]}."
+        else:
+             text = f"Who is sitting between {people[0]} and {people[2]}?"
+             answer = people[1]
+             explanation = f"The order is {people[0]}, {people[1]}, {people[2]}, {people[3]}."
+
+        options = sorted(people)
+
+        questions.append({
+            "type": "seating_logic",
+            "text": text,
+            "content": content,
+            "answer": answer,
+            "difficulty": 6,
+            "explanation": explanation,
+            "options": options
+        })
+
+    return questions

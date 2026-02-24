@@ -4,8 +4,33 @@ import json
 from database import Session, UserStats, VerbalReasoningQuestion, TopicProgress, ScoreHistory
 from utils import check_badges
 from verbal_seed import CLOZE_LIST
+from verbal_new_generators import generate_number_sequences, generate_letter_connections, generate_seating_arrangements
 
 verbal_reasoning_bp = Blueprint('verbal_reasoning', __name__)
+
+@verbal_reasoning_bp.route('/number_sequences', methods=['GET'])
+def get_number_sequence():
+    """Generates a random Number Sequence question."""
+    questions = generate_number_sequences(1)
+    if questions:
+        return jsonify(questions[0])
+    return jsonify({"error": "Could not generate question"}), 500
+
+@verbal_reasoning_bp.route('/letter_connections', methods=['GET'])
+def get_letter_connection():
+    """Generates a random Word Ladder question."""
+    questions = generate_letter_connections(1)
+    if questions:
+        return jsonify(questions[0])
+    return jsonify({"error": "Could not generate question"}), 500
+
+@verbal_reasoning_bp.route('/seating_arrangements', methods=['GET'])
+def get_seating_arrangement():
+    """Generates a random Seating Arrangement question."""
+    questions = generate_seating_arrangements(1)
+    if questions:
+        return jsonify(questions[0])
+    return jsonify({"error": "Could not generate question"}), 500
 
 @verbal_reasoning_bp.route('/cloze', methods=['GET'])
 def get_cloze():

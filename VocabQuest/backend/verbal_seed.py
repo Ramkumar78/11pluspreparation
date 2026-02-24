@@ -4,7 +4,10 @@ try:
         generate_logical_deduction,
         generate_letter_sequences,
         generate_compound_words,
-        generate_statement_logic
+        generate_statement_logic,
+        generate_number_sequences,
+        generate_letter_connections,
+        generate_seating_arrangements
     )
 except ImportError:
     try:
@@ -13,7 +16,10 @@ except ImportError:
             generate_logical_deduction,
             generate_letter_sequences,
             generate_compound_words,
-            generate_statement_logic
+            generate_statement_logic,
+            generate_number_sequences,
+            generate_letter_connections,
+            generate_seating_arrangements
         )
     except ImportError:
         print("Warning: Could not import verbal generators. Skipping procedural generation.")
@@ -22,6 +28,9 @@ except ImportError:
         def generate_letter_sequences(n=0): return []
         def generate_compound_words(n=0): return []
         def generate_statement_logic(n=0): return []
+        def generate_number_sequences(n=0): return []
+        def generate_letter_connections(n=0): return []
+        def generate_seating_arrangements(n=0): return []
 
 VERBAL_LIST = [
     {
@@ -204,3 +213,6 @@ VERBAL_LIST.extend(generate_logical_deduction(10))
 VERBAL_LIST.extend(generate_letter_sequences(10))
 VERBAL_LIST.extend(generate_compound_words(10))
 VERBAL_LIST.extend(generate_statement_logic(10))
+VERBAL_LIST.extend(generate_number_sequences(10))
+VERBAL_LIST.extend(generate_letter_connections(10))
+VERBAL_LIST.extend(generate_seating_arrangements(10))
