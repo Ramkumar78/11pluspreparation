@@ -91,7 +91,7 @@ def test_next_math_with_topic(client, test_db):
 
 def test_next_math_with_topic_not_in_db(client, test_db):
     # Requesting a topic that has no questions seeded
-    rv = client.get('/next_math?topic=Geometry')
+    rv = client.get('/next_math?topic=NonExistentTopic')
     assert rv.status_code == 200
     data = rv.get_json()
 
