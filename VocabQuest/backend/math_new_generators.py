@@ -105,8 +105,16 @@ def generate_bearings(level=1):
 
     # Options
     options = {answer_str}
-    while len(options) < 5:
+    attempts = 0
+    while len(options) < 5 and attempts < 20:
+        attempts += 1
         distractor = random.choice([x for x in range(10, 360, 10)])
+        if distractor != ans:
+            options.add(f"{distractor:03d}")
+
+    # Fallback
+    while len(options) < 5:
+        distractor = random.randint(10, 350)
         if distractor != ans:
             options.add(f"{distractor:03d}")
 
@@ -153,8 +161,18 @@ def generate_pie_charts(level=1):
 
     # Options
     options = {answer_str}
-    while len(options) < 5:
+    attempts = 0
+    while len(options) < 5 and attempts < 20:
+        attempts += 1
         offset = random.choice([-10, -5, 5, 10, 15, 20])
+        val = int(answer_str) + offset
+        if val > 0:
+            options.add(str(val))
+
+    # Fallback
+    while len(options) < 5:
+        offset = random.randint(-20, 20)
+        if offset == 0: offset = 1
         val = int(answer_str) + offset
         if val > 0:
             options.add(str(val))
@@ -202,8 +220,18 @@ def generate_pictograms(level=1):
         explanation += f"Total = {val}."
 
     options = {answer_str}
-    while len(options) < 5:
+    attempts = 0
+    while len(options) < 5 and attempts < 20:
+        attempts += 1
         offset = random.choice([-symbol_val, -symbol_val//2, symbol_val//2, symbol_val])
+        if offset == 0: offset = 1
+        opt = int(answer_str) + offset
+        if opt > 0:
+            options.add(str(opt))
+
+    # Fallback
+    while len(options) < 5:
+        offset = random.randint(-symbol_val, symbol_val)
         if offset == 0: offset = 1
         opt = int(answer_str) + offset
         if opt > 0:
@@ -254,8 +282,18 @@ def generate_bar_charts(level=1):
     answer_str = str(ans)
 
     options = {answer_str}
-    while len(options) < 5:
+    attempts = 0
+    while len(options) < 5 and attempts < 20:
+        attempts += 1
         offset = random.randint(-5, 5)
+        if offset == 0: offset = 1
+        opt = ans + offset
+        if opt >= 0:
+            options.add(str(opt))
+
+    # Fallback
+    while len(options) < 5:
+        offset = random.randint(-10, 10)
         if offset == 0: offset = 1
         opt = ans + offset
         if opt >= 0:
