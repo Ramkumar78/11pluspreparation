@@ -131,6 +131,7 @@ export default function Game() {
 
     } catch (err) {
       console.error("Failed to load challenge", err);
+      setStatus("error");
     }
   };
 
@@ -331,6 +332,26 @@ export default function Game() {
         }
     }
   };
+
+  if (status === "error") return (
+    <div className="flex flex-col items-center justify-center h-screen bg-red-50 text-center p-4">
+        <div className="text-6xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-black text-red-800 mb-2">Something went wrong!</h2>
+        <p className="text-red-600 mb-6">We couldn't load the next question. Please try again.</p>
+        <button
+            onClick={loadNextChallenge}
+            className="bg-red-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-red-700 transition flex items-center gap-2"
+        >
+            <RotateCcw size={20} /> TRY AGAIN
+        </button>
+        <button
+            onClick={() => navigate('/')}
+            className="mt-4 text-red-500 hover:text-red-700 font-bold underline"
+        >
+            Return Home
+        </button>
+    </div>
+  );
 
   if (!gameState || status === "loading") return (
     <div className="flex flex-col items-center justify-center h-screen bg-blue-50">

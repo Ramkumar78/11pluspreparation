@@ -73,5 +73,5 @@ if __name__ == '__main__':
     with app.app_context():
         init_db()
 
-    port = find_available_port(5000)
+    port = find_available_port(5001)
     app.run(host='0.0.0.0', port=port)
