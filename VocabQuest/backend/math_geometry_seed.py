@@ -8,6 +8,15 @@ except ImportError:
         def generate_transformations(n=0): return []
         def generate_bearings(n=1): return None
 
+try:
+    from math_geometry_generators import generate_nets_of_cubes
+except ImportError:
+    try:
+        from VocabQuest.backend.math_geometry_generators import generate_nets_of_cubes
+    except ImportError:
+        print("Warning: Could not import math_geometry_generators. Skipping nets generation.")
+        def generate_nets_of_cubes(n=0): return []
+
 GEOMETRY_LIST = [
     {
         "text": "A rectangle has an area of 48cm² and a width of 4cm. What is its perimeter?",
@@ -80,3 +89,6 @@ GEOMETRY_LIST.extend(generate_transformations(20))
 for _ in range(10):
     q = generate_bearings()
     if q: GEOMETRY_LIST.append(q)
+
+# Append Nets of Cubes questions
+GEOMETRY_LIST.extend(generate_nets_of_cubes(20))
