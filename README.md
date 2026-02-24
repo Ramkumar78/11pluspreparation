@@ -23,24 +23,27 @@
 ### Stage 2
 *   **Format:** Standard written answers.
 *   **Focus:** Harder, multi-step problems requiring working out, and English Comprehension.
-*   **ScholarQuest:** Includes complex word problems and explains the "how-to" when an answer is incorrect to teach the methodology. Now also includes classic English comprehension passages with evidence-based questions.
+*   **ScholarQuest:** Includes complex word problems (Sutton Challenge Questions) and explains the "how-to" when an answer is incorrect to teach the methodology. Now also includes classic English comprehension passages with evidence-based questions.
 
 ---
 
 ## 🚀 Features That Make Learning Fun
 
 *   **🎮 Gamified Experience:** Earn points, build streaks, and level up! The more you play, the harder it gets.
+    *   **Boss Battles:** Every 5th streak triggers a high-difficulty "Boss Battle" question for bonus points.
 *   **🧠 Adaptive Difficulty:**
     *   **Vocab Mode:** Adjusts word difficulty based on performance.
     *   **Maths Mode:** Scales arithmetic complexity and introduces tricky word problems.
-*   **📚 Triple Modes:**
+*   **📚 Multi-Subject Mastery:**
     *   **VocabQuest:** Visual clues, synonyms, and definitions to expand vocabulary.
-    *   **MathsQuest:** Covers key 11+ topics like Algebra, Ratios, Logic, and Geometry.
+    *   **MathsQuest:** Covers key 11+ topics like Algebra, Ratios, Logic, Geometry (Transformations, Bearings), and Data.
+    *   **Verbal Reasoning:** Logic puzzles, code breaking, hidden words, and sequences.
     *   **Comprehension:** Read classic passages (e.g., The Secret Garden, Oliver Twist) and answer analysis questions.
 *   **💡 Instant Explanations:** Got a math question wrong? We show you exactly how to solve it.
+*   **🎯 Focus Mode:** Need to concentrate? Toggle "Focus Mode" to remove animations and switch to a high-contrast, distraction-free interface.
 *   **🎨 Visual Clues:** Stuck on a word? High-quality cartoons and images provide hints.
 *   **🔊 Audio Pronunciation:** Learn how to say it right!
-*   **✨ Flashy Animations:** Confetti for wins, bouncing text, and slick transitions make every interaction feel rewarding.
+*   **✨ Flashy Animations:** Confetti for wins, bouncing text, and slick transitions make every interaction feel rewarding (unless in Focus Mode!).
 *   **🛡️ Kid-Safe Environment:** Secure, sanitized inputs, and curated content.
 
 ---
@@ -56,12 +59,9 @@
 
 ## 🛠️ How to Run
 
-ScholarQuest is built with **Docker** for easy setup.
+ScholarQuest is built with **Docker** for easy setup, but can also be run manually.
 
-### Prerequisites
-*   Docker & Docker Compose
-
-### Start the Game
+### Option 1: Docker (Recommended)
 1.  Clone the repository.
 2.  Run the following command in your terminal:
     ```bash
@@ -69,6 +69,23 @@ ScholarQuest is built with **Docker** for easy setup.
     ```
 3.  Open your browser and navigate to:
     👉 **http://localhost:5173**
+
+### Option 2: Manual Setup
+
+**Backend:**
+```bash
+cd VocabQuest/backend
+pip install -r requirements.txt
+python -m flask seed-db  # Initialize database with questions
+python app.py            # Start server on port 5001
+```
+
+**Frontend:**
+```bash
+cd VocabQuest/frontend
+npm install
+npm run dev              # Start client on port 5173
+```
 
 ---
 
@@ -81,7 +98,7 @@ We take quality seriously. ScholarQuest comes brim-full of tests and security fe
 ```bash
 cd VocabQuest/backend
 pip install -r requirements.txt
-pytest
+python -m pytest         # Ensures correct module resolution
 ```
 
 **Frontend:**

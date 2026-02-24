@@ -52,15 +52,16 @@ The 11+ Maths syllabus covers the KS2 National Curriculum with extensions into K
 - [x] Properties of 3D Shapes (Faces, Edges, Vertices)
 - [x] Angles (Triangle, Quadrilateral, Straight Line, Around a Point)
 - [x] Coordinates (1st & 4th Quadrant, Midpoints)
-- [ ] Transformations (Reflection, Rotation, Translation)
-- [ ] Bearings (Compass points)
+- [x] Transformations (Reflection, Rotation, Translation)
+- [x] Bearings (Compass points)
 - [ ] Nets of 3D Shapes
 
 ### 1.8 Statistics & Data
 - [x] Averages (Mean, Median, Mode, Range)
 - [x] Reverse Mean Problems
-- [ ] Pie Charts & Bar Charts (Interpretation)
-- [ ] Line Graphs & Pictograms
+- [x] Pie Charts & Bar Charts (Interpretation)
+- [x] Pictograms
+- [ ] Line Graphs
 - [x] Venn Diagrams (Sorting Data)
 - [x] Probability (Scale 0-1, Combined Events, 'Without Replacement')
 
@@ -80,7 +81,7 @@ Focuses on reading accuracy, fluency, vocabulary, and grammatical precision.
 - [x] Cloze Procedure (Word Bank & Missing Letters)
 - [x] Homophones/Homographs (Contextual usage)
 - [ ] Word Families (Prefixes, Suffixes, Roots)
-- [ ] Compound Words
+- [x] Compound Words
 
 ### 2.3 Grammar & Punctuation (SPaG)
 - [x] Word Classes (Nouns, Verbs, Adjectives, Adverbs, Prepositions, Pronouns)
@@ -97,13 +98,13 @@ Tests the ability to process verbal information and solve problems using words a
 ### 3.1 Constructing Words
 - [x] Move a Letter (to make new words)
 - [x] Missing Letters (in words/sentences)
-- [ ] Hidden Words (finding a 4-letter word across two words)
-- [ ] Join Two Words (Compound words)
+- [x] Hidden Words (finding a 4-letter word across two words)
+- [x] Join Two Words (Compound words)
 
 ### 3.2 Understanding Words
 - [x] Analogies (A is to B as C is to ?)
 - [x] Odd One Out (Semantic)
-- [ ] Synonyms/Antonyms (Matching pairs)
+- [x] Synonyms/Antonyms (Matching pairs)
 
 ### 3.3 Codes & Sequences
 - [x] Letter Sequences
@@ -112,9 +113,9 @@ Tests the ability to process verbal information and solve problems using words a
 - [ ] Letter Connections (Word ladders)
 
 ### 3.4 Logic
-- [ ] Logical Deduction (e.g., "If All Zogs are Pogs...")
+- [x] Logical Deduction (e.g., "If All Zogs are Pogs...")
 - [ ] Seating Arrangements / Order Puzzles
-- [ ] Statement Logic (True/False/Impossible)
+- [x] Statement Logic (True/False/Impossible)
 
 ---
 
@@ -137,32 +138,7 @@ Tests visual problem-solving using shapes and patterns. (Currently unimplemented
 
 ## Procedural Generation Specifications for Missing Skills
 
-### 1. VR: Hidden Words (Search across boundaries)
-**Goal:** Find a 4-letter word hidden between the end of one word and the start of the next (e.g., "The **cat** **s**at" -> CATS).
-
-**Algorithm:**
-1.  Load a dictionary of common 4-letter nouns/verbs.
-2.  Generate/Load pairs of words $(W_1, W_2)$.
-3.  Check if $W_1[-k:] + W_2[:4-k]$ forms a valid word for $k \in \{1, 2, 3\}$.
-4.  Filter for "valid" hidden words and "accidental" hidden words to ensure only one answer exists.
-5.  *Output:* "Find the hidden word in: THE CAT SAT" (Answer: CATS).
-
-### 2. VR: Logical Deduction (Syllogisms)
-**Goal:** Generate "If/Then" logic puzzles.
-
-**Algorithm:**
-1.  Define entities (e.g., Zogs, Pogs, Bloops).
-2.  Define relationships:
-    -   All A are B.
-    -   Some B are C.
-    -   No C are A.
-3.  Generate statements based on these rules.
-4.  Question: "Based on the above, which statement is definitely true?"
-    -   (a) Some A are C (False)
-    -   (b) All Zogs are Bloops (True)
-5.  Use a simple dependency graph to validate truth.
-
-### 3. NVR: Matrices (Procedural Shapes)
+### 1. NVR: Matrices (Procedural Shapes)
 **Goal:** Generate 2x2 or 3x3 grids where one cell is missing.
 
 **Algorithm:**
@@ -176,7 +152,7 @@ Tests visual problem-solving using shapes and patterns. (Currently unimplemented
 5.  Remove bottom-right cell as the Target.
 6.  Generate Distractors by violating one rule at a time.
 
-### 4. Math: Nets of Cubes
+### 2. Math: Nets of Cubes
 **Goal:** Identify which 2D net folds into a valid cube.
 
 **Algorithm:**
