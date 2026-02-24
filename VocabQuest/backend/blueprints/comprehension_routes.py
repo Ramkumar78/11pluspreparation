@@ -58,6 +58,8 @@ def next_comprehension():
 def check_comprehension():
     """Checks the answer for a specific comprehension question."""
     data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     q_id = data.get('question_id')
     user_answer = data.get('answer', '').strip()
 

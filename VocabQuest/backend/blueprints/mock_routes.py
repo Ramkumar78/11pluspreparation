@@ -148,6 +148,8 @@ def get_mock_test():
 def submit_mock():
     """Batch processes mock test results and returns a scorecard."""
     data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     answers = data.get('answers', [])
 
     session = Session()
