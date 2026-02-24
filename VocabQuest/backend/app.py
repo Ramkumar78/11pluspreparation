@@ -3,7 +3,6 @@ from flask import Flask
 from flask_cors import CORS
 from extensions import limiter
 from seeder import init_db, seed_database
-import json
 import os
 import logging
 
