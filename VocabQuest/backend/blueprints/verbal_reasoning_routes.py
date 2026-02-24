@@ -82,6 +82,8 @@ def next_verbal():
 @verbal_reasoning_bp.route('/check_verbal', methods=['POST'])
 def check_verbal():
     data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
 
