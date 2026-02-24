@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from sqlalchemy import func
 import random
 import json
 from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
@@ -117,22 +118,20 @@ def next_math():
             MathQuestion.difficulty <= max_diff
         )
 
+        selected = None
         # New logic: Fetch 'Standard Written' questions when mastery_level > 7 for specific topics
         if current_level > 7 and selected_topic in ["Ratio", "Algebra"]:
-            sw_questions = query.filter(MathQuestion.question_type == "Standard Written").all()
-            if sw_questions:
-                questions = sw_questions
-            else:
-                questions = query.all()
+            selected = query.filter(MathQuestion.question_type == "Standard Written").order_by(func.random()).first()
+            if not selected:
+                selected = query.order_by(func.random()).first()
         else:
-            questions = query.all()
+            selected = query.order_by(func.random()).first()
 
         # Fallback if no questions in that difficulty range for this topic
-        if not questions:
-             questions = session.query(MathQuestion).filter_by(topic=selected_topic).all()
+        if not selected:
+             selected = session.query(MathQuestion).filter_by(topic=selected_topic).order_by(func.random()).first()
 
-        if questions:
-            selected = random.choice(questions)
+        if selected:
             q_text = selected.text
             q_id = selected.id
             topic_display = selected.topic
@@ -159,12 +158,11 @@ def next_math():
     else:
         # Mixed Mode (Default behaviour)
         if random.random() > 0.3:
-            questions = session.query(MathQuestion).filter(
+            selected = session.query(MathQuestion).filter(
                 MathQuestion.difficulty >= min_diff,
                 MathQuestion.difficulty <= max_diff
-            ).all()
-            if questions:
-                selected = random.choice(questions)
+            ).order_by(func.random()).first()
+            if selected:
                 q_text = selected.text
                 q_id = selected.id
                 topic_display = selected.topic
