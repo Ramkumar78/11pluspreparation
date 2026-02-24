@@ -439,3 +439,96 @@ def generate_statement_logic(num_questions=10):
         })
 
     return questions
+
+def generate_word_families(num_questions=10):
+    """
+    Generates 'Word Families' questions (Prefixes, Suffixes, Roots).
+    """
+    word_data = [
+        {"root": "happy", "prefix": "un", "suffix": "ness", "derived": "unhappiness", "meaning": "the state of not being happy"},
+        {"root": "agree", "prefix": "dis", "suffix": "ment", "derived": "disagreement", "meaning": "a lack of consensus"},
+        {"root": "act", "prefix": "re", "suffix": "ion", "derived": "reaction", "meaning": "an action performed in response"},
+        {"root": "friend", "prefix": "un", "suffix": "ly", "derived": "unfriendly", "meaning": "not kind or pleasant"},
+        {"root": "help", "prefix": "", "suffix": "ful", "derived": "helpful", "meaning": "ready to give help"},
+        {"root": "joy", "prefix": "en", "suffix": "able", "derived": "enjoyable", "meaning": "giving delight or pleasure"},
+        {"root": "fear", "prefix": "", "suffix": "less", "derived": "fearless", "meaning": "without fear"},
+        {"root": "hope", "prefix": "", "suffix": "less", "derived": "hopeless", "meaning": "without hope"},
+        {"root": "care", "prefix": "", "suffix": "ful", "derived": "careful", "meaning": "making sure to avoid harm"},
+        {"root": "use", "prefix": "mis", "suffix": "", "derived": "misuse", "meaning": "use in the wrong way"},
+        {"root": "understand", "prefix": "mis", "suffix": "ing", "derived": "misunderstanding", "meaning": "a failure to understand correctly"},
+        {"root": "cycle", "prefix": "bi", "suffix": "", "derived": "bicycle", "meaning": "a vehicle with two wheels"},
+        {"root": "cycle", "prefix": "tri", "suffix": "", "derived": "tricycle", "meaning": "a vehicle with three wheels"},
+        {"root": "marine", "prefix": "sub", "suffix": "", "derived": "submarine", "meaning": "a vessel that goes under the sea"},
+        {"root": "vision", "prefix": "tele", "suffix": "", "derived": "television", "meaning": "seeing from a distance"},
+        {"root": "phone", "prefix": "tele", "suffix": "", "derived": "telephone", "meaning": "sound from a distance"},
+        {"root": "write", "prefix": "re", "suffix": "", "derived": "rewrite", "meaning": "write again"},
+        {"root": "play", "prefix": "re", "suffix": "", "derived": "replay", "meaning": "play again"},
+        {"root": "cook", "prefix": "pre", "suffix": "", "derived": "precook", "meaning": "cook beforehand"},
+        {"root": "view", "prefix": "pre", "suffix": "", "derived": "preview", "meaning": "view beforehand"}
+    ]
+
+    questions = []
+
+    for _ in range(num_questions):
+        item = random.choice(word_data)
+        q_type = random.choice(["find_root", "find_derived"])
+
+        if q_type == "find_root":
+            # Question: What is the root word of [derived]?
+            text = f"What is the root word of '{item['derived']}'?"
+            correct = item['root']
+
+            # Distractors: parts of the word, or other random roots
+            distractors = set()
+            if item['prefix']: distractors.add(item['prefix'])
+            if item['suffix']: distractors.add(item['suffix'])
+
+            attempts = 0
+            while len(distractors) < 3 and attempts < 100:
+                attempts += 1
+                d = random.choice(word_data)['root']
+                if d != correct:
+                    distractors.add(d)
+
+            options = list(distractors)[:3] + [correct]
+            random.shuffle(options)
+
+            questions.append({
+                "id": -1,
+                "type": "word_families",
+                "topic": "Morphology",
+                "question": text,
+                "options": options,
+                "answer": correct,
+                "difficulty": 4,
+                "explanation": f"The root word is '{correct}'. The prefix/suffix modifies it."
+            })
+
+        elif q_type == "find_derived":
+            # Question: Which word means [meaning]?
+            text = f"Which word means '{item['meaning']}'?"
+            correct = item['derived']
+
+            distractors = set()
+            attempts = 0
+            while len(distractors) < 3 and attempts < 100:
+                attempts += 1
+                d = random.choice(word_data)['derived']
+                if d != correct:
+                    distractors.add(d)
+
+            options = list(distractors)[:3] + [correct]
+            random.shuffle(options)
+
+            questions.append({
+                "id": -1,
+                "type": "word_families",
+                "topic": "Morphology",
+                "question": text,
+                "options": options,
+                "answer": correct,
+                "difficulty": 5,
+                "explanation": f"'{correct}' comes from the root '{item['root']}'."
+            })
+
+    return questions
