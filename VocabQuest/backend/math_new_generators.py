@@ -309,3 +309,114 @@ def generate_bar_charts(level=1):
         "question_type": "Multiple Choice",
         "options": sorted(list(options), key=lambda x: int(x))
     }
+
+def generate_line_graphs(num_questions=1):
+    """
+    Generates text-based Line Graph questions.
+    """
+    questions = []
+
+    for _ in range(num_questions):
+        # Scenario: Temperature over time
+        times = ["9am", "10am", "11am", "12pm", "1pm", "2pm"]
+        start_temp = random.randint(10, 20)
+        temps = [start_temp]
+        for _ in range(len(times)-1):
+            change = random.choice([-2, -1, 0, 1, 2, 3])
+            temps.append(temps[-1] + change)
+
+        data_str = " | ".join([f"{t}: {temp}°C" for t, temp in zip(times, temps)])
+        intro = f"A line graph shows the temperature in a garden from 9am to 2pm. The points are:\n{data_str}"
+
+        q_type = random.choice(["read_value", "find_time", "difference", "max_min"])
+
+        ans = ""
+        explanation = ""
+        question_text = ""
+
+        if q_type == "read_value":
+            idx = random.randint(0, len(times)-1)
+            target_time = times[idx]
+            ans = temps[idx]
+            question_text = f"{intro}\nWhat was the temperature at {target_time}?"
+            explanation = f"At {target_time}, the graph shows {ans}°C."
+
+        elif q_type == "find_time":
+            # Pick a unique temp if possible, or just one instance
+            unique_temps = [t for t in temps if temps.count(t) == 1]
+            if unique_temps:
+                ans_temp = random.choice(unique_temps)
+                ans_time = times[temps.index(ans_temp)]
+                question_text = f"{intro}\nAt what time was the temperature {ans_temp}°C?"
+                ans = ans_time # Expected string
+                explanation = f"The temperature was {ans_temp}°C at {ans_time}."
+            else:
+                # Fallback to read_value
+                idx = random.randint(0, len(times)-1)
+                target_time = times[idx]
+                ans = temps[idx]
+                question_text = f"{intro}\nWhat was the temperature at {target_time}?"
+                explanation = f"At {target_time}, the graph shows {ans}°C."
+
+        elif q_type == "difference":
+            idx1, idx2 = random.sample(range(len(times)), 2)
+            # Ensure idx1 < idx2 for logical flow "between X and Y"
+            if idx1 > idx2: idx1, idx2 = idx2, idx1
+
+            t1, t2 = times[idx1], times[idx2]
+            v1, v2 = temps[idx1], temps[idx2]
+            diff = abs(v1 - v2)
+
+            question_text = f"{intro}\nWhat is the difference in temperature between {t1} and {t2}?"
+            ans = diff
+            explanation = f"At {t1}, it was {v1}°C. At {t2}, it was {v2}°C. Difference is |{v1} - {v2}| = {diff}°C."
+
+        elif q_type == "max_min":
+            sub_type = random.choice(["max", "min"])
+            if sub_type == "max":
+                val = max(temps)
+                question_text = f"{intro}\nWhat was the highest temperature recorded?"
+                ans = val
+                explanation = f"The temperatures are {temps}. The highest value is {val}°C."
+            else:
+                val = min(temps)
+                question_text = f"{intro}\nWhat was the lowest temperature recorded?"
+                ans = val
+                explanation = f"The temperatures are {temps}. The lowest value is {val}°C."
+
+        # Options generation
+        options = set()
+        options.add(str(ans))
+
+        # Distractors
+        attempts = 0
+        while len(options) < 5 and attempts < 20:
+            attempts += 1
+            if isinstance(ans, int) or (isinstance(ans, str) and ans.isdigit()):
+                val = int(ans)
+                offset = random.randint(-5, 5)
+                if offset != 0:
+                    options.add(str(val + offset))
+            elif isinstance(ans, str) and ("am" in ans or "pm" in ans):
+                # Time distractors
+                options.add(random.choice(times))
+            else:
+                 # Generic fallback
+                 options.add(str(random.randint(10, 25)))
+
+        # Ensure fallback if loops fail
+        while len(options) < 5:
+             options.add(str(random.randint(100, 999)))
+
+        questions.append({
+            "text": question_text,
+            "answer": str(ans),
+            "topic": "Statistics",
+            "skill_tag": "Line Graphs",
+            "diff": 5,
+            "explanation": explanation,
+            "question_type": "Multiple Choice",
+            "options": sorted(list(options))
+        })
+
+    return questions

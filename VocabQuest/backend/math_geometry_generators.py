@@ -4,6 +4,35 @@ import random
 FILLED = "■"
 EMPTY = "□"
 
+# Labelled nets for Opposite Face questions
+# Each entry is (matrix, opposites_list)
+# Matrix: 0=empty, string=face label
+# Opposites: list of tuples (face1, face2)
+OPPOSITE_FACE_NETS = [
+    # Cross shape (1-4-1)
+    #   1
+    # 2 3 4 5
+    #   6
+    (
+        [[0, "1", 0, 0],
+         ["2", "3", "4", "5"],
+         [0, "6", 0, 0]],
+        [("1", "6"), ("2", "4"), ("3", "5")]
+    ),
+    # T-shape (aligned for easy display)
+    #   1
+    # 2 3 4
+    #   5
+    #   6
+    (
+        [[0, "1", 0],
+         ["2", "3", "4"],
+         [0, "5", 0],
+         [0, "6", 0]],
+        [("1", "5"), ("2", "4"), ("3", "6")]
+    )
+]
+
 # The 11 Valid Nets of a Cube
 # Represented as lists of lists (1=filled, 0=empty)
 VALID_NETS = [
@@ -134,9 +163,61 @@ def render_net(matrix):
         line = ""
         for i in range(width):
             val = row[i] if i < len(row) else 0
-            line += FILLED if val else EMPTY
+            if isinstance(val, str):
+                # Ensure spacing is somewhat preserved if using digits
+                # Using fullwidth digits might be better but let's stick to simple logic
+                line += val
+            else:
+                line += FILLED if val else EMPTY
         rows.append(line)
     return "\n".join(rows)
+
+def generate_opposite_face_questions(num_questions=1):
+    """
+    Generates 'Opposite Face' questions using labelled nets.
+    """
+    questions = []
+    for _ in range(num_questions):
+        matrix, opposites = random.choice(OPPOSITE_FACE_NETS)
+
+        # Select a target pair
+        target_pair = random.choice(opposites)
+        face1, face2 = target_pair
+
+        # Decide which one to ask about
+        if random.random() < 0.5:
+            given, answer = face1, face2
+        else:
+            given, answer = face2, face1
+
+        net_str = render_net(matrix)
+
+        question_text = f"The diagram below shows a net of a cube with faces numbered.\n\n{net_str}\n\nWhich face is OPPOSITE to face {given}?"
+
+        # Distractors: other faces
+        all_faces = set()
+        for row in matrix:
+            for cell in row:
+                if isinstance(cell, str):
+                    all_faces.add(cell)
+
+        distractors = list(all_faces - {answer, given})
+        random.shuffle(distractors)
+
+        # Select 3 distractors if possible (usually 4 others exist)
+        opts = [answer] + distractors[:3]
+        random.shuffle(opts)
+
+        questions.append({
+            "text": question_text,
+            "answer": answer,
+            "topic": "Geometry",
+            "diff": 8,
+            "explanation": f"In this specific net configuration, face {given} is opposite to face {answer} when folded.",
+            "question_type": "Multiple Choice",
+            "options": opts
+        })
+    return questions
 
 def generate_nets_of_cubes(num_questions=1):
     """
@@ -146,6 +227,16 @@ def generate_nets_of_cubes(num_questions=1):
     questions = []
 
     for _ in range(num_questions):
+        # 50% chance for Opposite Face question if num_questions is large,
+        # but for single question generation (n=1), flip a coin.
+        if random.random() < 0.5:
+             # Task 2: Opposite Faces
+             qs = generate_opposite_face_questions(1)
+             if qs:
+                 questions.extend(qs)
+                 continue
+
+        # Task 1: Identify Valid Net
         valid_matrix = random.choice(VALID_NETS)
 
         # Select 3 unique invalid nets

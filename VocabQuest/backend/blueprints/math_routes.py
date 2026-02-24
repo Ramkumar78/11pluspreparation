@@ -11,6 +11,17 @@ from math_seed import (
     generate_fdp_conversion
 )
 
+try:
+    from math_geometry_generators import generate_nets_of_cubes
+    from math_new_generators import generate_line_graphs
+except ImportError:
+    try:
+        from VocabQuest.backend.math_geometry_generators import generate_nets_of_cubes
+        from VocabQuest.backend.math_new_generators import generate_line_graphs
+    except ImportError:
+        def generate_nets_of_cubes(n=1): return []
+        def generate_line_graphs(n=1): return []
+
 BOSS_NAMES = [
     "The Number Cruncher", "Count Calamity", "The Fraction Phantom",
     "Captain Calculator", "The Geometry Giant", "Professor Percent",
@@ -101,8 +112,20 @@ def next_math():
          generated_data = generate_fdp_conversion(current_level)
          use_generator = True
 
+    elif selected_topic == "Geometry" and random.random() < 0.4:
+         g_list = generate_nets_of_cubes(1)
+         if g_list:
+             generated_data = g_list[0]
+             use_generator = True
+
+    elif selected_topic == "Statistics" and random.random() < 0.4:
+         g_list = generate_line_graphs(1)
+         if g_list:
+             generated_data = g_list[0]
+             use_generator = True
+
     if use_generator and generated_data:
-        q_text = generated_data['question']
+        q_text = generated_data.get('question', generated_data.get('text', ''))
         q_ans = generated_data['answer']
         q_id = -1
         topic_display = selected_topic

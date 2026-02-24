@@ -1,14 +1,15 @@
 try:
-    from math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts
+    from math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts, generate_line_graphs
 except ImportError:
     try:
-        from VocabQuest.backend.math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts
+        from VocabQuest.backend.math_new_generators import generate_pie_charts, generate_pictograms, generate_bar_charts, generate_line_graphs
     except ImportError:
         print("Warning: Could not import math_new_generators. Skipping procedural stats/data.")
         # Define dummy functions to prevent crashes if import fails
         def generate_pie_charts(n=1): return None
         def generate_pictograms(n=1): return None
         def generate_bar_charts(n=1): return None
+        def generate_line_graphs(n=1): return []
 
 DATA_PROBABILITY_LIST = [
     # --- PROBABILITY (Combined Events) ---
@@ -100,3 +101,7 @@ for _ in range(10):
 
     q3 = generate_bar_charts()
     if q3: DATA_PROBABILITY_LIST.append(q3)
+
+    q4_list = generate_line_graphs(1)
+    if q4_list:
+        DATA_PROBABILITY_LIST.extend(q4_list)
