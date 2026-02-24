@@ -54,14 +54,14 @@ The 11+ Maths syllabus covers the KS2 National Curriculum with extensions into K
 - [x] Coordinates (1st & 4th Quadrant, Midpoints)
 - [x] Transformations (Reflection, Rotation, Translation)
 - [x] Bearings (Compass points)
-- [ ] Nets of 3D Shapes
+- [x] Nets of 3D Shapes
 
 ### 1.8 Statistics & Data
 - [x] Averages (Mean, Median, Mode, Range)
 - [x] Reverse Mean Problems
 - [x] Pie Charts & Bar Charts (Interpretation)
 - [x] Pictograms
-- [ ] Line Graphs
+- [x] Line Graphs
 - [x] Venn Diagrams (Sorting Data)
 - [x] Probability (Scale 0-1, Combined Events, 'Without Replacement')
 

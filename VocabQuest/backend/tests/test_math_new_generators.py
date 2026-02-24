@@ -10,10 +10,13 @@ from sqlalchemy.orm import sessionmaker
 # Ensure backend path is in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Mock seeder before importing app to prevent heavy initialization
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, MathQuestion, TopicProgress
 from math_seed import generate_algebra_substitution, generate_ratio_proportion, generate_fdp_conversion
-from math_new_generators import generate_bearings, generate_pie_charts, generate_pictograms, generate_bar_charts, generate_transformations
+from math_new_generators import generate_bearings, generate_pie_charts, generate_pictograms, generate_bar_charts, generate_transformations, generate_line_graphs
 
 # Fixtures for Integration Tests
 @pytest.fixture(scope='function')
@@ -126,6 +129,22 @@ def test_generate_transformations():
         assert "answer" in q
         assert "topic" in q
         assert q["topic"] == "Transformations"
+
+def test_generate_line_graphs():
+    questions = generate_line_graphs(num_questions=5)
+    assert len(questions) == 5
+    for q in questions:
+        assert "text" in q
+        assert "answer" in q
+        assert "options" in q
+        assert "explanation" in q
+        assert q["skill_tag"] == "Line Graphs"
+        assert q["topic"] == "Statistics"
+        assert len(q["options"]) == 5
+        assert q["answer"] in q["options"]
+        # Basic content check
+        assert "line graph" in q["text"].lower()
+        assert "temperature" in q["text"].lower()
 
 # Integration Tests for Route
 
