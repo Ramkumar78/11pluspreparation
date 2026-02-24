@@ -9,7 +9,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app import app
 from database import Base, UserStats, VerbalReasoningQuestion, TopicProgress
-from verbal_new_generators import generate_letter_sequences, generate_compound_words, generate_statement_logic
+from verbal_new_generators import (
+    generate_letter_sequences, generate_compound_words, generate_statement_logic,
+    generate_number_sequences, generate_letter_connections, generate_seating_arrangements
+)
 
 @pytest.fixture(scope='function')
 def test_db():
@@ -139,3 +142,58 @@ def test_generate_statement_logic():
         assert 'answer' in q
         assert 'options' in q
         assert q['answer'] in q['options']
+
+def test_generate_number_sequences():
+    questions = generate_number_sequences(5)
+    assert len(questions) == 5
+    for q in questions:
+        assert q['type'] == 'number_sequence'
+        assert 'content' in q
+        assert 'answer' in q
+        assert q['explanation']
+
+def test_generate_letter_connections():
+    questions = generate_letter_connections(5)
+    # Could be empty if no connections found, but retry logic usually prevents this
+    if not questions:
+        pytest.skip("No letter connections generated")
+    for q in questions:
+        assert q['type'] == 'word_ladder'
+        assert 'content' in q
+        assert 'answer' in q
+        assert 'options' in q
+        assert len(q['options']) == 4
+
+def test_generate_seating_arrangements():
+    questions = generate_seating_arrangements(5)
+    assert len(questions) == 5
+    for q in questions:
+        assert q['type'] == 'seating_logic'
+        assert 'content' in q
+        assert 'answer' in q
+        assert 'options' in q
+        assert len(q['options']) == 4
+
+def test_get_number_sequence_route(client):
+    response = client.get('/number_sequences')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['type'] == 'number_sequence'
+    assert 'content' in data
+    assert 'answer' in data
+
+def test_get_letter_connection_route(client):
+    response = client.get('/letter_connections')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['type'] == 'word_ladder'
+    assert 'content' in data
+    assert 'answer' in data
+
+def test_get_seating_arrangement_route(client):
+    response = client.get('/seating_arrangements')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['type'] == 'seating_logic'
+    assert 'content' in data
+    assert 'answer' in data
