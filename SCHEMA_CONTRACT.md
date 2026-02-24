@@ -30,6 +30,25 @@ Fetches a random Math question.
 }
 ```
 
+### `GET /api/math/challenge`
+Fetches a random Sutton Challenge question (High Difficulty).
+
+#### Response
+```json
+{
+  "id": -1,
+  "type": "math",
+  "topic": "Algebra",
+  "question": "Solve for x: 2x + 5 = 15",
+  "question_type": "Challenge",
+  "generated_answer_check": "5",
+  "explanation_text": "Subtract 5 from both sides, then divide by 2.",
+  "user_level": 10,
+  "score": 0,
+  "streak": 0
+}
+```
+
 ### `POST /check_math`
 Validates a user's answer.
 
