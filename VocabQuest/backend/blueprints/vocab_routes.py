@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 import random
+import hashlib
 import bleach
 from extensions import limiter
 from database import Session, Word, UserStats, ScoreHistory, UserErrors
@@ -32,7 +33,8 @@ def next_word():
     selected = random.choice(candidates)
 
     # Use local image path
-    image_url = f"/images/{selected.text}.jpg"
+    hashed_word = hashlib.md5(selected.text.encode('utf-8')).hexdigest()
+    image_url = f"/images/{hashed_word}.jpg"
 
     response = {
         "id": selected.id,

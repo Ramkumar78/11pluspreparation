@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from database import Session, UserErrors, Word, MathQuestion, UserStats
 import random
+import hashlib
 
 repair_bp = Blueprint('repair', __name__)
 
@@ -33,7 +34,7 @@ def next_repair():
                 "id": word.id,
                 "type": "vocab",
                 "difficulty": word.difficulty,
-                "image": f"/images/{word.text}.jpg",
+                "image": f"/images/{hashlib.md5(word.text.encode('utf-8')).hexdigest()}.jpg",
                 "definition": word.definition,
                 "length": len(word.text),
                 "user_level": user.current_level,

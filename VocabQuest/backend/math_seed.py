@@ -275,7 +275,7 @@ MATH_LIST = [
         "explanation": "Perimeter is the distance around the outside. A square has 4 equal sides. 5 + 5 + 5 + 5 = 20cm."
     },
     {
-        "text": "Calculate 2/3 + 1/6. Give your answer as a simple fraction (e.g. 5/6).",
+        "text": "Calculate 2/3 + 1/6. Give your answer as a simple fraction (e.g. 3/4).",
         "answer": "5/6",
         "topic": "Fractions",
         "diff": 5,
