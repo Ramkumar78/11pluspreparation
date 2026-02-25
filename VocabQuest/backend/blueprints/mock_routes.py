@@ -159,6 +159,26 @@ def submit_mock():
     max_score = len(answers) * 10
     results_breakdown = []
 
+    # Pre-fetch questions in batch to avoid N+1
+    math_ids = [item['id'] for item in answers if item['type'] == 'math']
+    vocab_ids = [item['id'] for item in answers if item['type'] == 'vocab']
+    comp_ids = [item['id'] for item in answers if item['type'] == 'comprehension']
+
+    math_map = {}
+    if math_ids:
+        math_qs = session.query(MathQuestion).filter(MathQuestion.id.in_(math_ids)).all()
+        math_map = {q.id: q for q in math_qs}
+
+    vocab_map = {}
+    if vocab_ids:
+        vocab_words = session.query(Word).filter(Word.id.in_(vocab_ids)).all()
+        vocab_map = {w.id: w for w in vocab_words}
+
+    comp_map = {}
+    if comp_ids:
+        comp_qs = session.query(ComprehensionQuestion).filter(ComprehensionQuestion.id.in_(comp_ids)).all()
+        comp_map = {q.id: q for q in comp_qs}
+
     for item in answers:
         is_correct = False
         correct_val = ""
@@ -166,7 +186,7 @@ def submit_mock():
         topic = "General"
 
         if item['type'] == 'math':
-            q = session.query(MathQuestion).filter_by(id=item['id']).first()
+            q = math_map.get(item['id'])
             if q:
                 correct_val = q.answer
                 explanation = q.explanation
@@ -175,7 +195,7 @@ def submit_mock():
                     is_correct = True
 
         elif item['type'] == 'vocab':
-            w = session.query(Word).filter_by(id=item['id']).first()
+            w = vocab_map.get(item['id'])
             if w:
                 correct_val = w.text
                 topic = "Vocabulary"
@@ -183,7 +203,7 @@ def submit_mock():
                     is_correct = True
 
         elif item['type'] == 'comprehension':
-            q = session.query(ComprehensionQuestion).filter_by(id=item['id']).first()
+            q = comp_map.get(item['id'])
             if q:
                 correct_val = q.correct_answer
                 explanation = q.explanation
