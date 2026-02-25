@@ -22,21 +22,46 @@ except ImportError:
         def generate_nets_of_cubes(n=1): return []
         def generate_line_graphs(n=1): return []
 
-BOSS_NAMES = [
-    "The Number Cruncher", "Count Calamity", "The Fraction Phantom",
-    "Captain Calculator", "The Geometry Giant", "Professor Percent",
-    "The Algebra Alien"
-]
-
 TOPIC_TO_BOSS = {
-    "Geometry": ["The Geometry Giant"],
-    "Algebra": ["The Algebra Alien"],
-    "Fractions": ["The Fraction Phantom"],
-    "Percentages": ["Professor Percent"],
-    "Mental Maths": ["The Number Cruncher", "Captain Calculator", "Count Calamity"],
-    "BIDMAS": ["The Number Cruncher", "Captain Calculator"],
-    "Ratio": ["Count Calamity", "The Number Cruncher"],
-    "Statistics": ["The Number Cruncher", "Captain Calculator"]
+    "Geometry": "The Geometry Giant",
+    "3D Shapes": "The Geometry Giant",
+    "Angles": "The Geometry Giant",
+    "Area": "The Geometry Giant",
+    "Area Problem Solving": "The Geometry Giant",
+    "Perimeter": "The Geometry Giant",
+    "Surface Area": "The Geometry Giant",
+    "Volume": "The Geometry Giant",
+    "Algebra": "The Algebra Alien",
+    "Advanced Algebra": "The Algebra Alien",
+    "Algebra Indices": "The Algebra Alien",
+    "Algebra Substitution": "The Algebra Alien",
+    "Algebra Word Problem": "The Algebra Alien",
+    "Algebra Word Problems": "The Algebra Alien",
+    "Sequences": "The Algebra Alien",
+    "Age Problem": "The Algebra Alien",
+    "Inverse Operations": "The Algebra Alien",
+    "Fractions": "The Fraction Phantom",
+    "Fractions/Decimals": "The Fraction Phantom",
+    "Percentages": "Professor Percent",
+    "Reverse Percentages": "Professor Percent",
+    "Ratio": "Count Calamity",
+    "Proportion": "Count Calamity",
+    "Ratio/Scale": "Count Calamity",
+    "BIDMAS": "Captain Calculator",
+    "BODMAS": "Captain Calculator",
+    "Logic": "Captain Calculator",
+    "Measurement": "Captain Calculator",
+    "Time": "Captain Calculator",
+    "Speed Distance Time": "Captain Calculator",
+    "Speed/Distance": "Captain Calculator",
+    "Work/Time": "Captain Calculator",
+    "Mental Maths": "The Number Cruncher",
+    "Basic Operations": "The Number Cruncher",
+    "Number Properties": "The Number Cruncher",
+    "Place Value": "The Number Cruncher",
+    "Rounding": "The Number Cruncher",
+    "Statistics": "The Number Cruncher",
+    "Averages (Mean)": "The Number Cruncher"
 }
 
 math_bp = Blueprint('math', __name__)
@@ -124,7 +149,7 @@ def next_math():
     generated_data = None
     use_generator = False
 
-    if not is_boss and selected_topic == "Algebra" and rng.random() < 0.6:
+    if selected_topic == "Algebra" and rng.random() < 0.6:
          generated_data = generate_algebra_substitution(current_level)
          use_generator = True
     elif selected_topic == "Ratio" and rng.random() < 0.6:
@@ -231,8 +256,7 @@ def next_math():
 
     if is_boss:
         # Select boss based on topic
-        possible_bosses = TOPIC_TO_BOSS.get(topic_display, ["The Number Cruncher", "Captain Calculator"])
-        boss_name = rng.choice(possible_bosses)
+        boss_name = TOPIC_TO_BOSS.get(topic_display, "The Number Cruncher")
 
     response = {
         "id": q_id,
