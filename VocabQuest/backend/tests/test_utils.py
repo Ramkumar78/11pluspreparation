@@ -6,7 +6,20 @@ import re
 # Ensure backend path is in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from utils import generate_arithmetic
+from utils import generate_arithmetic, sanitize_filename
+
+def test_sanitize_filename():
+    """Test sanitize_filename utility function."""
+    assert sanitize_filename("Hello World") == "hello_world"
+    assert sanitize_filename("  Hello   World  ") == "hello_world"
+    assert sanitize_filename("Hello-World") == "hello_world"
+    assert sanitize_filename("Hello!@#World") == "helloworld"
+    assert sanitize_filename("Mixed CASE") == "mixed_case"
+    assert sanitize_filename("Multiple     Spaces") == "multiple_spaces"
+    # Current implementation replaces hyphens with underscores, and doesn't strip them from ends
+    assert sanitize_filename("---Hyphens---") == "_hyphens_"
+    assert sanitize_filename("") == ""
+    assert sanitize_filename("!@#$%^&*()") == ""
 
 def test_generate_arithmetic_level_low():
     # Level <= 3: +, -
@@ -67,3 +80,60 @@ def test_generate_arithmetic_validity():
             elif '÷' in q:
                 x, y = map(int, q.split(' ÷ '))
                 assert int(a) == x // y
+
+def test_generate_arithmetic_ranges():
+    """Verify generated numbers are within expected ranges for different levels."""
+    # Level 3 (low)
+    # a: 1-20, b: 1-20
+    for _ in range(50):
+        q, a_str = generate_arithmetic(3)
+        if '+' in q:
+            a, b = map(int, q.split(' + '))
+            assert 1 <= a <= 20
+            assert 1 <= b <= 20
+        elif '-' in q:
+            a, b = map(int, q.split(' - '))
+            assert 1 <= a <= 20
+            assert 1 <= b <= 20
+
+    # Level 7 (mid)
+    # a: 10-100, b: 2-12
+    for _ in range(50):
+        q, a_str = generate_arithmetic(7)
+        if '+' in q:
+            a, b = map(int, q.split(' + '))
+            assert 10 <= a <= 100
+            assert 2 <= b <= 12
+        elif '-' in q:
+            a, b = map(int, q.split(' - '))
+            # Subtraction result >= 0
+            # operands check might be tricky due to swap, but max value holds
+            assert a <= 100
+            assert b <= 100
+        elif 'x' in q:
+            a, b = map(int, q.split(' x '))
+            assert 10 <= a <= 100
+            assert 2 <= b <= 12
+
+    # Level 10 (high)
+    # a: 50-500, b: 5-20
+    for _ in range(50):
+        q, a_str = generate_arithmetic(10)
+        if '+' in q:
+            a, b = map(int, q.split(' + '))
+            assert 50 <= a <= 500
+            assert 5 <= b <= 20
+        elif '-' in q:
+            a, b = map(int, q.split(' - '))
+            assert a <= 500
+            assert b <= 500
+        elif 'x' in q:
+            a, b = map(int, q.split(' x '))
+            assert 50 <= a <= 500
+            assert 5 <= b <= 20
+        elif '÷' in q:
+            a, b = map(int, q.split(' ÷ '))
+            assert 5 <= b <= 20
+            # a (dividend) = b * ans (ans: 2-12)
+            # Max a = 20 * 12 = 240
+            assert 10 <= a <= 240
