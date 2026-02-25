@@ -5,7 +5,7 @@ WORKDIR /app
 # Ensure proper ownership of the working directory
 RUN chown -R node:node /app
 
-# Switch to non-root user
+# Security: Switch to non-root user (node) to mitigate privilege escalation risks
 USER node
 
 COPY --chown=node:node package*.json ./
