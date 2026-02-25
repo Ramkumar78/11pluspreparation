@@ -54,11 +54,6 @@ def init_db_command():
         logging.info("Database seeded successfully.")
     except Exception as e:
         logging.error(f"Error seeding database: {e}")
-@app.cli.command("seed-db")
-def seed_db_command():
-    """Seeds the database with initial data."""
-    seed_database()
-    print("Database seeded successfully.")
 
 def find_available_port(start_port, max_port=5100):
     """Finds the first available port in the range."""
