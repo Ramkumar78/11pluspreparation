@@ -1,18 +1,26 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from '../Home';
 import { MODES, MOCK_TYPES } from '../constants';
 
-// Variables used in vi.mock must start with 'mock'
-const mockNavigate = vi.fn();
+// Helper component to display current location
+function LocationDisplay() {
+  const location = useLocation();
+  return <div data-testid="location-display">{location.pathname}</div>;
+}
 
-vi.mock('react-router-dom', async (importActual) => {
-  const actual = await importActual();
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+// Helper to render component inside MemoryRouter
+function renderWithRouter(component) {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <Routes>
+        <Route path="/" element={component} />
+        <Route path="*" element={<LocationDisplay />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
 
 describe('Home Component Navigation', () => {
   beforeEach(() => {
@@ -20,50 +28,50 @@ describe('Home Component Navigation', () => {
   });
 
   it('navigates to vocab game when PLAY VOCAB is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('PLAY VOCAB'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/game/${MODES.VOCAB}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/game/${MODES.VOCAB}`);
   });
 
   it('navigates to math game when PLAY MATHS is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('PLAY MATHS'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/game/${MODES.MATH}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/game/${MODES.MATH}`);
   });
 
   it('navigates to comprehension game when PLAY COMP is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('PLAY COMP'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/game/${MODES.COMPREHENSION}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/game/${MODES.COMPREHENSION}`);
   });
 
   it('navigates to maths mock when MATHS MOCK is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('MATHS MOCK'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/mock/${MOCK_TYPES.MATH}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/mock/${MOCK_TYPES.MATH}`);
   });
 
   it('navigates to english mock when ENGLISH MOCK is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('ENGLISH MOCK'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/mock/${MOCK_TYPES.ENGLISH}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/mock/${MOCK_TYPES.ENGLISH}`);
   });
 
   it('navigates to set simulation when SET SIMULATION (45 MINS) is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('SET SIMULATION (45 MINS)'));
-    expect(mockNavigate).toHaveBeenCalledWith(`/mock/${MOCK_TYPES.SET_SIMULATION}`);
+    expect(screen.getByTestId('location-display')).toHaveTextContent(`/mock/${MOCK_TYPES.SET_SIMULATION}`);
   });
 
   it('navigates to dashboard when MY DASHBOARD is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('MY DASHBOARD'));
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/dashboard');
   });
 
   it('navigates to leaderboard when LEADERBOARD is clicked', () => {
-    render(<Home />);
+    renderWithRouter(<Home />);
     fireEvent.click(screen.getByText('LEADERBOARD'));
-    expect(mockNavigate).toHaveBeenCalledWith('/leaderboard');
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/leaderboard');
   });
 });
