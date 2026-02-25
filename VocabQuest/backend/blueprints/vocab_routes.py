@@ -59,6 +59,9 @@ def check_answer():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     word_id = data.get('id')
     raw_spelling = data.get('spelling', '')
     repair_mode = data.get('repair_mode', False)

@@ -114,6 +114,12 @@ def check_verbal():
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
 
+    if q_id is not None:
+        try:
+            q_id = int(q_id)
+        except (ValueError, TypeError):
+            return jsonify({"error": "Invalid ID format"}), 400
+
     session = Session()
     user = session.query(UserStats).first()
     if not user:

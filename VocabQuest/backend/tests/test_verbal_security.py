@@ -72,3 +72,17 @@ def test_check_verbal_no_id(client):
 def test_check_verbal_malformed_json(client):
     response = client.post('/check_verbal', data='{invalid_json', content_type='application/json')
     assert response.status_code == 400
+
+def test_check_verbal_id_is_list(client):
+    # Sending a JSON dict with list ID should return 400
+    response = client.post('/check_verbal', json={"answer": "something", "id": [1, 2]})
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['error'] == "Invalid ID format"
+
+def test_check_verbal_invalid_id_type(client):
+    # Sending a JSON dict with invalid string ID should return 400
+    response = client.post('/check_verbal', json={"answer": "something", "id": "invalid"})
+    assert response.status_code == 400
+    data = response.get_json()
+    assert data['error'] == "Invalid ID format"

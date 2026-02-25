@@ -24,7 +24,7 @@ export default function Game() {
   const [compQuestionId, setCompQuestionId] = useState(null);
   const [currentCompQuestion, setCurrentCompQuestion] = useState(null);
   const [isTimed, setIsTimed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(TIMING.GAME_DURATION.DEFAULT);
   const [topic, setTopic] = useState("");
   const [newBadge, setNewBadge] = useState(null);
   const [showStreak, setShowStreak] = useState(false);
@@ -32,7 +32,7 @@ export default function Game() {
 
   // Blitz Mode State
   const [isBlitz, setIsBlitz] = useState(false);
-  const [blitzTimeLeft, setBlitzTimeLeft] = useState(60);
+  const [blitzTimeLeft, setBlitzTimeLeft] = useState(TIMING.GAME_DURATION.DEFAULT);
   const [blitzStats, setBlitzStats] = useState({ correct: 0, total: 0 });
   const [showBlitzSummary, setShowBlitzSummary] = useState(false);
 
@@ -56,7 +56,7 @@ export default function Game() {
       handleTimeout();
       return;
     }
-    const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
+    const timer = setInterval(() => setTimeLeft(t => t - 1), TIMING.TIMER_INTERVAL);
     return () => clearInterval(timer);
   }, [isTimed, status, timeLeft]);
 
@@ -68,13 +68,13 @@ export default function Game() {
       setIsBlitz(false);
       return;
     }
-    const timer = setInterval(() => setBlitzTimeLeft(t => t - 1), 1000);
+    const timer = setInterval(() => setBlitzTimeLeft(t => t - 1), TIMING.TIMER_INTERVAL);
     return () => clearInterval(timer);
   }, [isBlitz, blitzTimeLeft, showBlitzSummary]);
 
   const startBlitz = () => {
     setIsBlitz(true);
-    setBlitzTimeLeft(60);
+    setBlitzTimeLeft(TIMING.GAME_DURATION.BLITZ);
     setBlitzStats({ correct: 0, total: 0 });
     setShowBlitzSummary(false);
     setIsTimed(false); // Disable per-question timer
@@ -83,7 +83,7 @@ export default function Game() {
 
   const loadNextChallenge = async () => {
     setStatus("loading");
-    setTimeLeft(60);
+    setTimeLeft(TIMING.GAME_DURATION.DEFAULT);
     try {
       let endpoint = '/next_word';
       if (mode === MODES.MATH) {
