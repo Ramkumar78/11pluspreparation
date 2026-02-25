@@ -148,7 +148,7 @@ def get_mock_test():
 def submit_mock():
     """Batch processes mock test results and returns a scorecard."""
     data = request.json
-    if not data:
+    if not data or not isinstance(data, dict):
         return jsonify({"error": "No data provided"}), 400
     answers = data.get('answers', [])
 
