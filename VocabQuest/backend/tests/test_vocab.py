@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-# Mock seeder to prevent implicit DB migration on app import
+# Mock seeder to prevent heavy initialization
 sys.modules['seeder'] = MagicMock()
 
 from app import app
@@ -200,22 +200,25 @@ def test_sanitization(client, test_db, monkeypatch):
     # We verify that the system processed it and marked it incorrect (didn't crash).
     assert data['correct'] is False
 
-def test_check_answer_errors(client):
+def test_check_answer_errors(client, test_db):
     """
-    Test Error Handling: Verify that check_answer handles invalid input correctly.
+    Test Error Handling: Verify that check_answer returns 400 for invalid inputs.
     """
-    # Case 1: Invalid ID (String)
-    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'test'})
+    # Test Case 1: Non-integer word_id (e.g. string "1")
+    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'apple'})
     assert resp.status_code == 400
-    assert resp.get_json()['error'] == "Invalid ID"
+    data = resp.get_json()
+    assert data['error'] == "Invalid ID"
 
-    # Case 2: Missing ID
-    resp = client.post('/check_answer', json={'spelling': 'test'})
+    # Test Case 2: Missing word_id (word_id is None)
+    # If key 'id' is missing, data.get('id') returns None, which is not int.
+    resp = client.post('/check_answer', json={'spelling': 'apple'})
     assert resp.status_code == 400
-    assert resp.get_json()['error'] == "Invalid ID"
+    data = resp.get_json()
+    assert data['error'] == "Invalid ID"
 
-    # Case 3: Invalid Spelling Format (Integer)
-    # Using a valid ID format (integer) to pass the first check
+    # Test Case 3: Non-string spelling (e.g. integer 123)
     resp = client.post('/check_answer', json={'id': 1, 'spelling': 123})
     assert resp.status_code == 400
-    assert resp.get_json()['error'] == "Invalid spelling format"
+    data = resp.get_json()
+    assert data['error'] == "Invalid spelling format"
