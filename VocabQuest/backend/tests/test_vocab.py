@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Mock seeder to prevent implicit DB migration on app import
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, Word
 from extensions import limiter
@@ -196,3 +199,25 @@ def test_sanitization(client, test_db, monkeypatch):
     # This does not match 'apple', so it should be incorrect.
     # We verify that the system processed it and marked it incorrect (didn't crash).
     assert data['correct'] is False
+
+def test_check_answer_errors(client, test_db):
+    """
+    Test Error Handling: Verify invalid inputs return 400 Bad Request.
+    """
+    # 1. Invalid ID Type (String)
+    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'apple'})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid ID"
+
+    # 2. Missing ID (None)
+    resp = client.post('/check_answer', json={'spelling': 'apple'})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid ID"
+
+    # 3. Invalid Spelling Type (Integer)
+    # We need a valid ID (int) to pass the first check
+    # Note: the endpoint checks ID type first, so if ID is invalid, it returns Invalid ID.
+    # We provide a valid ID here to test the spelling check.
+    resp = client.post('/check_answer', json={'id': 1, 'spelling': 123})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid spelling format"
