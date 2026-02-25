@@ -1,4 +1,4 @@
-import random
+from utils import rng
 
 SENTENCES = [
     {"text": "The quick brown fox jumps over the lazy dog.", "diff": 3},
@@ -43,7 +43,7 @@ def generate_shuffled_sentence(num_questions=1):
 
     while len(questions) < num_questions and attempts < max_attempts:
         attempts += 1
-        selected = random.choice(SENTENCES)
+        selected = rng.choice(SENTENCES)
         sentence = selected['text']
 
         words = sentence.split()
@@ -51,7 +51,7 @@ def generate_shuffled_sentence(num_questions=1):
             continue
 
         shuffled = words[:]
-        random.shuffle(shuffled)
+        rng.shuffle(shuffled)
 
         # Ensure it's not same as original
         if shuffled == words:

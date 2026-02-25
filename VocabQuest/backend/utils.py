@@ -1,5 +1,6 @@
 import re
 import secrets
+rng = secrets.SystemRandom()
 import json
 
 def sanitize_filename(title):
