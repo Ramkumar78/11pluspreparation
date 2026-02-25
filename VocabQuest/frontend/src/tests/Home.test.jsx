@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from '../Home';
 import { MODES, MOCK_TYPES } from '../constants';
@@ -23,6 +23,11 @@ function renderWithRouter(component) {
 }
 
 describe('Home Component Navigation', () => {
+
+  it('renders the ScholarQuest title', () => {
+    renderWithRouter(<Home />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('ScholarQuest');
+  });
 
   it('navigates to vocab game when PLAY VOCAB is clicked', () => {
     renderWithRouter(<Home />);
