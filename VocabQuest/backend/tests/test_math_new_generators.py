@@ -152,7 +152,7 @@ def test_next_math_algebra_generator(client, monkeypatch):
     # Force random to favor generator (probability < 0.6)
     # math_routes uses random.random() < 0.6
     # We patch random.random to return 0.1
-    monkeypatch.setattr('random.random', lambda: 0.1)
+    monkeypatch.setattr('blueprints.math_routes.rng.random', lambda: 0.1)
 
     response = client.get('/next_math?topic=Algebra')
     assert response.status_code == 200
@@ -166,7 +166,7 @@ def test_next_math_algebra_generator(client, monkeypatch):
     assert data['explanation'] is not None
 
 def test_next_math_ratio_generator(client, monkeypatch):
-    monkeypatch.setattr('random.random', lambda: 0.1)
+    monkeypatch.setattr('blueprints.math_routes.rng.random', lambda: 0.1)
 
     response = client.get('/next_math?topic=Ratio')
     assert response.status_code == 200
@@ -177,7 +177,7 @@ def test_next_math_ratio_generator(client, monkeypatch):
     assert len(data['options']) == 5
 
 def test_next_math_fdp_generator(client, monkeypatch):
-    monkeypatch.setattr('random.random', lambda: 0.1)
+    monkeypatch.setattr('blueprints.math_routes.rng.random', lambda: 0.1)
 
     # Test for "Fractions"
     response = client.get('/next_math?topic=Fractions')
@@ -194,7 +194,7 @@ def test_next_math_fdp_generator(client, monkeypatch):
 def test_db_fallback_explanation(client, test_db, monkeypatch):
     """Test that existing DB questions also return explanation now."""
     # Force random > 0.6 to skip generator for Algebra
-    monkeypatch.setattr('random.random', lambda: 0.9)
+    monkeypatch.setattr('blueprints.math_routes.rng.random', lambda: 0.9)
 
     # Add a DB question with explanation
     q = MathQuestion(

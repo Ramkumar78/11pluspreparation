@@ -1,4 +1,4 @@
-import random
+from utils import rng
 
 COMMON_WORDS = [
     "the", "at", "in", "on", "to", "of", "it", "is", "as", "be", "by", "or", "he", "do", "go", "no",
@@ -73,8 +73,8 @@ def generate_hidden_word(num_questions=10):
 
     while len(questions) < num_questions and attempts < max_attempts:
         attempts += 1
-        target = random.choice(TARGETS)
-        split = random.randint(1, 3)
+        target = rng.choice(TARGETS)
+        split = rng.randint(1, 3)
 
         part1 = target[:split].lower()
         part2 = target[split:].lower()
@@ -83,8 +83,8 @@ def generate_hidden_word(num_questions=10):
         right_candidates = [w for w in COMMON_WORDS if w.startswith(part2)]
 
         if left_candidates and right_candidates:
-            left = random.choice(left_candidates)
-            right = random.choice(right_candidates)
+            left = rng.choice(left_candidates)
+            right = rng.choice(right_candidates)
 
             # --- Uniqueness Check ---
             # Construct the combined phrase (uppercase for checking against TARGETS)
@@ -126,7 +126,7 @@ def generate_hidden_word(num_questions=10):
                     "text": text,
                     "content": content,
                     "answer": answer,
-                    "difficulty": random.randint(3, 6),
+                    "difficulty": rng.randint(3, 6),
                     "explanation": explanation
                 })
 
@@ -147,9 +147,9 @@ def generate_logical_deduction(num_questions=10):
     questions = []
 
     for _ in range(num_questions):
-        X, Y, Z = random.sample(entities, 3)
+        X, Y, Z = rng.sample(entities, 3)
 
-        template = random.choice([1, 2, 3])
+        template = rng.choice([1, 2, 3])
 
         if template == 1:
             # All X are Y. All Y are Z. -> All X are Z.
@@ -191,16 +191,16 @@ def generate_logical_deduction(num_questions=10):
             explanation = f"If {Z} is entirely inside {Y}, and {Y} does not overlap with {X}, then {Z} cannot overlap with {X}."
 
         # Select 3 random distractors
-        opts = random.sample(distractors, 3)
+        opts = rng.sample(distractors, 3)
         opts.append(correct)
-        random.shuffle(opts)
+        rng.shuffle(opts)
 
         questions.append({
             "type": "logic_deduction",
             "text": "Based on the statements, which conclusion is definitely true?",
             "content": f"{stmt1} {stmt2}",
             "answer": correct,
-            "difficulty": random.randint(5, 8),
+            "difficulty": rng.randint(5, 8),
             "explanation": explanation,
             "options": opts
         })
@@ -219,15 +219,15 @@ def generate_letter_sequences(num_questions=10):
     # Convert char to index: ord(char) - ord('A')
 
     for _ in range(num_questions):
-        pattern_type = random.choice(['add', 'sub', 'alternating_add', 'alternating_sub_add', 'pairs'])
+        pattern_type = rng.choice(['add', 'sub', 'alternating_add', 'alternating_sub_add', 'pairs'])
 
         sequence = []
         answer = ""
         explanation = ""
 
         if pattern_type == 'add':
-            step = random.randint(1, 4)
-            start = random.randint(0, 25 - (step * 5)) # Ensure we don't go out of bounds easily
+            step = rng.randint(1, 4)
+            start = rng.randint(0, 25 - (step * 5)) # Ensure we don't go out of bounds easily
             current = start
             for _ in range(5):
                 sequence.append(chr(ord('A') + current))
@@ -240,8 +240,8 @@ def generate_letter_sequences(num_questions=10):
             explanation = f"The pattern is +{step} letters. {sequence[3]} + {step} -> {answer}."
 
         elif pattern_type == 'sub':
-            step = random.randint(1, 3)
-            start = random.randint(step * 5, 25)
+            step = rng.randint(1, 3)
+            start = rng.randint(step * 5, 25)
             current = start
             for _ in range(5):
                 sequence.append(chr(ord('A') + current))
@@ -252,9 +252,9 @@ def generate_letter_sequences(num_questions=10):
             explanation = f"The pattern is -{step} letters (backwards). {sequence[3]} - {step} -> {answer}."
 
         elif pattern_type == 'alternating_add':
-            step1 = random.randint(1, 2)
-            step2 = random.randint(3, 4)
-            start = random.randint(0, 15)
+            step1 = rng.randint(1, 2)
+            step2 = rng.randint(3, 4)
+            start = rng.randint(0, 15)
             current = start
             seq_indices = []
 
@@ -273,9 +273,9 @@ def generate_letter_sequences(num_questions=10):
 
         elif pattern_type == 'alternating_sub_add':
             # +X, -Y
-            step1 = random.randint(2, 4) # Add
-            step2 = random.randint(1, 2) # Sub
-            start = random.randint(5, 20)
+            step1 = rng.randint(2, 4) # Add
+            step2 = rng.randint(1, 2) # Sub
+            start = rng.randint(5, 20)
             current = start
 
             for i in range(5):
@@ -294,7 +294,7 @@ def generate_letter_sequences(num_questions=10):
             # Forward index, Backward index
             # A (0), Z (25) -> sum 25
             # B (1), Y (24) -> sum 25
-            start = random.randint(0, 5)
+            start = rng.randint(0, 5)
             sequence = []
             for i in range(3): # 3 pairs = 6 letters
                 fwd = start + i
@@ -312,7 +312,7 @@ def generate_letter_sequences(num_questions=10):
             "text": "What is the next letter in the sequence?",
             "content": sequence_str,
             "answer": answer,
-            "difficulty": random.randint(4, 7),
+            "difficulty": rng.randint(4, 7),
             "explanation": explanation
         })
 
@@ -347,20 +347,20 @@ def generate_compound_words(num_questions=10):
 
     while len(questions) < num_questions and attempts < 1000:
         attempts += 1
-        word1, word2 = random.choice(compounds)
+        word1, word2 = rng.choice(compounds)
 
         correct = word2
 
         # Generate distractors
         opts = [correct]
         while len(opts) < 4:
-            d = random.choice(distractors_pool)
+            d = rng.choice(distractors_pool)
             # Ensure distractor is not the correct answer AND not another valid completion for this word
             if d != correct and d not in opts:
                 if d in valid_completions[word1]:
                     continue # Skip if this distractor makes another valid compound word (e.g. SUN + LIGHT when target is FLOWER)
                 opts.append(d)
-        random.shuffle(opts)
+        rng.shuffle(opts)
 
         content = f"{word1.upper()} + [ ? ]"
         text = f"Select the word that can be added to the end of '{word1.upper()}' to form a new compound word."
@@ -398,8 +398,8 @@ def generate_statement_logic(num_questions=10):
     questions = []
 
     for _ in range(num_questions):
-        A, B, C = random.sample(names, 3)
-        prop_adj, prop_opp, prop_sup = random.choice(properties)
+        A, B, C = rng.sample(names, 3)
+        prop_adj, prop_opp, prop_sup = rng.choice(properties)
 
         # Scenario: A > B, B > C => A is most 'prop'
         # Statements:
@@ -413,14 +413,14 @@ def generate_statement_logic(num_questions=10):
         question_text = f"Based on the statements, who is the {prop_sup}?"
         answer = A
         options = [A, B, C]
-        random.shuffle(options)
+        rng.shuffle(options)
 
         explanation = f"{A} is {prop_adj} than {B}, and {B} is {prop_adj} than {C}, so {A} is the {prop_sup}."
 
         # Variation: Mix adjectives? "A is taller than B. C is shorter than B."
         # => A > B, C < B => A > B > C. Tallest? A.
 
-        variation = random.choice([1, 2])
+        variation = rng.choice([1, 2])
         if variation == 2:
             stmt1 = f"{A} is {prop_adj} than {B}."
             stmt2 = f"{C} is {prop_opp} than {B}." # C < B
@@ -433,7 +433,7 @@ def generate_statement_logic(num_questions=10):
             "text": question_text,
             "content": content,
             "answer": answer,
-            "difficulty": random.randint(4, 6),
+            "difficulty": rng.randint(4, 6),
             "explanation": explanation,
             "options": options
         })
@@ -470,8 +470,8 @@ def generate_word_families(num_questions=10):
     questions = []
 
     for _ in range(num_questions):
-        item = random.choice(word_data)
-        q_type = random.choice(["find_root", "find_derived"])
+        item = rng.choice(word_data)
+        q_type = rng.choice(["find_root", "find_derived"])
 
         if q_type == "find_root":
             # Question: What is the root word of [derived]?
@@ -486,12 +486,12 @@ def generate_word_families(num_questions=10):
             attempts = 0
             while len(distractors) < 3 and attempts < 100:
                 attempts += 1
-                d = random.choice(word_data)['root']
+                d = rng.choice(word_data)['root']
                 if d != correct:
                     distractors.add(d)
 
             options = list(distractors)[:3] + [correct]
-            random.shuffle(options)
+            rng.shuffle(options)
 
             questions.append({
                 "id": -1,
@@ -513,12 +513,12 @@ def generate_word_families(num_questions=10):
             attempts = 0
             while len(distractors) < 3 and attempts < 100:
                 attempts += 1
-                d = random.choice(word_data)['derived']
+                d = rng.choice(word_data)['derived']
                 if d != correct:
                     distractors.add(d)
 
             options = list(distractors)[:3] + [correct]
-            random.shuffle(options)
+            rng.shuffle(options)
 
             questions.append({
                 "id": -1,
@@ -540,14 +540,14 @@ def generate_number_sequences(num_questions=10):
     questions = []
 
     for _ in range(num_questions):
-        pattern_type = random.choice(['arithmetic', 'geometric', 'squares', 'alternating'])
+        pattern_type = rng.choice(['arithmetic', 'geometric', 'squares', 'alternating'])
         sequence = []
         answer = ""
         explanation = ""
 
         if pattern_type == 'arithmetic':
-            start = random.randint(1, 50)
-            diff = random.randint(1, 15) * random.choice([1, -1])
+            start = rng.randint(1, 50)
+            diff = rng.randint(1, 15) * rng.choice([1, -1])
             if diff == 0: diff = 2
 
             for i in range(6):
@@ -560,8 +560,8 @@ def generate_number_sequences(num_questions=10):
             explanation = f"The pattern is {sign}{diff}. {sequence[4]} {sign}{diff} = {answer}."
 
         elif pattern_type == 'geometric':
-            start = random.randint(1, 5)
-            ratio = random.randint(2, 3)
+            start = rng.randint(1, 5)
+            ratio = rng.randint(2, 3)
 
             curr = start
             for _ in range(6):
@@ -573,7 +573,7 @@ def generate_number_sequences(num_questions=10):
             explanation = f"The pattern is multiply by {ratio}. {sequence[4]} * {ratio} = {answer}."
 
         elif pattern_type == 'squares':
-            start_n = random.randint(1, 5)
+            start_n = rng.randint(1, 5)
             for i in range(6):
                 n = start_n + i
                 sequence.append(n*n)
@@ -583,9 +583,9 @@ def generate_number_sequences(num_questions=10):
             explanation = f"The sequence is square numbers: {start_n}^2, {start_n+1}^2... The next is {start_n+5}^2 = {answer}."
 
         elif pattern_type == 'alternating':
-            start = random.randint(10, 50)
-            op1 = random.randint(2, 5)
-            op2 = random.randint(1, 3)
+            start = rng.randint(10, 50)
+            op1 = rng.randint(2, 5)
+            op2 = rng.randint(1, 3)
             # +op1, -op2
 
             curr = start
@@ -612,7 +612,7 @@ def generate_number_sequences(num_questions=10):
             "text": "What is the next number in the sequence?",
             "content": seq_display,
             "answer": answer,
-            "difficulty": random.randint(4, 7),
+            "difficulty": rng.randint(4, 7),
             "explanation": explanation
         })
 
@@ -665,18 +665,18 @@ def generate_letter_connections(num_questions=10):
 
             if len(candidates) > 20: break # Don't search too long
 
-        return random.choice(candidates) if candidates else None
+        return rng.choice(candidates) if candidates else None
 
     questions = []
     attempts = 0
     while len(questions) < num_questions and attempts < 100:
         attempts += 1
         # Pick random length (3 or 4)
-        l = random.choice([3, 4])
+        l = rng.choice([3, 4])
         pool = words_by_len.get(l, [])
         if not pool: continue
 
-        start = random.choice(pool)
+        start = rng.choice(pool)
         path = get_path(start)
 
         if path and 3 <= len(path) <= 4:
@@ -684,7 +684,7 @@ def generate_letter_connections(num_questions=10):
             # Path: A -> B -> C (len 3). Missing B.
             # Path: A -> B -> C -> D (len 4). Missing B or C.
 
-            missing_idx = random.randint(1, len(path)-2)
+            missing_idx = rng.randint(1, len(path)-2)
             missing_word = path[missing_idx]
 
             display_path = list(path)
@@ -697,12 +697,12 @@ def generate_letter_connections(num_questions=10):
             # Simple distractors: random words of same length
             distractors = []
             while len(distractors) < 3:
-                d = random.choice(pool)
+                d = rng.choice(pool)
                 if d != missing_word and d not in path and d not in distractors:
                     distractors.append(d)
 
             options = [missing_word] + distractors
-            random.shuffle(options)
+            rng.shuffle(options)
 
             questions.append({
                 "type": "word_ladder",
@@ -726,7 +726,7 @@ def generate_seating_arrangements(num_questions=10):
 
     for _ in range(num_questions):
         # Linear Arrangement of 4 people
-        people = random.sample(names, 4)
+        people = rng.sample(names, 4)
         # Arrangement: P1 P2 P3 P4 (Left to Right)
 
         # Generate Clues
@@ -742,11 +742,11 @@ def generate_seating_arrangements(num_questions=10):
         # Clue 3: Relative (P2 is between P1 and P3)
         clues.append(f"{people[1]} is sitting between {people[0]} and {people[2]}.")
 
-        random.shuffle(clues)
+        rng.shuffle(clues)
         content = " ".join(clues)
 
         # Question types
-        q_type = random.choice(['left', 'right', 'between'])
+        q_type = rng.choice(['left', 'right', 'between'])
 
         if q_type == 'left':
             text = "Who is sitting on the far left?"

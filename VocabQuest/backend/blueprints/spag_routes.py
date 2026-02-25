@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-import random
+from utils import rng
 from spag_seed import SPAG_QUESTIONS
 from database import Session, UserStats
 
@@ -31,13 +31,13 @@ def generate_spag():
 
         # Decide source: Static vs Procedural
         # 60% Static, 20% Shuffled Sentence, 20% Word Families
-        roll = random.random()
+        roll = rng.random()
 
         question_data = None
 
         if roll < 0.6 and SPAG_QUESTIONS:
             # Static Question
-            selected = random.choice(SPAG_QUESTIONS)
+            selected = rng.choice(SPAG_QUESTIONS)
             question_data = {
                 "id": selected.get('id'),
                 "type": "spag", # Standardize type
@@ -64,7 +64,7 @@ def generate_spag():
         # Fallback if generator returned empty
         if not question_data:
             if SPAG_QUESTIONS:
-                selected = random.choice(SPAG_QUESTIONS)
+                selected = rng.choice(SPAG_QUESTIONS)
                 question_data = {
                     "id": selected.get('id'),
                     "type": "spag",
