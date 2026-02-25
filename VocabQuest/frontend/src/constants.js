@@ -15,6 +15,11 @@ export const MOCK_TYPES = {
 export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 export const TIMING = {
+  GAME_DURATION: {
+    DEFAULT: 60,
+    BLITZ: 60
+  },
+  TIMER_INTERVAL: 1000,
   BADGE_DISPLAY: 5000,
   INPUT_FOCUS_DELAY: {
     BLITZ: 100,
