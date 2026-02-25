@@ -200,24 +200,22 @@ def test_sanitization(client, test_db, monkeypatch):
     # We verify that the system processed it and marked it incorrect (didn't crash).
     assert data['correct'] is False
 
-def test_check_answer_errors(client, test_db):
+def test_check_answer_errors(client):
     """
-    Test Error Handling: Verify invalid inputs return 400 Bad Request.
+    Test Error Handling: Verify that check_answer handles invalid input correctly.
     """
-    # 1. Invalid ID Type (String)
-    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'apple'})
+    # Case 1: Invalid ID (String)
+    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'test'})
     assert resp.status_code == 400
     assert resp.get_json()['error'] == "Invalid ID"
 
-    # 2. Missing ID (None)
-    resp = client.post('/check_answer', json={'spelling': 'apple'})
+    # Case 2: Missing ID
+    resp = client.post('/check_answer', json={'spelling': 'test'})
     assert resp.status_code == 400
     assert resp.get_json()['error'] == "Invalid ID"
 
-    # 3. Invalid Spelling Type (Integer)
-    # We need a valid ID (int) to pass the first check
-    # Note: the endpoint checks ID type first, so if ID is invalid, it returns Invalid ID.
-    # We provide a valid ID here to test the spelling check.
+    # Case 3: Invalid Spelling Format (Integer)
+    # Using a valid ID format (integer) to pass the first check
     resp = client.post('/check_answer', json={'id': 1, 'spelling': 123})
     assert resp.status_code == 400
     assert resp.get_json()['error'] == "Invalid spelling format"
