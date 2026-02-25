@@ -24,7 +24,7 @@ function renderWithRouter(component) {
 
 describe('Home Component Navigation', () => {
 
-  it('renders the ScholarQuest title', () => {
+  it('renders the ScholarQuest title correctly', () => {
     renderWithRouter(<Home />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('ScholarQuest');
   });
