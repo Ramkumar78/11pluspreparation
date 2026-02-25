@@ -32,7 +32,7 @@ export default function Game() {
 
   // Blitz Mode State
   const [isBlitz, setIsBlitz] = useState(false);
-  const [blitzTimeLeft, setBlitzTimeLeft] = useState(TIMING.GAME_DURATION.BLITZ);
+  const [blitzTimeLeft, setBlitzTimeLeft] = useState(TIMING.GAME_DURATION.DEFAULT);
   const [blitzStats, setBlitzStats] = useState({ correct: 0, total: 0 });
   const [showBlitzSummary, setShowBlitzSummary] = useState(false);
 
