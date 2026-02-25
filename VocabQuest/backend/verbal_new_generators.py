@@ -618,6 +618,41 @@ def generate_number_sequences(num_questions=10):
 
     return questions
 
+def is_neighbor(w1, w2):
+    """Checks if two words differ by exactly one letter."""
+    diff = 0
+    for c1, c2 in zip(w1, w2):
+        if c1 != c2: diff += 1
+    return diff == 1
+
+
+def get_path(start_word, pool, length_limit=5):
+    """Uses BFS to find a random word ladder path of a certain length."""
+    queue = [(start_word, [start_word])]
+    visited = {start_word}
+
+    candidates = []
+
+    while queue:
+        curr, path = queue.pop(0)
+        if len(path) >= length_limit:
+            continue
+
+        # Find neighbors
+        for w in pool:
+            if w not in visited and is_neighbor(curr, w):
+                new_path = path + [w]
+                if len(new_path) >= 3:  # Minimum path length 3 (Start -> Mid -> End)
+                    candidates.append(new_path)
+                visited.add(w)
+                queue.append((w, new_path))
+
+        if len(candidates) > 20:
+            break  # Don't search too long
+
+    return rng.choice(candidates) if candidates else None
+
+
 def generate_letter_connections(num_questions=10):
     """
     Generates Word Ladder questions (Start -> ? -> End).
@@ -634,39 +669,6 @@ def generate_letter_connections(num_questions=10):
             if l not in words_by_len: words_by_len[l] = []
             words_by_len[l].append(w)
 
-    def is_neighbor(w1, w2):
-        diff = 0
-        for c1, c2 in zip(w1, w2):
-            if c1 != c2: diff += 1
-        return diff == 1
-
-    def get_path(start_word, length_limit=5):
-        # BFS
-        l = len(start_word)
-        pool = words_by_len.get(l, [])
-        queue = [(start_word, [start_word])]
-        visited = {start_word}
-
-        candidates = []
-
-        while queue:
-            curr, path = queue.pop(0)
-            if len(path) >= length_limit:
-                continue
-
-            # Find neighbors
-            for w in pool:
-                if w not in visited and is_neighbor(curr, w):
-                    new_path = path + [w]
-                    if len(new_path) >= 3: # Minimum path length 3 (Start -> Mid -> End)
-                        candidates.append(new_path)
-                    visited.add(w)
-                    queue.append((w, new_path))
-
-            if len(candidates) > 20: break # Don't search too long
-
-        return rng.choice(candidates) if candidates else None
-
     questions = []
     attempts = 0
     while len(questions) < num_questions and attempts < 100:
@@ -674,10 +676,11 @@ def generate_letter_connections(num_questions=10):
         # Pick random length (3 or 4)
         l = rng.choice([3, 4])
         pool = words_by_len.get(l, [])
-        if not pool: continue
+        if not pool:
+            continue
 
         start = rng.choice(pool)
-        path = get_path(start)
+        path = get_path(start, pool)
 
         if path and 3 <= len(path) <= 4:
             # Create question
