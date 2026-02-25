@@ -164,3 +164,34 @@ def test_submit_mock_mixed(client, test_db):
 
     assert data['total_score'] == 10
     assert data['percentage'] == 50
+
+def test_submit_mock_partial_answers(client, test_db):
+    # Fetch questions to get IDs
+    word = test_db.query(Word).first()
+    math = test_db.query(MathQuestion).first()
+
+    # User answers one, leaves one empty
+    payload = {
+        "answers": [
+            {
+                "id": word.id,
+                "type": "vocab",
+                "user_answer": "testword" # Correct, answered
+            },
+            {
+                "id": math.id,
+                "type": "math",
+                "user_answer": "" # Unanswered
+            }
+        ]
+    }
+
+    rv = client.post('/submit_mock', json=payload)
+    assert rv.status_code == 200
+    data = rv.get_json()
+
+    # Max score should be 10 (1 question answered * 10)
+    # Total score should be 10 (1 correct)
+    assert data['max_score'] == 10
+    assert data['total_score'] == 10
+    assert data['percentage'] == 100
