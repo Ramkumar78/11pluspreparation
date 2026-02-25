@@ -5,6 +5,19 @@ ScholarQuest is a solid foundation for an 11+ preparation tool, now covering **M
 
 However, several key features are missing to make it a complete product for students and parents.
 
+## Competitor Analysis & Feature Strategy
+
+A recent analysis of top 11+ preparation platforms (Atom Learning, Eleven Plus Exams, Bond 11+, etc.) highlights several "cool features" that drive user engagement and premium subscriptions. ScholarQuest aims to integrate these to achieve market parity and superiority.
+
+| Feature Category | Competitor Standard | ScholarQuest Strategy |
+| :--- | :--- | :--- |
+| **Adaptive Learning** | AI algorithms that adjust difficulty (Atom Learning). | **Phase 3:** Implement an ELO-based difficulty engine for Maths & Vocab to prevent boredom or frustration. |
+| **Exam Simulation** | Board-specific mock exams (GL, ISEB, CSSE). | **Phase 3:** "Exam Mode" toggles that adjust timer logic, question types, and scoring to mirror specific boards. |
+| **Community** | Parent forums and resource sharing (Eleven Plus Exams). | **Phase 4:** Launch "Parent Connect" forum and expert Q&A sessions. |
+| **Analytics** | Detailed progress tracking & auto-marking (Quest for Exams). | **Enhanced Dashboard:** Instant auto-marking with "red/amber/green" topic heatmaps. |
+| **Multimedia** | Video explanations for complex questions (PiAcademy). | **Video Integration:** Embed short explanation clips for NVR and hard Maths problems. |
+| **Resources** | Downloadable worksheets & flashcards (11 Plus Guide). | **Hybrid Model:** Offer digital flashcards (spaced repetition) and printable PDF mock exams. |
+
 ## 1. Critical Gaps
 
 ### Non-Verbal Reasoning (NVR)

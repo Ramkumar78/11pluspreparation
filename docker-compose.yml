@@ -8,6 +8,7 @@ services:
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
+    command: python app.py
 
   frontend:
     build: ./VocabQuest/frontend
