@@ -164,20 +164,15 @@ def submit_mock():
     vocab_ids = [item['id'] for item in answers if item['type'] == 'vocab']
     comp_ids = [item['id'] for item in answers if item['type'] == 'comprehension']
 
-    math_map = {}
-    if math_ids:
-        math_qs = session.query(MathQuestion).filter(MathQuestion.id.in_(math_ids)).all()
-        math_map = {q.id: q for q in math_qs}
+    def fetch_questions(model, ids):
+        if not ids:
+            return {}
+        qs = session.query(model).filter(model.id.in_(ids)).all()
+        return {q.id: q for q in qs}
 
-    vocab_map = {}
-    if vocab_ids:
-        vocab_words = session.query(Word).filter(Word.id.in_(vocab_ids)).all()
-        vocab_map = {w.id: w for w in vocab_words}
-
-    comp_map = {}
-    if comp_ids:
-        comp_qs = session.query(ComprehensionQuestion).filter(ComprehensionQuestion.id.in_(comp_ids)).all()
-        comp_map = {q.id: q for q in comp_qs}
+    math_map = fetch_questions(MathQuestion, math_ids)
+    vocab_map = fetch_questions(Word, vocab_ids)
+    comp_map = fetch_questions(ComprehensionQuestion, comp_ids)
 
     for item in answers:
         is_correct = False
