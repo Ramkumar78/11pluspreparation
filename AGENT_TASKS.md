@@ -49,3 +49,18 @@ This document tracks outstanding tasks, technical debt, and feature requests.
     1. Define Shape, Fill, Rotation features.
     2. Create rules for row/column progression.
     3. Generate SVG/Canvas based questions.
+
+## 4. Strategic Initiatives (New Features)
+
+### Adaptive & Exam-Specific
+- [ ] **Algorithm**: Develop adaptive difficulty algorithm (ELO-based) for maths and vocab.
+- [ ] **Exam Mode**: Create `ExamBoardSelector` toggle (GL/ISEB/CSSE) to filter question types and adjust timer logic.
+
+### Analytics & Reporting
+- [ ] **Data Model**: Design schema for detailed analytics tracking (question history, timestamps, topic tags).
+- [ ] **Visualization**: Implement heatmaps for "Problem Areas" on the Parent Dashboard.
+
+### Content & Multimedia
+- [ ] **Flashcards**: Implement `FlashcardComponent` with flip animation for vocabulary and formulas.
+- [ ] **Video**: Integrate video player for per-question explanation solutions (Modal or Inline).
+- [ ] **Community**: Create basic structure (routes/schema) for Parent Community Forum.

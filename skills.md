@@ -136,6 +136,16 @@ Tests visual problem-solving using shapes and patterns. (Currently unimplemented
 
 ---
 
+## 5. Strategic Competencies
+New capabilities required to match top-tier competitors.
+
+- [ ] **Adaptive Algorithms**: Implementation of ELO or IRT (Item Response Theory) for difficulty scaling.
+- [ ] **Data Visualization**: Advanced charting (Recharts/Chart.js) for parent dashboards (Heatmaps, Trend Lines).
+- [ ] **Multimedia Integration**: Embedding and controlling video content for explanations.
+- [ ] **Exam Board Formatting**: Strict adherence to GL, ISEB, and CSSE layouts and timing logic.
+
+---
+
 ## Procedural Generation Specifications for Missing Skills
 
 ### 1. NVR: Matrices (Procedural Shapes)
