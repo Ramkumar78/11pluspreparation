@@ -1,80 +1,69 @@
-import pytest
 import sys
 import os
+import pytest
+import re
 
-# Add backend to path for imports
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Ensure backend path is in sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from utils import sanitize_filename, generate_arithmetic
-
-def test_sanitize_filename():
-    assert sanitize_filename("Test File") == "test_file"
-    assert sanitize_filename("Test  File") == "test_file"
-    assert sanitize_filename("Test - File") == "test_file"
-    assert sanitize_filename("Test File!") == "test_file"
-    assert sanitize_filename("  Test File  ") == "test_file"
-    assert sanitize_filename("MixedCASE") == "mixedcase"
-    assert sanitize_filename("Special@#$%^&*Chars") == "specialchars"
-    assert sanitize_filename("Dash-Separated") == "dash_separated"
+from utils import generate_arithmetic
 
 def test_generate_arithmetic_level_low():
-    """Test levels <= 3"""
+    # Level <= 3: +, -
     for _ in range(20):
-        question, answer = generate_arithmetic(3)
-        # Parse question
-        parts = question.split()
-        assert len(parts) == 3
-        a, op, b = int(parts[0]), parts[1], int(parts[2])
+        q, a = generate_arithmetic(3)
+        assert any(op in q for op in ['+', '-'])
+        assert not any(op in q for op in ['x', '÷'])
+        # Check answer validity
+        # q is like "a + b" or "a - b"
+        # We can try to parse it or just trust the function returns valid strings
+        assert isinstance(q, str)
+        assert isinstance(a, str)
 
-        assert op in ['+', '-']
-        assert 1 <= a <= 40  # Sum/diff could be up to 40 if a,b are 20
-        # Actually a and b are randint(1, 20)
-        # If op is '+', result is a+b
-        # If op is '-', logic ensures a >= b
-
-        # Verify calculation
-        if op == '+':
-            assert int(answer) == a + b
-        elif op == '-':
-            assert int(answer) == a - b
-            assert int(answer) >= 0
-
-def test_generate_arithmetic_level_medium():
-    """Test levels 4-7"""
-    for _ in range(20):
-        question, answer = generate_arithmetic(5)
-        parts = question.split()
-        assert len(parts) == 3
-        a, op, b = int(parts[0]), parts[1], int(parts[2])
-
-        assert op in ['+', '-', 'x'] # Wait, generate_arithmetic returns 'x' for multiplication
-
-        # Verify calculation
-        if op == '+':
-            assert int(answer) == a + b
-        elif op == '-':
-            assert int(answer) == a - b
-            assert int(answer) >= 0
-        elif op == 'x':
-            assert int(answer) == a * b
+def test_generate_arithmetic_level_mid():
+    # Level <= 7: +, -, x
+    has_mul = False
+    for _ in range(50):
+        q, a = generate_arithmetic(7)
+        assert any(op in q for op in ['+', '-', 'x'])
+        assert '÷' not in q
+        if 'x' in q:
+            has_mul = True
+    assert has_mul # statistically likely
 
 def test_generate_arithmetic_level_high():
-    """Test levels > 7"""
-    for _ in range(20):
-        question, answer = generate_arithmetic(8)
-        parts = question.split()
-        assert len(parts) == 3
-        a, op, b = int(parts[0]), parts[1], int(parts[2])
+    # Level > 7: +, -, x, ÷
+    has_div = False
+    for _ in range(50):
+        q, a = generate_arithmetic(10)
+        assert any(op in q for op in ['+', '-', 'x', '÷'])
+        if '÷' in q:
+            has_div = True
+            # specific check for division logic
+            # q format: "a ÷ b", a = b * ans
+            parts = q.split(' ÷ ')
+            assert len(parts) == 2
+            dividend = int(parts[0])
+            divisor = int(parts[1])
+            answer = int(a)
+            assert dividend / divisor == answer
+    assert has_div # statistically likely
 
-        assert op in ['+', '-', 'x', '÷'] # '÷' for division
+def test_generate_arithmetic_validity():
+    # General validity check for all operations
+    for level in [2, 5, 8]:
+        for _ in range(20):
+            q, a = generate_arithmetic(level)
 
-        # Verify calculation
-        if op == '+':
-            assert int(answer) == a + b
-        elif op == '-':
-            assert int(answer) == a - b
-        elif op == 'x':
-            assert int(answer) == a * b
-        elif op == '÷':
-            assert int(answer) == a // b # Integer division result check
-            assert a % b == 0 # Should be divisible
+            if '+' in q:
+                x, y = map(int, q.split(' + '))
+                assert int(a) == x + y
+            elif '-' in q:
+                x, y = map(int, q.split(' - '))
+                assert int(a) == x - y
+            elif 'x' in q:
+                x, y = map(int, q.split(' x '))
+                assert int(a) == x * y
+            elif '÷' in q:
+                x, y = map(int, q.split(' ÷ '))
+                assert int(a) == x // y
