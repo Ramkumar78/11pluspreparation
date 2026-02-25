@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
-import random
+
 import json
 from database import Session, UserStats, ComprehensionPassage, ComprehensionQuestion
-from utils import sanitize_filename, check_badges
+from utils import sanitize_filename, check_badges, rng
 
 comprehension_bp = Blueprint('comprehension', __name__)
 
@@ -26,7 +26,7 @@ def next_comprehension():
         session.close()
         return jsonify({"error": "No passages available"}), 404
 
-    selected = random.choice(passages)
+    selected = rng.choice(passages)
 
     # Get questions
     questions_objs = session.query(ComprehensionQuestion).filter_by(passage_id=selected.id).all()

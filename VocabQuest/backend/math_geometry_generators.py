@@ -1,4 +1,4 @@
-import random
+from utils import rng
 
 # Use geometric shapes for display
 FILLED = "■"
@@ -178,14 +178,14 @@ def generate_opposite_face_questions(num_questions=1):
     """
     questions = []
     for _ in range(num_questions):
-        matrix, opposites = random.choice(OPPOSITE_FACE_NETS)
+        matrix, opposites = rng.choice(OPPOSITE_FACE_NETS)
 
         # Select a target pair
-        target_pair = random.choice(opposites)
+        target_pair = rng.choice(opposites)
         face1, face2 = target_pair
 
         # Decide which one to ask about
-        if random.random() < 0.5:
+        if rng.random() < 0.5:
             given, answer = face1, face2
         else:
             given, answer = face2, face1
@@ -202,11 +202,11 @@ def generate_opposite_face_questions(num_questions=1):
                     all_faces.add(cell)
 
         distractors = list(all_faces - {answer, given})
-        random.shuffle(distractors)
+        rng.shuffle(distractors)
 
         # Select 3 distractors if possible (usually 4 others exist)
         opts = [answer] + distractors[:3]
-        random.shuffle(opts)
+        rng.shuffle(opts)
 
         questions.append({
             "text": question_text,
@@ -229,7 +229,7 @@ def generate_nets_of_cubes(num_questions=1):
     for _ in range(num_questions):
         # 50% chance for Opposite Face question if num_questions is large,
         # but for single question generation (n=1), flip a coin.
-        if random.random() < 0.5:
+        if rng.random() < 0.5:
              # Task 2: Opposite Faces
              qs = generate_opposite_face_questions(1)
              if qs:
@@ -237,18 +237,18 @@ def generate_nets_of_cubes(num_questions=1):
                  continue
 
         # Task 1: Identify Valid Net
-        valid_matrix = random.choice(VALID_NETS)
+        valid_matrix = rng.choice(VALID_NETS)
 
         # Select 3 unique invalid nets
         # Ensure we have enough distractors
         num_distractors = min(3, len(INVALID_NETS))
-        distractors_matrices = random.sample(INVALID_NETS, num_distractors)
+        distractors_matrices = rng.sample(INVALID_NETS, num_distractors)
 
         valid_str = render_net(valid_matrix)
         distractors_str = [render_net(m) for m in distractors_matrices]
 
         options = [valid_str] + distractors_str
-        random.shuffle(options)
+        rng.shuffle(options)
 
         questions.append({
             "text": "Which of the following shapes is a VALID net of a cube? (Can be folded to make a cube)",

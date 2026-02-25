@@ -1,4 +1,4 @@
-import random
+from utils import rng
 import math
 
 def generate_transformations(num_questions=20):
@@ -13,9 +13,9 @@ def generate_transformations(num_questions=20):
     questions = []
 
     for _ in range(num_questions):
-        q_type = random.choice(['reflection_x', 'reflection_y', 'rotation_90', 'rotation_180', 'translation'])
-        x = random.randint(-10, 10)
-        y = random.randint(-10, 10)
+        q_type = rng.choice(['reflection_x', 'reflection_y', 'rotation_90', 'rotation_180', 'translation'])
+        x = rng.randint(-10, 10)
+        y = rng.randint(-10, 10)
 
         if q_type == 'reflection_x':
             new_x, new_y = x, -y
@@ -32,7 +32,7 @@ def generate_transformations(num_questions=20):
         elif q_type == 'rotation_90':
             # Clockwise 90 degrees: (x, y) -> (y, -x)
             # Counter-clockwise 90 degrees: (x, y) -> (-y, x)
-            direction = random.choice(['clockwise', 'anticlockwise'])
+            direction = rng.choice(['clockwise', 'anticlockwise'])
             if direction == 'clockwise':
                 new_x, new_y = y, -x
                 text = f"Point A is at ({x}, {y}). It is rotated 90° clockwise about the origin (0,0). What are the new coordinates?"
@@ -50,8 +50,8 @@ def generate_transformations(num_questions=20):
             diff = 7
 
         elif q_type == 'translation':
-            dx = random.randint(-5, 5)
-            dy = random.randint(-5, 5)
+            dx = rng.randint(-5, 5)
+            dy = rng.randint(-5, 5)
             # Ensure non-zero translation
             if dx == 0 and dy == 0:
                 dx = 1
@@ -80,7 +80,7 @@ def generate_bearings(level=1):
     """
     # 1. Reciprocal Bearings (Back Bearing)
     # Ensure angle is a nice number ending in 0 or 5 for easier mental math
-    angle = random.choice([x for x in range(10, 350, 10)])
+    angle = rng.choice([x for x in range(10, 350, 10)])
 
     # Text templates
     templates = [
@@ -88,7 +88,7 @@ def generate_bearings(level=1):
         ("A ship sails on a bearing of {angle:03d}°. What is the opposite bearing?", "reciprocal")
     ]
 
-    text_template, q_type = random.choice(templates)
+    text_template, q_type = rng.choice(templates)
 
     explanation = ""
     ans = 0
@@ -108,13 +108,13 @@ def generate_bearings(level=1):
     attempts = 0
     while len(options) < 5 and attempts < 20:
         attempts += 1
-        distractor = random.choice([x for x in range(10, 360, 10)])
+        distractor = rng.choice([x for x in range(10, 360, 10)])
         if distractor != ans:
             options.add(f"{distractor:03d}")
 
     # Fallback
     while len(options) < 5:
-        distractor = random.randint(10, 350)
+        distractor = rng.randint(10, 350)
         if distractor != ans:
             options.add(f"{distractor:03d}")
 
@@ -136,16 +136,16 @@ def generate_pie_charts(level=1):
     # Type 1: Calculate Amount given Angle and Total
     # Type 2: Calculate Angle given Amount and Total
 
-    total = random.choice([60, 72, 90, 120, 180, 360])
+    total = rng.choice([60, 72, 90, 120, 180, 360])
     # Choose an amount that results in a clean angle (factor of 360)
     # 360 degrees represents Total.
     deg_per_unit = 360 // total
 
     # Choose a random amount
-    amount = random.randint(1, total // 2)
+    amount = rng.randint(1, total // 2)
     angle = amount * deg_per_unit
 
-    q_type = random.choice(["calc_amount", "calc_angle"])
+    q_type = rng.choice(["calc_amount", "calc_angle"])
 
     if q_type == "calc_amount":
         question_text = f"In a pie chart representing {total} people, a sector has an angle of {angle}°. How many people does this represent?"
@@ -164,14 +164,14 @@ def generate_pie_charts(level=1):
     attempts = 0
     while len(options) < 5 and attempts < 20:
         attempts += 1
-        offset = random.choice([-10, -5, 5, 10, 15, 20])
+        offset = rng.choice([-10, -5, 5, 10, 15, 20])
         val = int(answer_str) + offset
         if val > 0:
             options.add(str(val))
 
     # Fallback
     while len(options) < 5:
-        offset = random.randint(-20, 20)
+        offset = rng.randint(-20, 20)
         if offset == 0: offset = 1
         val = int(answer_str) + offset
         if val > 0:
@@ -193,14 +193,14 @@ def generate_pictograms(level=1):
     Generates text-based Pictogram questions.
     """
     # Use even numbers to avoid .5 issues with int math
-    symbol_val = random.choice([2, 4, 10])
+    symbol_val = rng.choice([2, 4, 10])
     rows = [
-        ("Monday", random.randint(1, 5), random.choice([0, 0.5])),
-        ("Tuesday", random.randint(1, 5), random.choice([0, 0.5])),
-        ("Wednesday", random.randint(1, 5), random.choice([0, 0.5]))
+        ("Monday", rng.randint(1, 5), rng.choice([0, 0.5])),
+        ("Tuesday", rng.randint(1, 5), rng.choice([0, 0.5])),
+        ("Wednesday", rng.randint(1, 5), rng.choice([0, 0.5]))
     ]
 
-    target_day, whole, half = random.choice(rows)
+    target_day, whole, half = rng.choice(rows)
 
     question_text = f"A pictogram uses a symbol '*' to represent {symbol_val} items. On {target_day}, there are {whole} full symbols"
     if half:
@@ -223,7 +223,7 @@ def generate_pictograms(level=1):
     attempts = 0
     while len(options) < 5 and attempts < 20:
         attempts += 1
-        offset = random.choice([-symbol_val, -symbol_val//2, symbol_val//2, symbol_val])
+        offset = rng.choice([-symbol_val, -symbol_val//2, symbol_val//2, symbol_val])
         if offset == 0: offset = 1
         opt = int(answer_str) + offset
         if opt > 0:
@@ -231,7 +231,7 @@ def generate_pictograms(level=1):
 
     # Fallback
     while len(options) < 5:
-        offset = random.randint(-symbol_val, symbol_val)
+        offset = rng.randint(-symbol_val, symbol_val)
         if offset == 0: offset = 1
         opt = int(answer_str) + offset
         if opt > 0:
@@ -254,11 +254,11 @@ def generate_bar_charts(level=1):
     """
     # Compare two bars or sum them
     categories = ["A", "B", "C", "D"]
-    vals = {k: random.randint(5, 20) for k in categories}
+    vals = {k: rng.randint(5, 20) for k in categories}
 
-    q_type = random.choice(["difference", "sum", "read"])
+    q_type = rng.choice(["difference", "sum", "read"])
 
-    c1, c2 = random.sample(categories, 2)
+    c1, c2 = rng.sample(categories, 2)
 
     intro = f"In a bar chart, bar A is {vals['A']}, bar B is {vals['B']}, bar C is {vals['C']}, and bar D is {vals['D']}."
 
@@ -285,7 +285,7 @@ def generate_bar_charts(level=1):
     attempts = 0
     while len(options) < 5 and attempts < 20:
         attempts += 1
-        offset = random.randint(-5, 5)
+        offset = rng.randint(-5, 5)
         if offset == 0: offset = 1
         opt = ans + offset
         if opt >= 0:
@@ -293,7 +293,7 @@ def generate_bar_charts(level=1):
 
     # Fallback
     while len(options) < 5:
-        offset = random.randint(-10, 10)
+        offset = rng.randint(-10, 10)
         if offset == 0: offset = 1
         opt = ans + offset
         if opt >= 0:
@@ -319,23 +319,23 @@ def generate_line_graphs(num_questions=1):
     for _ in range(num_questions):
         # Scenario: Temperature over time
         times = ["9am", "10am", "11am", "12pm", "1pm", "2pm"]
-        start_temp = random.randint(10, 20)
+        start_temp = rng.randint(10, 20)
         temps = [start_temp]
         for _ in range(len(times)-1):
-            change = random.choice([-2, -1, 0, 1, 2, 3])
+            change = rng.choice([-2, -1, 0, 1, 2, 3])
             temps.append(temps[-1] + change)
 
         data_str = " | ".join([f"{t}: {temp}°C" for t, temp in zip(times, temps)])
         intro = f"A line graph shows the temperature in a garden from 9am to 2pm. The points are:\n{data_str}"
 
-        q_type = random.choice(["read_value", "find_time", "difference", "max_min"])
+        q_type = rng.choice(["read_value", "find_time", "difference", "max_min"])
 
         ans = ""
         explanation = ""
         question_text = ""
 
         if q_type == "read_value":
-            idx = random.randint(0, len(times)-1)
+            idx = rng.randint(0, len(times)-1)
             target_time = times[idx]
             ans = temps[idx]
             question_text = f"{intro}\nWhat was the temperature at {target_time}?"
@@ -345,21 +345,21 @@ def generate_line_graphs(num_questions=1):
             # Pick a unique temp if possible, or just one instance
             unique_temps = [t for t in temps if temps.count(t) == 1]
             if unique_temps:
-                ans_temp = random.choice(unique_temps)
+                ans_temp = rng.choice(unique_temps)
                 ans_time = times[temps.index(ans_temp)]
                 question_text = f"{intro}\nAt what time was the temperature {ans_temp}°C?"
                 ans = ans_time # Expected string
                 explanation = f"The temperature was {ans_temp}°C at {ans_time}."
             else:
                 # Fallback to read_value
-                idx = random.randint(0, len(times)-1)
+                idx = rng.randint(0, len(times)-1)
                 target_time = times[idx]
                 ans = temps[idx]
                 question_text = f"{intro}\nWhat was the temperature at {target_time}?"
                 explanation = f"At {target_time}, the graph shows {ans}°C."
 
         elif q_type == "difference":
-            idx1, idx2 = random.sample(range(len(times)), 2)
+            idx1, idx2 = rng.sample(range(len(times)), 2)
             # Ensure idx1 < idx2 for logical flow "between X and Y"
             if idx1 > idx2: idx1, idx2 = idx2, idx1
 
@@ -372,7 +372,7 @@ def generate_line_graphs(num_questions=1):
             explanation = f"At {t1}, it was {v1}°C. At {t2}, it was {v2}°C. Difference is |{v1} - {v2}| = {diff}°C."
 
         elif q_type == "max_min":
-            sub_type = random.choice(["max", "min"])
+            sub_type = rng.choice(["max", "min"])
             if sub_type == "max":
                 val = max(temps)
                 question_text = f"{intro}\nWhat was the highest temperature recorded?"
@@ -394,19 +394,19 @@ def generate_line_graphs(num_questions=1):
             attempts += 1
             if isinstance(ans, int) or (isinstance(ans, str) and ans.isdigit()):
                 val = int(ans)
-                offset = random.randint(-5, 5)
+                offset = rng.randint(-5, 5)
                 if offset != 0:
                     options.add(str(val + offset))
             elif isinstance(ans, str) and ("am" in ans or "pm" in ans):
                 # Time distractors
-                options.add(random.choice(times))
+                options.add(rng.choice(times))
             else:
                  # Generic fallback
-                 options.add(str(random.randint(10, 25)))
+                 options.add(str(rng.randint(10, 25)))
 
         # Ensure fallback if loops fail
         while len(options) < 5:
-             options.add(str(random.randint(100, 999)))
+             options.add(str(rng.randint(100, 999)))
 
         questions.append({
             "text": question_text,
