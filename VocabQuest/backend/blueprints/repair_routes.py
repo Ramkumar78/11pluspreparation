@@ -13,15 +13,17 @@ def next_repair():
          session.add(user)
          session.commit()
 
-    # Fetch all errors
-    errors = session.query(UserErrors).all()
+    # Fetch random error efficiently using count and offset
+    query = session.query(UserErrors)
+    count = query.count()
 
-    if not errors:
+    if count == 0:
         session.close()
         return jsonify({"empty": True, "message": "No errors found! Good job!"})
 
-    # Pick a random error
-    selected_error = random.choice(errors)
+    # Pick a random error using database-side offset
+    offset = random.randint(0, count - 1)
+    selected_error = query.offset(offset).first()
 
     response = {}
 
