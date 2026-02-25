@@ -109,6 +109,8 @@ def check_verbal():
     data = request.json
     if not data:
         return jsonify({"error": "No data provided"}), 400
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
 
