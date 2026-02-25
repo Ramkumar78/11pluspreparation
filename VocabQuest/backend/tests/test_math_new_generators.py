@@ -144,7 +144,7 @@ def test_generate_line_graphs():
         assert q["answer"] in q["options"]
         # Basic content check
         assert "line graph" in q["text"].lower()
-        assert "temperature" in q["text"].lower()
+        # "temperature" is not always present due to new scenarios (distance, height, etc.)
 
 # Integration Tests for Route
 
