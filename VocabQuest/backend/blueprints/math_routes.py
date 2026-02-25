@@ -28,6 +28,17 @@ BOSS_NAMES = [
     "The Algebra Alien"
 ]
 
+TOPIC_TO_BOSS = {
+    "Geometry": ["The Geometry Giant"],
+    "Algebra": ["The Algebra Alien"],
+    "Fractions": ["The Fraction Phantom"],
+    "Percentages": ["Professor Percent"],
+    "Mental Maths": ["The Number Cruncher", "Captain Calculator", "Count Calamity"],
+    "BIDMAS": ["The Number Cruncher", "Captain Calculator"],
+    "Ratio": ["Count Calamity", "The Number Cruncher"],
+    "Statistics": ["The Number Cruncher", "Captain Calculator"]
+}
+
 math_bp = Blueprint('math', __name__)
 
 def get_random_question(query):
@@ -97,7 +108,7 @@ def next_math():
 
     if user.streak > 0 and user.streak % 5 == 0:
         is_boss = True
-        boss_name = rng.choice(BOSS_NAMES)
+        # boss_name selected after topic is determined
         min_diff = min(10, current_level + 2)
         max_diff = min(10, current_level + 3)
     else:
@@ -217,6 +228,11 @@ def next_math():
             topic_display = "Mental Maths"
             q_type_str = "Mental"
             q_explanation = f"The answer is {q_ans}."
+
+    if is_boss:
+        # Select boss based on topic
+        possible_bosses = TOPIC_TO_BOSS.get(topic_display, ["The Number Cruncher", "Captain Calculator"])
+        boss_name = rng.choice(possible_bosses)
 
     response = {
         "id": q_id,
