@@ -222,3 +222,26 @@ def test_check_answer_errors(client, test_db):
     assert resp.status_code == 400
     data = resp.get_json()
     assert data['error'] == "Invalid spelling format"
+
+def test_check_answer_no_data(client, test_db):
+    """
+    Test Error Handling: Verify that check_answer returns 400 when no data is provided.
+    """
+    resp = client.post('/check_answer', json={})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data['error'] == "No data provided"
+
+def test_check_answer_invalid_game_state(client, test_db):
+    """
+    Test Error Handling: Verify that check_answer returns 400 when word or user is missing.
+    """
+    # Setup user but no word with ID 9999
+    user = UserStats(current_level=5, streak=0, total_score=0)
+    test_db.add(user)
+    test_db.commit()
+
+    resp = client.post('/check_answer', json={'id': 9999, 'spelling': 'test'})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data['error'] == "Game state invalid"
