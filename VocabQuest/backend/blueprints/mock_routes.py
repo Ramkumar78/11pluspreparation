@@ -156,7 +156,12 @@ def submit_mock():
     user = session.query(UserStats).first()
 
     score = 0
-    max_score = len(answers) * 10
+    # Only count questions that were actually answered
+    answered_items = [
+        item for item in answers
+        if item.get('user_answer') is not None and str(item.get('user_answer')).strip() != ''
+    ]
+    max_score = len(answered_items) * 10
     results_breakdown = []
 
     # Pre-fetch questions in batch to avoid N+1
