@@ -143,6 +143,7 @@ export default function Game() {
 
   const speakWord = (text) => {
     if (!text) return;
+    window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-GB';
     utterance.rate = 0.9;
