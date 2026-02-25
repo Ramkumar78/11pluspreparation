@@ -1,11 +1,13 @@
+import logging
+import os
 import socket
+import sys
+
 from flask import Flask
 from flask_cors import CORS
+
 from extensions import limiter
 from seeder import init_db, seed_database
-import os
-import logging
-import sys
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

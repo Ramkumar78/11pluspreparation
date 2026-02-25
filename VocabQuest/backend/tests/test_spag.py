@@ -1,7 +1,6 @@
 import pytest
 import sys
 import os
-import json
 from unittest.mock import MagicMock, patch
 
 # Add backend to path

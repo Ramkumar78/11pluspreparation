@@ -1,10 +1,13 @@
 import pytest
 import sys
 import os
-from flask import json
+from unittest.mock import MagicMock
 
 # Ensure backend path is in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+# Mock seeder to prevent heavy initialization/migration
+sys.modules['seeder'] = MagicMock()
 
 from app import app
 
