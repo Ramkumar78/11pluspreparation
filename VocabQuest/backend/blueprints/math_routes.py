@@ -229,7 +229,7 @@ def next_math():
 @math_bp.route('/check_math', methods=['POST'])
 def check_math():
     data = request.json
-    if not data:
+    if not data or not isinstance(data, dict):
         return jsonify({"error": "No data provided"}), 400
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
