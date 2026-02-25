@@ -77,7 +77,7 @@ def init_db():
     # Run migrations first
     migrate_db()
 
-    session = Session()
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
