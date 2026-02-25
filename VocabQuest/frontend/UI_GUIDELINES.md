@@ -53,3 +53,24 @@ Focus Mode is controlled by the `FocusHeader` component in `App.jsx`, which togg
 ## Icons
 Use `lucide-react` for all icons.
 -   Common: `BookOpen`, `Zap` (Streak), `Trophy` (Leaderboard), `Lightbulb` (Hint).
+
+## New Feature UI Considerations
+
+### Parent Analytics Dashboard
+-   **Data Vis**: Use clear traffic-light colors (`emerald-500` for Mastery/Green, `amber-400` for Developing/Amber, `rose-500` for Needs Work/Red).
+-   **Layout**: Dense, information-rich tables and charts. Less whitespace than the student view.
+-   **Tone**: Professional, reassuring, clear.
+
+### Flashcard View
+-   **Animation**: Smooth 3D flip transform on click (`rotate-y-180`).
+-   **Typography**: Huge, centered text for the "Front", detailed breakdown/definition on the "Back".
+-   **Controls**: "Know it" (Green Tick) vs "Still Learning" (Red Cross) buttons at the bottom.
+
+### Video Player Integration
+-   **Presentation**: Modal overlay (`z-50`) with a darkened backdrop (`bg-black/50`).
+-   **Focus**: When a video plays, pause all game timers.
+-   **Controls**: Simple Play/Pause/Seek/Close.
+
+### Exam Format Selection
+-   **Toggle**: Use a Segmented Control (Tabs style) for switching modes (e.g., [Practice | GL | ISEB]).
+-   **Indicators**: Distinct badges/icons for the active mode (e.g., "⏱️ GL Mode Active").
