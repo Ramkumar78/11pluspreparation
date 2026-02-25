@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Mock seeder to prevent heavy initialization
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, Word
 from extensions import limiter
@@ -196,3 +199,26 @@ def test_sanitization(client, test_db, monkeypatch):
     # This does not match 'apple', so it should be incorrect.
     # We verify that the system processed it and marked it incorrect (didn't crash).
     assert data['correct'] is False
+
+def test_check_answer_errors(client, test_db):
+    """
+    Test Error Handling: Verify that check_answer returns 400 for invalid inputs.
+    """
+    # Test Case 1: Non-integer word_id (e.g. string "1")
+    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'apple'})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data['error'] == "Invalid ID"
+
+    # Test Case 2: Missing word_id (word_id is None)
+    # If key 'id' is missing, data.get('id') returns None, which is not int.
+    resp = client.post('/check_answer', json={'spelling': 'apple'})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data['error'] == "Invalid ID"
+
+    # Test Case 3: Non-string spelling (e.g. integer 123)
+    resp = client.post('/check_answer', json={'id': 1, 'spelling': 123})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data['error'] == "Invalid spelling format"
