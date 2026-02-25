@@ -20,7 +20,7 @@ def client():
         yield client
 
 @patch('blueprints.spag_routes.Session')
-@patch('random.random')
+@patch('blueprints.spag_routes.rng.random')
 def test_spag_generate_static(mock_random, mock_session_cls, client):
     """Test that the SPaG endpoint returns a valid static question."""
     mock_random.return_value = 0.1 # Force static question (< 0.6)
@@ -54,7 +54,7 @@ def test_spag_generate_static(mock_random, mock_session_cls, client):
     assert any(q['id'] == data['id'] for q in SPAG_QUESTIONS)
 
 @patch('blueprints.spag_routes.Session')
-@patch('random.random')
+@patch('blueprints.spag_routes.rng.random')
 def test_spag_generate_shuffled(mock_random, mock_session_cls, client):
     """Test that the SPaG endpoint returns a shuffled sentence question."""
     mock_random.return_value = 0.7 # Force shuffled sentence (0.6 <= x < 0.8)
@@ -78,7 +78,7 @@ def test_spag_generate_shuffled(mock_random, mock_session_cls, client):
     assert data['user_level'] == 5
 
 @patch('blueprints.spag_routes.Session')
-@patch('random.random')
+@patch('blueprints.spag_routes.rng.random')
 def test_spag_generate_word_families(mock_random, mock_session_cls, client):
     """Test that the SPaG endpoint returns a word family question."""
     mock_random.return_value = 0.9 # Force word families (>= 0.8)

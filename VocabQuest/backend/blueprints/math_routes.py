@@ -1,9 +1,9 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy import func
-import random
+
 import json
 from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
-from utils import generate_arithmetic, check_badges
+from utils import generate_arithmetic, check_badges, rng
 from math_seed import (
     sutton_challenge_questions,
     generate_algebra_substitution,
@@ -38,13 +38,13 @@ def get_random_question(query):
     count = query.count()
     if count == 0:
         return None
-    offset = random.randint(0, count - 1)
+    offset = rng.randint(0, count - 1)
     return query.offset(offset).first()
 
 @math_bp.route('/api/math/challenge', methods=['GET'])
 def math_challenge():
     """Serves a random Sutton Challenge question."""
-    selected = random.choice(sutton_challenge_questions)
+    selected = rng.choice(sutton_challenge_questions)
 
     # Standardize response format with regular math questions
     response = {
@@ -97,7 +97,7 @@ def next_math():
 
     if user.streak > 0 and user.streak % 5 == 0:
         is_boss = True
-        boss_name = random.choice(BOSS_NAMES)
+        boss_name = rng.choice(BOSS_NAMES)
         min_diff = min(10, current_level + 2)
         max_diff = min(10, current_level + 3)
     else:
@@ -113,23 +113,23 @@ def next_math():
     generated_data = None
     use_generator = False
 
-    if not is_boss and selected_topic == "Algebra" and random.random() < 0.6:
+    if not is_boss and selected_topic == "Algebra" and rng.random() < 0.6:
          generated_data = generate_algebra_substitution(current_level)
          use_generator = True
-    elif selected_topic == "Ratio" and random.random() < 0.6:
+    elif selected_topic == "Ratio" and rng.random() < 0.6:
          generated_data = generate_ratio_proportion(current_level)
          use_generator = True
-    elif selected_topic in ["Fractions", "Percentages"] and random.random() < 0.6:
+    elif selected_topic in ["Fractions", "Percentages"] and rng.random() < 0.6:
          generated_data = generate_fdp_conversion(current_level)
          use_generator = True
 
-    elif selected_topic == "Geometry" and random.random() < 0.4:
+    elif selected_topic == "Geometry" and rng.random() < 0.4:
          g_list = generate_nets_of_cubes(1)
          if g_list:
              generated_data = g_list[0]
              use_generator = True
 
-    elif selected_topic == "Statistics" and random.random() < 0.4:
+    elif selected_topic == "Statistics" and rng.random() < 0.4:
          g_list = generate_line_graphs(1)
          if g_list:
              generated_data = g_list[0]
@@ -191,7 +191,7 @@ def next_math():
 
     else:
         # Mixed Mode (Default behaviour)
-        if random.random() > 0.3:
+        if rng.random() > 0.3:
             selected = get_random_question(session.query(MathQuestion).filter(
                 MathQuestion.difficulty >= min_diff,
                 MathQuestion.difficulty <= max_diff
