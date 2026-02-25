@@ -1,5 +1,4 @@
 import pytest
-import json
 import sys
 import os
 from sqlalchemy import create_engine
