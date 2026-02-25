@@ -1,5 +1,5 @@
 import re
-import random
+import secrets
 import json
 
 def sanitize_filename(title):
@@ -9,17 +9,17 @@ def sanitize_filename(title):
 def generate_arithmetic(level):
     """Generates arithmetic questions suitable for the level."""
     if level <= 3:
-        op = random.choice(['+', '-'])
-        a = random.randint(1, 20)
-        b = random.randint(1, 20)
+        op = secrets.choice(['+', '-'])
+        a = 1 + secrets.randbelow(20)
+        b = 1 + secrets.randbelow(20)
     elif level <= 7:
-        op = random.choice(['+', '-', '*'])
-        a = random.randint(10, 100)
-        b = random.randint(2, 12)
+        op = secrets.choice(['+', '-', '*'])
+        a = 10 + secrets.randbelow(91)
+        b = 2 + secrets.randbelow(11)
     else:
-        op = random.choice(['+', '-', '*', '/'])
-        a = random.randint(50, 500)
-        b = random.randint(5, 20)
+        op = secrets.choice(['+', '-', '*', '/'])
+        a = 50 + secrets.randbelow(451)
+        b = 5 + secrets.randbelow(16)
 
     if op == '+':
         return f"{a} + {b}", str(a + b)
@@ -29,7 +29,7 @@ def generate_arithmetic(level):
     elif op == '*':
         return f"{a} x {b}", str(a * b)
     elif op == '/':
-        ans = random.randint(2, 12)
+        ans = 2 + secrets.randbelow(11)
         a = b * ans
         return f"{a} ÷ {b}", str(ans)
 

@@ -31,9 +31,17 @@
 
 *   **🎮 Gamified Experience:** Earn points, build streaks, and level up! The more you play, the harder it gets.
     *   **Boss Battles:** Every 5th streak triggers a high-difficulty "Boss Battle" question for bonus points.
-*   **🧠 Adaptive Difficulty:**
-    *   **Vocab Mode:** Adjusts word difficulty based on performance.
-    *   **Maths Mode:** Scales arithmetic complexity and introduces tricky word problems.
+*   **🧠 AI-Driven Adaptive Learning:**
+    *   **Real-time Adjustment:** An ELO-based engine scales difficulty for Maths and Vocabulary to keep students in the "flow state".
+    *   **Smart Tutor:** Automatically intervenes with easier questions or hints when struggles are detected.
+*   **📝 Exam Board Mastery:**
+    *   **GL & ISEB Modes:** Toggleable exam simulations that mirror the timing and question styles of major exam boards.
+    *   **CSSE Support:** Specialised content for the challenging Essex 11+ format.
+*   **📊 Deep Dive Analytics:**
+    *   **Parent Dashboard:** Track progress with "traffic light" heatmaps (Green/Amber/Red) identifying weak topics.
+    *   **Auto-Marking:** Instant feedback on mock exams with detailed score breakdowns.
+*   **🎥 Video Explanations:**
+    *   **Visual Learning:** Short video clips explain complex Non-Verbal Reasoning and Maths concepts step-by-step.
 *   **📚 Multi-Subject Mastery:**
     *   **VocabQuest:** Visual clues, synonyms, and definitions to expand vocabulary.
     *   **MathsQuest:** Covers key 11+ topics like Algebra, Ratios, Logic, Geometry (Transformations, Bearings), and Data.
@@ -76,7 +84,7 @@ ScholarQuest is built with **Docker** for easy setup, but can also be run manual
 ```bash
 cd VocabQuest/backend
 pip install -r requirements.txt
-python -m flask seed-db  # Initialize database with questions
+python -m flask init-db  # Initialize database with questions
 python app.py            # Start server on port 5001
 ```
 
