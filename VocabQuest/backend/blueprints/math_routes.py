@@ -30,6 +30,17 @@ BOSS_NAMES = [
 
 math_bp = Blueprint('math', __name__)
 
+def get_random_question(query):
+    """
+    Selects a random question using OFFSET based on query count.
+    More efficient than ORDER BY RANDOM() for large tables.
+    """
+    count = query.count()
+    if count == 0:
+        return None
+    offset = random.randint(0, count - 1)
+    return query.offset(offset).first()
+
 @math_bp.route('/api/math/challenge', methods=['GET'])
 def math_challenge():
     """Serves a random Sutton Challenge question."""
@@ -144,15 +155,15 @@ def next_math():
         selected = None
         # New logic: Fetch 'Standard Written' questions when mastery_level > 7 for specific topics
         if current_level > 7 and selected_topic in ["Ratio", "Algebra"]:
-            selected = query.filter(MathQuestion.question_type == "Standard Written").order_by(func.random()).first()
+            selected = get_random_question(query.filter(MathQuestion.question_type == "Standard Written"))
             if not selected:
-                selected = query.order_by(func.random()).first()
+                selected = get_random_question(query)
         else:
-            selected = query.order_by(func.random()).first()
+            selected = get_random_question(query)
 
         # Fallback if no questions in that difficulty range for this topic
         if not selected:
-             selected = session.query(MathQuestion).filter_by(topic=selected_topic).order_by(func.random()).first()
+             selected = get_random_question(session.query(MathQuestion).filter_by(topic=selected_topic))
 
         if selected:
             q_text = selected.text
@@ -181,10 +192,10 @@ def next_math():
     else:
         # Mixed Mode (Default behaviour)
         if random.random() > 0.3:
-            selected = session.query(MathQuestion).filter(
+            selected = get_random_question(session.query(MathQuestion).filter(
                 MathQuestion.difficulty >= min_diff,
                 MathQuestion.difficulty <= max_diff
-            ).order_by(func.random()).first()
+            ))
             if selected:
                 q_text = selected.text
                 q_id = selected.id

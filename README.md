@@ -76,7 +76,7 @@ ScholarQuest is built with **Docker** for easy setup, but can also be run manual
 ```bash
 cd VocabQuest/backend
 pip install -r requirements.txt
-python -m flask seed-db  # Initialize database with questions
+python -m flask init-db  # Initialize database with questions
 python app.py            # Start server on port 5001
 ```
 

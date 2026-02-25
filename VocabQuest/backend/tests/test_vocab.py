@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Mock seeder to prevent implicit DB migration on app import
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, Word
 from extensions import limiter
