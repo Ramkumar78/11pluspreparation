@@ -64,3 +64,10 @@ This document tracks outstanding tasks, technical debt, and feature requests.
 - [ ] **Flashcards**: Implement `FlashcardComponent` with flip animation for vocabulary and formulas.
 - [ ] **Video**: Integrate video player for per-question explanation solutions (Modal or Inline).
 - [ ] **Community**: Create basic structure (routes/schema) for Parent Community Forum.
+
+## 5. Known Bugs & Issues
+
+- [ ] Maths - Boss Mode: Boss challenge shows a "Geometric" heading, but the actual question displayed is arithmetic (e.g., 20-8).
+- [ ] Maths - Generation: Questions in the maths section are highly repetitive and need better variance.
+- [ ] Vocab Quest - Audio: When starting Vocab Quest, two different words are being pronounced at the same time.
+- [ ] Mock Exams - Scoring: Mock score displays as 200/200, even though only 20 tests were actually taken.
