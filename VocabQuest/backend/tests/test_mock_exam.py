@@ -8,6 +8,9 @@ from sqlalchemy.orm import sessionmaker
 # Ensure backend path is in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+from unittest.mock import MagicMock
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, Word, MathQuestion
 
