@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 # Add backend to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+# Mock seeder to prevent implicit DB migration on app import
+sys.modules['seeder'] = MagicMock()
+
 from app import app
 from database import Base, UserStats, Word
 from extensions import limiter
@@ -196,3 +199,23 @@ def test_sanitization(client, test_db, monkeypatch):
     # This does not match 'apple', so it should be incorrect.
     # We verify that the system processed it and marked it incorrect (didn't crash).
     assert data['correct'] is False
+
+def test_check_answer_errors(client):
+    """
+    Test Error Handling: Verify that check_answer handles invalid input correctly.
+    """
+    # Case 1: Invalid ID (String)
+    resp = client.post('/check_answer', json={'id': "1", 'spelling': 'test'})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid ID"
+
+    # Case 2: Missing ID
+    resp = client.post('/check_answer', json={'spelling': 'test'})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid ID"
+
+    # Case 3: Invalid Spelling Format (Integer)
+    # Using a valid ID format (integer) to pass the first check
+    resp = client.post('/check_answer', json={'id': 1, 'spelling': 123})
+    assert resp.status_code == 400
+    assert resp.get_json()['error'] == "Invalid spelling format"

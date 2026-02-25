@@ -5,6 +5,7 @@ from extensions import limiter
 from seeder import init_db, seed_database
 import os
 import logging
+import sys
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -54,11 +55,6 @@ def init_db_command():
         logging.info("Database seeded successfully.")
     except Exception as e:
         logging.error(f"Error seeding database: {e}")
-@app.cli.command("seed-db")
-def seed_db_command():
-    """Seeds the database with initial data."""
-    seed_database()
-    print("Database seeded successfully.")
 
 def find_available_port(start_port, max_port=5100):
     """Finds the first available port in the range."""
@@ -72,6 +68,11 @@ if __name__ == '__main__':
     # Initialize Data
     with app.app_context():
         init_db()
+
+    # Security check for production
+    if os.environ.get("FLASK_ENV") == "production":
+        print("ERROR: Do not use app.run() in production. Use a WSGI server like Gunicorn.", file=sys.stderr)
+        sys.exit(1)
 
     port = find_available_port(5001)
     app.run(host='0.0.0.0', port=port)

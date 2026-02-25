@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { Trophy, Flame, ArrowLeft, Lightbulb, Clock, Zap, RotateCcw } from 'lucide-react';
-import { MODES, API_URL } from './constants';
+import { MODES, API_URL, TIMING } from './constants';
 import VocabGame from './components/VocabGame';
 import MathGame from './components/MathGame';
 import ComprehensionGame from './components/ComprehensionGame';
@@ -121,7 +121,13 @@ export default function Game() {
       setCanType(false);
       setStatus("playing");
 
-      const delay = isBlitz ? 100 : (mode === MODES.MATH ? 500 : (mode === MODES.COMPREHENSION ? 1000 : 3000));
+      const delay = isBlitz
+        ? TIMING.INPUT_FOCUS_DELAY.BLITZ
+        : (mode === MODES.MATH
+          ? TIMING.INPUT_FOCUS_DELAY.MATH
+          : (mode === MODES.COMPREHENSION
+            ? TIMING.INPUT_FOCUS_DELAY.COMPREHENSION
+            : TIMING.INPUT_FOCUS_DELAY.DEFAULT));
       setTimeout(() => {
         setCanType(true);
         if (inputRef.current && mode !== MODES.COMPREHENSION) {
@@ -158,7 +164,7 @@ export default function Game() {
           origin: { y: 0.5 },
           colors: ['#FFD700', '#FFA500', '#FF4500']
       });
-      setTimeout(() => setNewBadge(null), 5000);
+      setTimeout(() => setNewBadge(null), TIMING.BADGE_DISPLAY);
     }
   };
 
@@ -177,7 +183,7 @@ export default function Game() {
                 )}
             </div>
         );
-        setTimeout(loadNextChallenge, 5000);
+        setTimeout(loadNextChallenge, TIMING.FEEDBACK_DELAY.MATH.TIMEOUT);
     } else if (mode === MODES.VOCAB) {
         axios.post(`${API_URL}/check_answer`, {
                 id: gameState.id,
@@ -185,10 +191,10 @@ export default function Game() {
             }).then(res => {
                 setFeedback(`⏰ Time's Up! The word was: ${res.data.correct_word}`);
                 speakWord(res.data.correct_word);
-                setTimeout(loadNextChallenge, 3500);
+                setTimeout(loadNextChallenge, TIMING.FEEDBACK_DELAY.VOCAB.TIMEOUT);
             }).catch(err => {
                 console.error(err);
-                setTimeout(loadNextChallenge, 2000);
+                setTimeout(loadNextChallenge, TIMING.FEEDBACK_DELAY.DEFAULT_ERROR);
             });
     } else if (mode === MODES.COMPREHENSION) {
          axios.post(`${API_URL}/check_comprehension`, {
@@ -206,10 +212,10 @@ export default function Game() {
                       )}
                   </div>
               );
-              setTimeout(loadNextChallenge, 5000);
+              setTimeout(loadNextChallenge, TIMING.FEEDBACK_DELAY.COMPREHENSION.TIMEOUT);
           }).catch(err => {
                console.error(err);
-               setTimeout(loadNextChallenge, 2000);
+               setTimeout(loadNextChallenge, TIMING.FEEDBACK_DELAY.DEFAULT_ERROR);
           });
     }
   };
@@ -234,7 +240,7 @@ export default function Game() {
               );
               checkAndShowBadges(res);
               if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-              setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);
+              setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.CORRECT : TIMING.FEEDBACK_DELAY.COMPREHENSION.CORRECT);
           } else {
               if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
               setStatus("wrong");
@@ -249,7 +255,7 @@ export default function Game() {
                       )}
                   </div>
               );
-              setTimeout(loadNextChallenge, isBlitz ? 1000 : 8000);
+              setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.WRONG : TIMING.FEEDBACK_DELAY.COMPREHENSION.WRONG);
           }
       } catch (err) {
           console.error(err);
@@ -279,13 +285,13 @@ export default function Game() {
                 }
                 if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
                 speakWord(res.data.correct_word);
-                setTimeout(loadNextChallenge, isBlitz ? 500 : 2000);
+                setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.CORRECT : TIMING.FEEDBACK_DELAY.VOCAB.CORRECT);
             } else {
                 if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
                 setStatus("wrong");
                 setFeedback(`❌ Oops! The word was: ${res.data.correct_word}`);
                 speakWord(res.data.correct_word);
-                setTimeout(loadNextChallenge, isBlitz ? 1000 : 3500);
+                setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.WRONG : TIMING.FEEDBACK_DELAY.VOCAB.WRONG);
             }
         } catch (err) {
             console.error(err);
@@ -310,7 +316,7 @@ export default function Game() {
                     setShowStreak(true);
                 }
                 if (!isBlitz) confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                setTimeout(loadNextChallenge, isBlitz ? 500 : 1500);
+                setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.CORRECT : TIMING.FEEDBACK_DELAY.MATH.CORRECT);
             } else {
                 if (isBlitz) setBlitzStats(s => ({ ...s, total: s.total + 1 }));
                 setStatus("wrong");
@@ -325,7 +331,7 @@ export default function Game() {
                         )}
                     </div>
                 );
-                setTimeout(loadNextChallenge, isBlitz ? 1000 : 8000);
+                setTimeout(loadNextChallenge, isBlitz ? TIMING.FEEDBACK_DELAY.BLITZ.WRONG : TIMING.FEEDBACK_DELAY.MATH.WRONG);
             }
         } catch (err) {
             console.error(err);

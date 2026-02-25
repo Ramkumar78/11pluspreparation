@@ -1,28 +1,25 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from '../Home';
 import { MODES, MOCK_TYPES } from '../constants';
 
-// Helper component to display current location
-function LocationDisplay() {
+const LocationDisplay = () => {
   const location = useLocation();
   return <div data-testid="location-display">{location.pathname}</div>;
-}
+};
 
-// Helper to render component inside MemoryRouter
-function renderWithRouter(component) {
-  return render(
-    <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        <Route path="/" element={component} />
-        <Route path="*" element={<LocationDisplay />} />
-      </Routes>
-    </MemoryRouter>
-  );
-}
-
-describe('Home Component Navigation', () => {
+describe('Home Component Integration Navigation', () => {
+  const renderWithRouter = (ui) => {
+    return render(
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={ui} />
+          <Route path="*" element={<LocationDisplay />} />
+        </Routes>
+      </MemoryRouter>
+    );
+  };
 
   it('navigates to vocab game when PLAY VOCAB is clicked', () => {
     renderWithRouter(<Home />);
