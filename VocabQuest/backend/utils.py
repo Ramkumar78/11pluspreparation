@@ -8,7 +8,6 @@ def sanitize_filename(title):
 
 def generate_arithmetic(level):
     """Generates arithmetic questions suitable for the level."""
-    ops = ['+', '-', '*', '/']
     if level <= 3:
         op = random.choice(['+', '-'])
         a = random.randint(1, 20)
@@ -33,7 +32,6 @@ def generate_arithmetic(level):
         ans = random.randint(2, 12)
         a = b * ans
         return f"{a} ÷ {b}", str(ans)
-    return f"{a} + {b}", str(a+b)
 
 def check_badges(user):
     """Checks for new badges based on user stats."""
