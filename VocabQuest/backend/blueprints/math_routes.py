@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func
 
 import json
 from database import Session, UserStats, MathQuestion, TopicProgress, ScoreHistory, UserErrors
