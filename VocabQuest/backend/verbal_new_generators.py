@@ -68,6 +68,7 @@ def generate_hidden_word(num_questions=10):
     4. Filter for uniqueness (ensure no other 4-letter word exists in the boundary).
     """
     questions = []
+    seen_content = set()
     attempts = 0
     max_attempts = num_questions * 100  # Allow plenty of retries for uniqueness constraint
 
@@ -118,9 +119,10 @@ def generate_hidden_word(num_questions=10):
                 explanation = f"The end of '{left.upper()}' ({part1.upper()}) and the start of '{right.upper()}' ({part2.upper()}) make '{target}'."
 
                 # Check if this question is already added
-                if any(q['content'] == content for q in questions):
+                if content in seen_content:
                     continue
 
+                seen_content.add(content)
                 questions.append({
                     "type": "hidden_word",
                     "text": text,
@@ -343,6 +345,7 @@ def generate_compound_words(num_questions=10):
     distractors_pool = ["ball", "man", "fly", "fish", "berry", "light", "stone", "water", "land", "house", "room", "top", "box"]
 
     questions = []
+    seen_content = set()
     attempts = 0
 
     while len(questions) < num_questions and attempts < 1000:
@@ -367,9 +370,10 @@ def generate_compound_words(num_questions=10):
         explanation = f"'{word1.title()}' + '{word2}' makes '{word1.title()}{word2}'."
 
         # Check dupe
-        if any(q['content'] == content for q in questions):
+        if content in seen_content:
             continue
 
+        seen_content.add(content)
         questions.append({
             "type": "compound_word",
             "text": text,
