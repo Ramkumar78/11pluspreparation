@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Game from './Game';
 import Home from './Home';
 import Dashboard from './Dashboard';
 import MockTest from './MockTest';
 import Leaderboard from './Leaderboard';
+import VisualStrategyBacktester from './components/VisualStrategyBacktester';
 
 function FocusHeader({ focusMode, setFocusMode, seconds }) {
   const formatTime = (totalSeconds) => {
@@ -46,6 +47,7 @@ function FocusHeader({ focusMode, setFocusMode, seconds }) {
 function App() {
   const [focusMode, setFocusMode] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const location = useLocation();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,9 +56,11 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  const isBacktest = location.pathname === '/backtest';
+
   return (
     <div className={`min-h-screen flex flex-col ${focusMode ? 'focus-mode-active' : ''}`}>
-      <FocusHeader focusMode={focusMode} setFocusMode={setFocusMode} seconds={seconds} />
+      {!isBacktest && <FocusHeader focusMode={focusMode} setFocusMode={setFocusMode} seconds={seconds} />}
       <div className="flex-grow relative">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -64,6 +68,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/mock/:type" element={<MockTest />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/backtest" element={<VisualStrategyBacktester />} />
         </Routes>
       </div>
     </div>
