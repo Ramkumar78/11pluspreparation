@@ -148,8 +148,12 @@ def get_mock_test():
 def submit_mock():
     """Batch processes mock test results and returns a scorecard."""
     data = request.json
-    if not data or not isinstance(data, dict):
+    if not data:
         return jsonify({"error": "No data provided"}), 400
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     answers = data.get('answers', [])
 
     session = Session()
