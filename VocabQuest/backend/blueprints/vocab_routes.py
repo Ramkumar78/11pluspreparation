@@ -1,10 +1,9 @@
-from flask import Blueprint, jsonify, request
-import random
 import hashlib
 import bleach
+from flask import Blueprint, jsonify, request
 from extensions import limiter
 from database import Session, Word, UserStats, ScoreHistory, UserErrors
-from utils import check_badges
+from utils import check_badges, rng
 
 vocab_bp = Blueprint('vocab', __name__)
 
@@ -30,7 +29,7 @@ def next_word():
         # Fallback to all words
         candidates = session.query(Word).all()
 
-    selected = random.choice(candidates)
+    selected = rng.choice(candidates)
 
     # Use local image path
     hashed_word = hashlib.md5(selected.text.encode('utf-8')).hexdigest()

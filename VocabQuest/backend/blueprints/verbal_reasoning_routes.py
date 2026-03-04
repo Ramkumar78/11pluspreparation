@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
-import random
 import json
 from database import Session, UserStats, VerbalReasoningQuestion, TopicProgress, ScoreHistory
-from utils import check_badges
+from utils import check_badges, rng
 from verbal_seed import CLOZE_LIST
 from verbal_new_generators import generate_number_sequences, generate_letter_connections, generate_seating_arrangements
 
@@ -38,7 +37,7 @@ def get_cloze():
     if not CLOZE_LIST:
         return jsonify({"error": "No cloze questions available"}), 404
 
-    question = random.choice(CLOZE_LIST)
+    question = rng.choice(CLOZE_LIST)
     return jsonify(question)
 
 @verbal_reasoning_bp.route('/next_verbal', methods=['GET'])
@@ -77,7 +76,7 @@ def next_verbal():
         questions = session.query(VerbalReasoningQuestion).all()
 
     if questions:
-        selected = random.choice(questions)
+        selected = rng.choice(questions)
         q_id = selected.id
         q_text = selected.question_text
         q_content = selected.content
