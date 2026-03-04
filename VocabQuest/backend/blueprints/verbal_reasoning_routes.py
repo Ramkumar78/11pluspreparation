@@ -2,11 +2,22 @@ from flask import Blueprint, jsonify, request
 import random
 import json
 from database import Session, UserStats, VerbalReasoningQuestion, TopicProgress, ScoreHistory
-from utils import check_badges
+from utils import check_badges, rng
 from verbal_seed import CLOZE_LIST
 from verbal_new_generators import generate_number_sequences, generate_letter_connections, generate_seating_arrangements
 
 verbal_reasoning_bp = Blueprint('verbal_reasoning', __name__)
+
+def get_random_question(query):
+    """
+    Selects a random question using OFFSET based on query count.
+    More efficient than ORDER BY RANDOM() for large tables.
+    """
+    count = query.count()
+    if count == 0:
+        return None
+    offset = rng.randint(0, count - 1)
+    return query.offset(offset).first()
 
 @verbal_reasoning_bp.route('/number_sequences', methods=['GET'])
 def get_number_sequence():
@@ -68,16 +79,17 @@ def next_verbal():
     min_diff = max(1, current_level - 1)
     max_diff = min(10, current_level + 2)
 
-    questions = session.query(VerbalReasoningQuestion).filter(
+    query = session.query(VerbalReasoningQuestion).filter(
         VerbalReasoningQuestion.difficulty >= min_diff,
         VerbalReasoningQuestion.difficulty <= max_diff
-    ).all()
+    )
 
-    if not questions:
-        questions = session.query(VerbalReasoningQuestion).all()
+    selected = get_random_question(query)
 
-    if questions:
-        selected = random.choice(questions)
+    if not selected:
+        selected = get_random_question(session.query(VerbalReasoningQuestion))
+
+    if selected:
         q_id = selected.id
         q_text = selected.question_text
         q_content = selected.content
