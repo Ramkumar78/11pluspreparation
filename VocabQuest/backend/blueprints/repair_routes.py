@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from database import Session, UserErrors, Word, MathQuestion, UserStats
-import random
+from utils import rng
 import hashlib
 
 repair_bp = Blueprint('repair', __name__)
@@ -23,7 +23,7 @@ def next_repair():
         return jsonify({"empty": True, "message": "No errors found! Good job!"})
 
     # Pick a random error using database-side offset
-    offset = random.randint(0, count - 1)
+    offset = rng.randint(0, count - 1)
     selected_error = query.offset(offset).first()
 
     response = {}
