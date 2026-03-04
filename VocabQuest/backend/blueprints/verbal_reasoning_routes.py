@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-import random
 import json
 from database import Session, UserStats, VerbalReasoningQuestion, TopicProgress, ScoreHistory
 from utils import check_badges, rng
@@ -49,7 +48,7 @@ def get_cloze():
     if not CLOZE_LIST:
         return jsonify({"error": "No cloze questions available"}), 404
 
-    question = random.choice(CLOZE_LIST)
+    question = rng.choice(CLOZE_LIST)
     return jsonify(question)
 
 @verbal_reasoning_bp.route('/next_verbal', methods=['GET'])

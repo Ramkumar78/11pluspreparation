@@ -11,6 +11,9 @@ def record_mistake():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     required_fields = ['question_type', 'question_text', 'user_answer', 'correct_answer']
     for field in required_fields:
         if field not in data:
@@ -62,7 +65,7 @@ def get_user_stats():
     if user.badges:
         try:
             badges = json.loads(user.badges)
-        except:
+        except json.JSONDecodeError:
             badges = []
 
     error_count = session.query(UserErrors).filter_by(user_id=user.id).count()

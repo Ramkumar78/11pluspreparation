@@ -1,9 +1,8 @@
 from flask import Blueprint, jsonify, request
-import random
 import json
 from sqlalchemy.sql.expression import func
 from database import Session, UserStats, MathQuestion, Word, ComprehensionPassage, ComprehensionQuestion, ScoreHistory
-from utils import sanitize_filename
+from utils import sanitize_filename, rng
 
 mock_bp = Blueprint('mock', __name__)
 
@@ -108,7 +107,7 @@ def get_mock_test():
                     "topic": passage.topic
                 })
 
-        random.shuffle(test_items)
+        rng.shuffle(test_items)
 
     else:
         # Mixed (Original behavior)
@@ -134,12 +133,12 @@ def get_mock_test():
                 "difficulty": v.difficulty
             })
 
-        random.shuffle(test_items)
+        rng.shuffle(test_items)
 
     session.close()
 
     return jsonify({
-        "test_id": f"mock-{random.randint(1000,9999)}",
+        "test_id": f"mock-{rng.randint(1000,9999)}",
         "duration_minutes": duration,
         "items": test_items
     })
@@ -148,8 +147,12 @@ def get_mock_test():
 def submit_mock():
     """Batch processes mock test results and returns a scorecard."""
     data = request.json
-    if not data or not isinstance(data, dict):
+    if not data:
         return jsonify({"error": "No data provided"}), 400
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     answers = data.get('answers', [])
 
     session = Session()
