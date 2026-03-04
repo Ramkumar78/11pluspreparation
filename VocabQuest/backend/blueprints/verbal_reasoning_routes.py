@@ -7,6 +7,17 @@ from verbal_new_generators import generate_number_sequences, generate_letter_con
 
 verbal_reasoning_bp = Blueprint('verbal_reasoning', __name__)
 
+def get_random_question(query):
+    """
+    Selects a random question using OFFSET based on query count.
+    More efficient than ORDER BY RANDOM() for large tables.
+    """
+    count = query.count()
+    if count == 0:
+        return None
+    offset = rng.randint(0, count - 1)
+    return query.offset(offset).first()
+
 @verbal_reasoning_bp.route('/number_sequences', methods=['GET'])
 def get_number_sequence():
     """Generates a random Number Sequence question."""
@@ -67,16 +78,17 @@ def next_verbal():
     min_diff = max(1, current_level - 1)
     max_diff = min(10, current_level + 2)
 
-    questions = session.query(VerbalReasoningQuestion).filter(
+    query = session.query(VerbalReasoningQuestion).filter(
         VerbalReasoningQuestion.difficulty >= min_diff,
         VerbalReasoningQuestion.difficulty <= max_diff
-    ).all()
+    )
 
-    if not questions:
-        questions = session.query(VerbalReasoningQuestion).all()
+    selected = get_random_question(query)
 
-    if questions:
-        selected = rng.choice(questions)
+    if not selected:
+        selected = get_random_question(session.query(VerbalReasoningQuestion))
+
+    if selected:
         q_id = selected.id
         q_text = selected.question_text
         q_content = selected.content
