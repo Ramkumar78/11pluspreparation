@@ -60,6 +60,10 @@ def check_comprehension():
     data = request.json
     if not data:
         return jsonify({"error": "No data provided"}), 400
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     q_id = data.get('question_id')
     user_answer = data.get('answer', '').strip()
 

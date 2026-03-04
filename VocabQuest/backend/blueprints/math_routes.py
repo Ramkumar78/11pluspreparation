@@ -279,8 +279,12 @@ def next_math():
 @math_bp.route('/check_math', methods=['POST'])
 def check_math():
     data = request.json
-    if not data or not isinstance(data, dict):
+    if not data:
         return jsonify({"error": "No data provided"}), 400
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid data format"}), 400
+
     user_answer = str(data.get('answer', '')).strip().lower()
     q_id = data.get('id')
     repair_mode = data.get('repair_mode', False)

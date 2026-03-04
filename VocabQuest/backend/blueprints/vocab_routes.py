@@ -60,6 +60,7 @@ def check_answer():
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
+    # Validate JSON payload is a dictionary
     if not isinstance(data, dict):
         return jsonify({"error": "Invalid data format"}), 400
 
