@@ -62,7 +62,7 @@ def get_user_stats():
     if user.badges:
         try:
             badges = json.loads(user.badges)
-        except:
+        except json.JSONDecodeError:
             badges = []
 
     error_count = session.query(UserErrors).filter_by(user_id=user.id).count()

@@ -40,7 +40,7 @@ def check_badges(user):
     if user.badges:
         try:
             existing_badges = json.loads(user.badges)
-        except:
+        except json.JSONDecodeError:
             existing_badges = []
 
     new_badges = []

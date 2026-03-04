@@ -209,7 +209,7 @@ def next_math():
             if selected.options:
                 try:
                     q_options = json.loads(selected.options)
-                except:
+                except json.JSONDecodeError:
                     q_options = []
         else:
             # Fallback if topic valid but no questions (shouldn't happen with good seed)
@@ -240,7 +240,7 @@ def next_math():
                 if selected.options:
                     try:
                         q_options = json.loads(selected.options)
-                    except:
+                    except json.JSONDecodeError:
                         q_options = []
             else:
                 q_text, q_ans = generate_arithmetic(current_level)
